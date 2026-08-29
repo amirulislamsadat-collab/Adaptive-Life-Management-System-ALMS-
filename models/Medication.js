@@ -3,51 +3,70 @@
 // ============================================================
 const db = require('../config/db');
 
-const Medication = {
-  findAllByUser: async (userId) => {
-    const [rows] = await db.query(
-      'SELECT * FROM medications WHERE user_id = ? ORDER BY time_of_day ASC',
-      [userId]
-    );
-    return rows;
-  },
+async function findAllByUser(userId) {
+  const [rows] = await db.query(
+    'SELECT * FROM medications WHERE user_id = ? ORDER BY time_of_day ASC',
+    [userId]
+  );
+  return rows;
+}
 
-  findById: async (id, userId) => {
-    const [rows] = await db.query(
-      'SELECT * FROM medications WHERE id = ? AND user_id = ?',
-      [id, userId]
-    );
-    return rows[0] || null;
-  },
+async function findById(id, userId) {
+  const [rows] = await db.query(
+    'SELECT * FROM medications WHERE id = ? AND user_id = ?',
+    [id, userId]
+  );
+  return rows[0] || null;
+}
 
-  create: async (userId, data) => {
-    const [result] = await db.query(
-      `INSERT INTO medications (user_id, medication_name, dosage, frequency, days_of_week, time_of_day, notes)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [userId, data.medication_name, data.dosage || '', data.frequency || 'daily',
-       data.days_of_week || null, data.time_of_day, data.notes || '']
-    );
-    return result;
-  },
+async function create(userId, data) {
+  const sql = `INSERT INTO medications (user_id, medication_name, dosage, frequency, days_of_week, time_of_day, notes)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`;
+  const params = [
+    userId,
+    data.medication_name,
+    data.dosage || '',
+    data.frequency || 'daily',
+    data.days_of_week || null,
+    data.time_of_day,
+    data.notes || ''
+  ];
+  const [result] = await db.query(sql, params);
+  return result;
+}
 
-  update: async (id, userId, data) => {
-    const [result] = await db.query(
-      `UPDATE medications
+async function update(id, userId, data) {
+  const sql = `UPDATE medications
        SET medication_name = ?, dosage = ?, frequency = ?, days_of_week = ?, time_of_day = ?, notes = ?
-       WHERE id = ? AND user_id = ?`,
-      [data.medication_name, data.dosage || '', data.frequency || 'daily',
-       data.days_of_week || null, data.time_of_day, data.notes || '', id, userId]
-    );
-    return result;
-  },
+       WHERE id = ? AND user_id = ?`;
+  const params = [
+    data.medication_name,
+    data.dosage || '',
+    data.frequency || 'daily',
+    data.days_of_week || null,
+    data.time_of_day,
+    data.notes || '',
+    id,
+    userId
+  ];
+  const [result] = await db.query(sql, params);
+  return result;
+}
 
-  toggleEnabled: async (id, userId, currentState) => {
-    await db.query('UPDATE medications SET is_enabled = ? WHERE id = ? AND user_id = ?', [currentState ? 0 : 1, id, userId]);
-  },
+async function toggleEnabled(id, userId, currentState) {
+  const newState = currentState ? 0 : 1;
+  await db.query('UPDATE medications SET is_enabled = ? WHERE id = ? AND user_id = ?', [newState, id, userId]);
+}
 
-  delete: async (id, userId) => {
-    await db.query('DELETE FROM medications WHERE id = ? AND user_id = ?', [id, userId]);
-  }
+async function remove(id, userId) {
+  await db.query('DELETE FROM medications WHERE id = ? AND user_id = ?', [id, userId]);
+}
+
+module.exports = {
+  findAllByUser,
+  findById,
+  create,
+  update,
+  toggleEnabled,
+  delete: remove
 };
-
-module.exports = Medication;

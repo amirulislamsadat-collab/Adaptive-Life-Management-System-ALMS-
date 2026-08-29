@@ -27,6 +27,17 @@
           <span><i class="fas fa-sun" aria-hidden="true"></i> Wake: <%= log.wake_time.slice(0,5) %></span>
           <span><i class="fas fa-hourglass-half" aria-hidden="true"></i> <%= Math.floor(log.duration_minutes/60) %>h <%= log.duration_minutes%60 %>m</span>
           <span class="badge-progress <%= log.quality === 'great' || log.quality === 'good' ? 'completed' : (log.quality === 'poor' || log.quality === 'bad' ? 'missed' : 'pending') %>"><%= log.quality %></span>
+          <%
+            // Compare this night against the 7-day average so it's easy to spot
+            // whether a given entry was an unusually short or long night.
+            var diffVsAvg = avgMinutes ? (log.duration_minutes - avgMinutes) : 0;
+          %>
+          <% if(avgMinutes && Math.abs(diffVsAvg) >= 15){ %>
+          <span class="<%= diffVsAvg > 0 ? 'amount-income' : 'amount-expense' %>" style="font-size:12px;">
+            <i class="fas fa-<%= diffVsAvg > 0 ? 'arrow-up' : 'arrow-down' %>" aria-hidden="true"></i>
+            <%= Math.abs(Math.round(diffVsAvg)) %> min <%= diffVsAvg > 0 ? 'more' : 'less' %> than usual
+          </span>
+          <% } %>
         </div>
         <% if(log.notes){ %><div class="meta item-desc"><%= log.notes %></div><% } %>
       </div>

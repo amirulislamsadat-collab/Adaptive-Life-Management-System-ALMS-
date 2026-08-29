@@ -23,7 +23,14 @@
           <span><i class="fas fa-calendar-day" aria-hidden="true"></i> <%= new Date(log.log_date).toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'}) %></span>
           <span><i class="fas fa-hourglass-half" aria-hidden="true"></i> <%= log.duration_minutes %> min</span>
           <span class="badge-priority <%= log.intensity === 'intense' ? 'high' : (log.intensity === 'light' ? 'low' : 'medium') %>"><%= log.intensity %></span>
-          <% if(log.calories_burned){ %><span><i class="fas fa-fire" aria-hidden="true"></i> <%= log.calories_burned %> kcal</span><% } %>
+          <%
+            // A rough calories-per-minute figure so two workouts of different
+            // lengths can be compared at a glance, not just total calories.
+            var calPerMin = (log.calories_burned && log.duration_minutes) ? (log.calories_burned / log.duration_minutes) : null;
+          %>
+          <% if(log.calories_burned){ %>
+          <span><i class="fas fa-fire" aria-hidden="true"></i> <%= log.calories_burned %> kcal<% if(calPerMin){ %> (<%= calPerMin.toFixed(1) %>/min)<% } %></span>
+          <% } %>
         </div>
         <% if(log.notes){ %><div class="meta item-desc"><%= log.notes %></div><% } %>
       </div>
