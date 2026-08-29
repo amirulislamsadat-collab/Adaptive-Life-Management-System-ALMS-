@@ -1,0 +1,94 @@
+<%- include('header', { currentPath: '/modules/reports' }) %>
+<%
+  const scoreColor = (s) => s >= 75 ? '#10B981' : (s >= 50 ? '#F59E0B' : '#EF4444');
+%>
+<div class="page">
+  <div class="top-header">
+    <h1 class="page-title"><i class="fas fa-chart-line" aria-hidden="true"></i> <%= module.name %></h1>
+    <p class="page-desc"><%= module.description %></p>
+  </div>
+
+  <div class="section-header">
+    <div class="section-title"><i class="fas fa-balance-scale" aria-hidden="true"></i> Life Balance Report</div>
+  </div>
+  <div class="card" style="margin-bottom:40px;">
+    <% if(lifeScore.overall !== null){ %>
+    <div style="display:flex;gap:48px;flex-wrap:wrap;align-items:center;">
+      <div class="score-ring" style="--score: <%= lifeScore.overall %>; --score-color: <%= scoreColor(lifeScore.overall) %>;">
+        <div class="score-ring-inner">
+          <div class="score-ring-value"><%= lifeScore.overall %></div>
+          <div class="score-ring-label">Life Score</div>
+        </div>
+      </div>
+      <div style="flex:1;min-width:260px;">
+        <div class="score-breakdown">
+          <% lifeScore.components.forEach(c => { %>
+          <div class="score-row">
+            <span class="score-row-label"><%= c.label %></span>
+            <div class="progress-track"><div class="progress-fill" style="width:<%= c.score %>%; background: <%= scoreColor(c.score) %>;"></div></div>
+            <span class="score-row-val"><%= c.score %></span>
+          </div>
+          <% }) %>
+        </div>
+      </div>
+    </div>
+    <% } else { %>
+    <p class="empty-msg">Not enough data yet to calculate a Life Score. Start logging activity in your active modules — tasks, study, health, habits, digital wellbeing, or finance.</p>
+    <% } %>
+  </div>
+
+  <div class="section-header">
+    <div class="section-title"><i class="fas fa-tachometer-alt" aria-hidden="true"></i> Productivity Report</div>
+  </div>
+  <div class="summary-strip" style="margin-bottom:20px;">
+    <% if(productivity.taskCompletionRate !== null){ %>
+    <div class="summary-tile"><div class="val"><%= productivity.taskCompletionRate %>%</div><div class="lbl">Tasks Completed</div></div>
+    <% } %>
+    <% if(productivity.assignmentCompletionRate !== null){ %>
+    <div class="summary-tile"><div class="val"><%= productivity.assignmentCompletionRate %>%</div><div class="lbl">Assignments Completed</div></div>
+    <% } %>
+    <% if(productivity.sessionCompletionRate !== null){ %>
+    <div class="summary-tile"><div class="val"><%= productivity.sessionCompletionRate %>%</div><div class="lbl">Study Sessions Completed</div></div>
+    <% } %>
+    <% if(productivity.habitConsistency !== null){ %>
+    <div class="summary-tile"><div class="val"><%= productivity.habitConsistency %>%</div><div class="lbl">Habits Checked In Today</div></div>
+    <% } %>
+    <% if(productivity.productiveScreenPct !== null){ %>
+    <div class="summary-tile"><div class="val"><%= productivity.productiveScreenPct %>%</div><div class="lbl">Productive Screen Time</div></div>
+    <% } %>
+  </div>
+  <ul class="insight-list" style="margin-bottom:40px;">
+    <% productivity.insights.forEach(text => { %>
+    <li><i class="fas fa-circle-info" aria-hidden="true"></i> <%= text %></li>
+    <% }) %>
+  </ul>
+
+  <div class="section-header">
+    <div class="section-title"><i class="fas fa-lightbulb" aria-hidden="true"></i> Personalized Recommendations</div>
+  </div>
+  <% if(recommendations.length){ %>
+  <div style="margin-bottom:32px;">
+    <% recommendations.forEach(rec => { %>
+    <div class="rec-card">
+      <div class="rec-card-icon"><i class="fas <%= rec.icon %>" aria-hidden="true"></i></div>
+      <div>
+        <div class="rec-card-msg"><%= rec.message %></div>
+        <div class="rec-card-reason"><%= rec.reason %></div>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+  <% } else { %>
+  <div class="empty-state" style="margin-bottom:32px;">
+    <div class="empty-icon"><i class="fas fa-lightbulb" aria-hidden="true"></i></div>
+    <h3>No recommendations right now</h3>
+    <p>You're keeping up well, or there isn't enough recent activity to generate suggestions yet.</p>
+  </div>
+  <% } %>
+
+  <div class="action-buttons">
+    <a href="/dashboard" class="btn secondary"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Dashboard</a>
+    <a href="/modules/settings" class="btn secondary"><i class="fas fa-cog" aria-hidden="true"></i> Module Settings</a>
+  </div>
+</div>
+<%- include('footer') %>

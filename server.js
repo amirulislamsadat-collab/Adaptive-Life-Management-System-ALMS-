@@ -25,6 +25,8 @@ const healthRoutes    = require('./routes/healthRoutes');
 const habitRoutes     = require('./routes/habitRoutes');
 const digitalRoutes   = require('./routes/digitalRoutes');
 const financeRoutes   = require('./routes/financeRoutes');
+const goalRoutes      = require('./routes/goalRoutes');
+const journalRoutes   = require('./routes/journalRoutes');
 
 // --- Middleware Imports ---
 const notificationMiddleware = require('./middleware/notificationMiddleware');
@@ -76,6 +78,8 @@ app.use('/', healthRoutes);
 app.use('/', habitRoutes);
 app.use('/', digitalRoutes);
 app.use('/', financeRoutes);
+app.use('/', goalRoutes);
+app.use('/', journalRoutes);
 
 // --- Notifications API (for client-side polling without page refresh) ---
 const Reminder = require('./models/Reminder');
@@ -188,7 +192,9 @@ async function initDB() {
       (10, 'Alarms',          'alarms',   'Set recurring alarms with customizable schedules',                    'alarm'),
       (11, 'Subjects',        'subjects', 'Manage your academic subjects and instructors',                       'subject'),
       (12, 'Habit Tracker',   'habits',     'Build consistent habits and track your daily completion streaks',            'habit'),
-      (13, 'Digital Wellbeing','screentime','Track screen time and social media usage, and see how productive your time really is', 'mobile')
+      (13, 'Digital Wellbeing','screentime','Track screen time and social media usage, and see how productive your time really is', 'mobile'),
+      (14, 'Goals',           'goals',      'Set personal goals, track progress, and celebrate milestones',               'bullseye'),
+      (15, 'Reports & Insights','reports',  'Generate productivity and life balance reports with personalized recommendations', 'chart-line')
     `);
 
     // ---------- TABLE 4: user_modules ----------
@@ -529,7 +535,65 @@ async function initDB() {
       )
     `);
 
-    console.log('[DB] All 24 tables created and seeded successfully.');
+    // ---------- TABLE 25: goals (Feature 30) ----------
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS goals (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        target_date DATE,
+        progress_percent INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    // ---------- TABLE 26: savings_goals (Feature 29) ----------
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS savings_goals (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        target_amount DECIMAL(10,2) NOT NULL,
+        target_date DATE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    // ---------- TABLE 27: savings_contributions (Feature 29) ----------
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS savings_contributions (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        goal_id INT NOT NULL,
+        user_id INT NOT NULL,
+        amount DECIMAL(10,2) NOT NULL,
+        contributed_on DATE NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (goal_id) REFERENCES savings_goals(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    // ---------- TABLE 28: journal_entries (Feature 31) ----------
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS journal_entries (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        entry_date DATE NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        content TEXT,
+        mood_tag VARCHAR(20),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    console.log('[DB] All 28 tables created and seeded successfully.');
   } catch (err) {
     console.error('[DB] Initialization error ->', err.message);
   }

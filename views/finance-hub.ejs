@@ -30,7 +30,27 @@
       <div class="hub-card-desc">Record and categorize your income and expenses.</div>
       <div class="hub-card-stat"><i class="fas fa-arrow-right" aria-hidden="true"></i> Manage Expenses</div>
     </a>
+    <a href="/savings-goals" class="hub-card">
+      <div class="hub-card-icon"><i class="fas fa-piggy-bank" aria-hidden="true"></i></div>
+      <div class="hub-card-title">Savings Goals</div>
+      <div class="hub-card-desc">Create savings goals and monitor your progress toward them.</div>
+      <div class="hub-card-stat"><i class="fas fa-arrow-right" aria-hidden="true"></i> Manage Savings Goals</div>
+    </a>
   </div>
+
+  <% if(savingsGoals && savingsGoals.length){ %>
+  <div class="section-header" style="margin-top:40px;">
+    <div class="section-title"><i class="fas fa-piggy-bank" aria-hidden="true"></i> Savings Progress</div>
+  </div>
+  <div class="upcoming-strip">
+    <% savingsGoals.slice(0,4).forEach(g => { %>
+    <div class="upcoming-row">
+      <span><strong><%= g.name %></strong> &mdash; $<%= g.savedAmount.toFixed(2) %> / $<%= parseFloat(g.target_amount).toFixed(2) %></span>
+      <span class="countdown-chip <%= g.progressPercent >= 100 ? '' : (g.progressPercent >= 50 ? 'soon' : 'urgent') %>"><%= g.progressPercent %>%</span>
+    </div>
+    <% }) %>
+  </div>
+  <% } %>
 
   <div class="action-buttons" style="margin-top:40px;">
     <a href="/dashboard" class="btn secondary"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Dashboard</a>

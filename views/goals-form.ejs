@@ -1,0 +1,35 @@
+<%- include('header', { currentPath: '/goals' }) %>
+<div class="page page-center">
+  <a href="/goals" class="back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Goals</a>
+  <div class="form-card card">
+    <div class="form-header">
+      <i class="fas fa-<%= goal ? 'edit' : 'bullseye' %>" aria-hidden="true"></i>
+      <h1><%= pageTitle %></h1>
+    </div>
+    <form method="POST" action="<%= formAction %>" id="goalForm">
+      <div class="fg">
+        <label for="gTitle">Title <span class="required">*</span></label>
+        <input id="gTitle" type="text" name="title" required placeholder="e.g. Run a 10K, Learn guitar" value="<%= goal ? goal.title : '' %>">
+      </div>
+      <div class="fg">
+        <label for="gTarget">Target Date</label>
+        <input id="gTarget" type="date" name="target_date" value="<%= goal && goal.target_date ? new Date(goal.target_date).toISOString().slice(0,10) : '' %>">
+      </div>
+      <% if(goal){ %>
+      <div class="fg">
+        <label for="gProgress">Progress (<span id="progressVal"><%= goal.progress_percent %></span>%)</label>
+        <input id="gProgress" type="range" name="progress_percent" min="0" max="100" step="5" value="<%= goal.progress_percent %>" oninput="document.getElementById('progressVal').textContent=this.value">
+      </div>
+      <% } %>
+      <div class="fg">
+        <label for="gDesc">Description</label>
+        <textarea id="gDesc" name="description" placeholder="What does success look like for this goal?" rows="4"><%= goal ? goal.description || '' : '' %></textarea>
+      </div>
+      <div class="form-actions">
+        <a class="btn secondary" href="/goals" id="cancelGoalBtn"><i class="fas fa-times" aria-hidden="true"></i> Cancel</a>
+        <button class="btn primary" type="submit" id="saveGoalBtn"><i class="fas fa-save" aria-hidden="true"></i> Save Goal</button>
+      </div>
+    </form>
+  </div>
+</div>
+<%- include('footer') %>

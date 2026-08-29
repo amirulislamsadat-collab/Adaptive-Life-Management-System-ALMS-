@@ -1,0 +1,76 @@
+<%- include('header', { currentPath: '/savings-goals' }) %>
+<%
+  const savedTotal = (contributions || []).reduce((sum, c) => sum + parseFloat(c.amount), 0);
+%>
+<div class="page page-center">
+  <a href="/savings-goals" class="back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Savings Goals</a>
+  <div class="form-card card">
+    <div class="form-header">
+      <i class="fas fa-<%= goal ? 'edit' : 'piggy-bank' %>" aria-hidden="true"></i>
+      <h1><%= pageTitle %></h1>
+    </div>
+    <form method="POST" action="<%= formAction %>" id="savingsGoalForm">
+      <div class="fg">
+        <label for="sgName">Goal Name <span class="required">*</span></label>
+        <input id="sgName" type="text" name="name" required placeholder="e.g. Emergency Fund, New Laptop" value="<%= goal ? goal.name : '' %>">
+      </div>
+      <div class="form-row">
+        <div class="fg">
+          <label for="sgTarget">Target Amount <span class="required">*</span></label>
+          <input id="sgTarget" type="number" name="target_amount" min="0.01" step="0.01" required value="<%= goal ? goal.target_amount : '' %>">
+        </div>
+        <div class="fg">
+          <label for="sgDate">Target Date</label>
+          <input id="sgDate" type="date" name="target_date" value="<%= goal && goal.target_date ? new Date(goal.target_date).toISOString().slice(0,10) : '' %>">
+        </div>
+      </div>
+      <div class="form-actions">
+        <a class="btn secondary" href="/savings-goals" id="cancelSavingsGoalBtn"><i class="fas fa-times" aria-hidden="true"></i> Cancel</a>
+        <button class="btn primary" type="submit" id="saveSavingsGoalBtn"><i class="fas fa-save" aria-hidden="true"></i> Save Goal</button>
+      </div>
+    </form>
+  </div>
+
+  <% if(goal){ %>
+  <div class="form-card card" style="margin-top:24px;">
+    <div class="form-header">
+      <i class="fas fa-hand-holding-usd" aria-hidden="true"></i>
+      <h1>Contributions</h1>
+    </div>
+    <p style="margin-bottom:20px;color:var(--text-muted);">Total saved so far: <strong class="amount-income">$<%= savedTotal.toFixed(2) %></strong> of $<%= parseFloat(goal.target_amount).toFixed(2) %></p>
+
+    <form method="POST" action="/savings-goals/<%= goal.id %>/contributions/add" style="display:flex;gap:10px;align-items:flex-end;margin-bottom:24px;flex-wrap:wrap;" id="addContributionForm">
+      <div class="fg" style="margin-bottom:0;flex:1;min-width:140px;">
+        <label for="contribAmount">Amount</label>
+        <input id="contribAmount" type="number" name="amount" min="0.01" step="0.01" required placeholder="50.00">
+      </div>
+      <div class="fg" style="margin-bottom:0;flex:1;min-width:140px;">
+        <label for="contribDate">Date</label>
+        <input id="contribDate" type="date" name="contributed_on" value="<%= new Date().toISOString().slice(0,10) %>">
+      </div>
+      <button type="submit" class="btn primary" id="addContributionBtn"><i class="fas fa-plus" aria-hidden="true"></i> Add</button>
+    </form>
+
+    <% if(contributions && contributions.length){ %>
+    <div class="list">
+      <% contributions.forEach(c => { %>
+      <div class="item">
+        <div class="item-body">
+          <span class="amount-income">+$<%= parseFloat(c.amount).toFixed(2) %></span>
+          <span class="meta"><i class="fas fa-calendar-day" aria-hidden="true"></i> <%= new Date(c.contributed_on).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) %></span>
+        </div>
+        <div class="actions">
+          <form method="POST" action="/savings-goals/<%= goal.id %>/contributions/<%= c.id %>/delete" onsubmit="return confirm('Remove this contribution?');">
+            <button type="submit" class="btn danger btn-sm" id="deleteContribution<%= c.id %>"><i class="fas fa-trash-alt" aria-hidden="true"></i></button>
+          </form>
+        </div>
+      </div>
+      <% }) %>
+    </div>
+    <% } else { %>
+    <p class="empty-msg">No contributions logged yet.</p>
+    <% } %>
+  </div>
+  <% } %>
+</div>
+<%- include('footer') %>

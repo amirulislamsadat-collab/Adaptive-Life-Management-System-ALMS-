@@ -32,6 +32,20 @@ Built with plain **MVC**: `models/` (MySQL data access), `views/` (EJS templates
 | 27 | Productive Time Analysis | `/modules/screentime` (Digital Wellbeing hub — productive vs. non-productive breakdown) |
 | 28 | Expense Tracking | `/expenses` (Finance Tracker) |
 
+29–35 (this increment):
+
+| # | Feature | Where |
+|---|---|---|
+| 29 | Savings Goal Management | `/savings-goals` (Finance Tracker — goals with a contribution log) |
+| 30 | Goal Management | `/goals` (Goals) |
+| 31 | Journal Management | `/journal` (Personal Journal — create/edit/search) |
+| 32 | Productivity Report Generation | `/modules/reports` (Reports & Insights) |
+| 33 | Life Balance Report | `/modules/reports` (Life Score gauge computed from active modules) |
+| 34 | Personalized Recommendation Generation | `/modules/reports` (rule-based recommendations) |
+| 35 | Recommendation Explanation | `/modules/reports` (each recommendation shows the data behind it) |
+
+Features 32-35 are read-only: `models/ReportEngine.js` computes them fresh on every visit from the other feature tables (tasks, study, health, habits, screen time, finance) instead of storing generated reports.
+
 ## Local development (XAMPP)
 
 1. Install [XAMPP](https://www.apachefriends.org/) and start **MySQL** from the XAMPP Control Panel (Apache is not required — this app runs its own Node server).

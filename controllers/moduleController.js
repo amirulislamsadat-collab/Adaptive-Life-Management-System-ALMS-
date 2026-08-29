@@ -13,6 +13,8 @@ const Medication     = require('../models/Medication');
 const ScreenTimeLog  = require('../models/ScreenTimeLog');
 const SocialMediaLog = require('../models/SocialMediaLog');
 const Expense        = require('../models/Expense');
+const SavingsGoal    = require('../models/SavingsGoal');
+const ReportEngine   = require('../models/ReportEngine');
 
 exports.getSettings = async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
@@ -75,8 +77,11 @@ exports.getModulePage = async (req, res) => {
     }
 
     if (mod.slug === 'finance') {
-      const summary = await Expense.getSummary(userId);
-      return res.render('finance-hub', { user: req.session.user, module: mod, summary });
+      const [summary, savingsGoals] = await Promise.all([
+        Expense.getSummary(userId),
+        SavingsGoal.findAllByUser(userId)
+      ]);
+      return res.render('finance-hub', { user: req.session.user, module: mod, summary, savingsGoals });
     }
 
     if (mod.slug === 'screentime') {
@@ -85,6 +90,15 @@ exports.getModulePage = async (req, res) => {
         SocialMediaLog.getWeeklyByPlatform(userId)
       ]);
       return res.render('digital-hub', { user: req.session.user, module: mod, summary, weeklyByPlatform });
+    }
+
+    if (mod.slug === 'reports') {
+      const [productivity, lifeScore, recommendations] = await Promise.all([
+        ReportEngine.getProductivityReport(userId),
+        ReportEngine.getLifeScore(userId),
+        ReportEngine.getRecommendations(userId)
+      ]);
+      return res.render('reports-hub', { user: req.session.user, module: mod, productivity, lifeScore, recommendations });
     }
 
     res.render('module-page', { user: req.session.user, module: mod });

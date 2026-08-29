@@ -46,8 +46,15 @@
       <li class="nav-section-label">Finance Tracker</li>
       <li><a href="/modules/finance" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/modules/finance')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-wallet" aria-hidden="true"></i></span> Finance Overview</a></li>
       <li><a href="/expenses" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/expenses')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-money-bill-wave" aria-hidden="true"></i></span> Expenses</a></li>
+      <li><a href="/savings-goals" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/savings-goals')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-piggy-bank" aria-hidden="true"></i></span> Savings Goals</a></li>
+      <li class="nav-section-label">Goals</li>
+      <li><a href="/goals" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/goals')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-bullseye" aria-hidden="true"></i></span> My Goals</a></li>
+      <li class="nav-section-label">Personal Journal</li>
+      <li><a href="/journal" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/journal')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-pen" aria-hidden="true"></i></span> Journal</a></li>
+      <li class="nav-section-label">Reports &amp; Insights</li>
+      <li><a href="/modules/reports" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/modules/reports')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></span> Reports</a></li>
       <li class="nav-section-label">Workspace</li>
-      <li><a href="/modules/settings" class="<%= (typeof currentPath !== 'undefined' && (currentPath.startsWith('/modules/settings') || (currentPath.startsWith('/modules') && !currentPath.startsWith('/modules/study') && !currentPath.startsWith('/modules/health') && !currentPath.startsWith('/modules/finance') && !currentPath.startsWith('/modules/screentime')))) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-cog" aria-hidden="true"></i></span> Modules</a></li>
+      <li><a href="/modules/settings" class="<%= (typeof currentPath !== 'undefined' && (currentPath.startsWith('/modules/settings') || (currentPath.startsWith('/modules') && !currentPath.startsWith('/modules/study') && !currentPath.startsWith('/modules/health') && !currentPath.startsWith('/modules/finance') && !currentPath.startsWith('/modules/screentime') && !currentPath.startsWith('/modules/reports')))) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-cog" aria-hidden="true"></i></span> Modules</a></li>
     </nav>
     <div class="sidebar-foot">
       <div class="user-chip">
