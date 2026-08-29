@@ -61,6 +61,18 @@ app.use((req, res, next) => {
   next();
 });
 
+// --- Setup Gate: block every page until the setup wizard is finished ---
+// (Feature 1) — without this, a brand-new user could type any feature URL
+// directly and skip role/module selection entirely.
+app.use((req, res, next) => {
+  const user = req.session.user;
+  const isSetupRelatedPath = req.path.startsWith('/setup') || req.path.startsWith('/logout') || req.path.startsWith('/api');
+  if (user && user.setup_completed != 1 && !isSetupRelatedPath) {
+    return res.redirect('/setup');
+  }
+  next();
+});
+
 // --- Notification Middleware (Feature 13) ---
 app.use(notificationMiddleware);
 

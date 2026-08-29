@@ -10,51 +10,99 @@
 <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-<% if(user){ %>
+<script>
+// Applied immediately (before the sidebar renders) so a hidden sidebar
+// doesn't flash on screen for a moment on every page load.
+if (localStorage.getItem('alms_sidebar_hidden') === '1') {
+  document.body.classList.add('sidebar-hidden');
+}
+</script>
+<% var setupDone = user && user.setup_completed == 1; %>
+<% if(setupDone){ %>
+<%
+  var cp = typeof currentPath !== 'undefined' ? currentPath : '';
+  var studyActive   = cp.indexOf('/modules/study') === 0 || cp.indexOf('/assignments') === 0 || cp.indexOf('/exams') === 0 || cp.indexOf('/study-sessions') === 0;
+  var healthActive  = cp.indexOf('/modules/health') === 0 || cp.indexOf('/sleep') === 0 || cp.indexOf('/water') === 0 || cp.indexOf('/exercise') === 0 || cp.indexOf('/mood') === 0 || cp.indexOf('/medications') === 0;
+  var digitalActive = cp.indexOf('/modules/screentime') === 0 || cp.indexOf('/screen-time') === 0 || cp.indexOf('/social-media') === 0;
+  var financeActive = cp.indexOf('/modules/finance') === 0 || cp.indexOf('/expenses') === 0 || cp.indexOf('/savings-goals') === 0;
+%>
+<button type="button" class="sidebar-show-btn" id="sidebarShowBtn" aria-label="Show sidebar" title="Show sidebar">
+  <i class="fas fa-bars" aria-hidden="true"></i>
+</button>
 <div class="app-shell">
   <aside class="sidebar" aria-label="Main navigation">
-    <a href="/dashboard" class="nav-brand" aria-label="ALMS Home">
-      <div class="nav-logo"><i class="fas fa-infinity" aria-hidden="true"></i></div>
-      ALMS
-    </a>
+    <div class="nav-brand-row">
+      <a href="/dashboard" class="nav-brand" aria-label="ALMS Home">
+        <div class="nav-logo"><i class="fas fa-infinity" aria-hidden="true"></i></div>
+        ALMS
+      </a>
+      <button type="button" class="sidebar-hide-btn" id="sidebarHideBtn" aria-label="Hide sidebar" title="Hide sidebar">
+        <i class="fas fa-angles-left" aria-hidden="true"></i>
+      </button>
+    </div>
     <nav class="nav-links" id="sidebarNav">
-      <li><a href="/dashboard" class="<%= (typeof currentPath !== 'undefined' && currentPath === '/dashboard') ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-th-large" aria-hidden="true"></i></span> Dashboard</a></li>
-      <li><a href="/tasks/hub" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/tasks')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-tasks" aria-hidden="true"></i></span> Tasks</a></li>
-      <li><a href="/notes" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/notes')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-sticky-note" aria-hidden="true"></i></span> Notes</a></li>
-      <li><a href="/calendar" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/calendar')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-calendar-alt" aria-hidden="true"></i></span> Calendar</a></li>
-      <li><a href="/reminders" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/reminders')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-clock" aria-hidden="true"></i></span> Reminders</a></li>
-      <li><a href="/alarms" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/alarms')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-bell" aria-hidden="true"></i></span> Alarms</a></li>
-      <li><a href="/subjects" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/subjects')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-book" aria-hidden="true"></i></span> Subjects</a></li>
-      <li class="nav-section-label">Study Planner</li>
-      <li><a href="/modules/study" class="<%= (typeof currentPath !== 'undefined' && (currentPath.startsWith('/modules/study'))) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-book-open" aria-hidden="true"></i></span> Study Overview</a></li>
-      <li><a href="/assignments" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/assignments')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-file-signature" aria-hidden="true"></i></span> Assignments</a></li>
-      <li><a href="/exams" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/exams')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-graduation-cap" aria-hidden="true"></i></span> Examinations</a></li>
-      <li><a href="/study-sessions" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/study-sessions')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-stopwatch" aria-hidden="true"></i></span> Study Sessions</a></li>
-      <li class="nav-section-label">Health &amp; Wellness</li>
-      <li><a href="/modules/health" class="<%= (typeof currentPath !== 'undefined' && (currentPath.startsWith('/modules/health'))) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-heartbeat" aria-hidden="true"></i></span> Health Overview</a></li>
-      <li><a href="/sleep" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/sleep')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-bed" aria-hidden="true"></i></span> Sleep</a></li>
-      <li><a href="/water" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/water')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-tint" aria-hidden="true"></i></span> Water Intake</a></li>
-      <li><a href="/exercise" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/exercise')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-running" aria-hidden="true"></i></span> Exercise</a></li>
-      <li><a href="/mood" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/mood')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-smile" aria-hidden="true"></i></span> Mood</a></li>
-      <li><a href="/medications" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/medications')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-pills" aria-hidden="true"></i></span> Medications</a></li>
-      <li class="nav-section-label">Habit Tracker</li>
-      <li><a href="/habits" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/habits')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-fire" aria-hidden="true"></i></span> Habits</a></li>
-      <li class="nav-section-label">Digital Wellbeing</li>
-      <li><a href="/modules/screentime" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/modules/screentime')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-mobile-alt" aria-hidden="true"></i></span> Digital Overview</a></li>
-      <li><a href="/screen-time" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/screen-time')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-hourglass-half" aria-hidden="true"></i></span> Screen Time</a></li>
-      <li><a href="/social-media" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/social-media')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-hashtag" aria-hidden="true"></i></span> Social Media</a></li>
-      <li class="nav-section-label">Finance Tracker</li>
-      <li><a href="/modules/finance" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/modules/finance')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-wallet" aria-hidden="true"></i></span> Finance Overview</a></li>
-      <li><a href="/expenses" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/expenses')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-money-bill-wave" aria-hidden="true"></i></span> Expenses</a></li>
-      <li><a href="/savings-goals" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/savings-goals')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-piggy-bank" aria-hidden="true"></i></span> Savings Goals</a></li>
-      <li class="nav-section-label">Goals</li>
-      <li><a href="/goals" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/goals')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-bullseye" aria-hidden="true"></i></span> My Goals</a></li>
-      <li class="nav-section-label">Personal Journal</li>
-      <li><a href="/journal" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/journal')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-pen" aria-hidden="true"></i></span> Journal</a></li>
-      <li class="nav-section-label">Reports &amp; Insights</li>
-      <li><a href="/modules/reports" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/modules/reports')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></span> Reports</a></li>
-      <li class="nav-section-label">Workspace</li>
-      <li><a href="/modules/settings" class="<%= (typeof currentPath !== 'undefined' && (currentPath.startsWith('/modules/settings') || (currentPath.startsWith('/modules') && !currentPath.startsWith('/modules/study') && !currentPath.startsWith('/modules/health') && !currentPath.startsWith('/modules/finance') && !currentPath.startsWith('/modules/screentime') && !currentPath.startsWith('/modules/reports')))) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-cog" aria-hidden="true"></i></span> Modules</a></li>
+      <li><a href="/dashboard" class="<%= cp === '/dashboard' ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-th-large" aria-hidden="true"></i></span> Dashboard</a></li>
+      <li><a href="/tasks/hub" class="<%= cp.indexOf('/tasks') === 0 ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-tasks" aria-hidden="true"></i></span> Tasks</a></li>
+      <li><a href="/notes" class="<%= cp.indexOf('/notes') === 0 ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-sticky-note" aria-hidden="true"></i></span> Notes</a></li>
+      <li><a href="/calendar" class="<%= cp.indexOf('/calendar') === 0 ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-calendar-alt" aria-hidden="true"></i></span> Calendar</a></li>
+      <li><a href="/reminders" class="<%= cp.indexOf('/reminders') === 0 ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-clock" aria-hidden="true"></i></span> Reminders</a></li>
+      <li><a href="/alarms" class="<%= cp.indexOf('/alarms') === 0 ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-bell" aria-hidden="true"></i></span> Alarms</a></li>
+      <li><a href="/subjects" class="<%= cp.indexOf('/subjects') === 0 ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-book" aria-hidden="true"></i></span> Subjects</a></li>
+
+      <li class="nav-group">
+        <details <%= studyActive ? 'open' : '' %>>
+          <summary class="<%= studyActive ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-book-open" aria-hidden="true"></i></span> Study Planner <i class="fas fa-chevron-down nav-chevron" aria-hidden="true"></i></summary>
+          <ul class="nav-subgroup">
+            <li><a href="/modules/study" class="<%= cp.indexOf('/modules/study') === 0 ? 'active' : '' %>">Overview</a></li>
+            <li><a href="/assignments" class="<%= cp.indexOf('/assignments') === 0 ? 'active' : '' %>">Assignments</a></li>
+            <li><a href="/exams" class="<%= cp.indexOf('/exams') === 0 ? 'active' : '' %>">Examinations</a></li>
+            <li><a href="/study-sessions" class="<%= cp.indexOf('/study-sessions') === 0 ? 'active' : '' %>">Study Sessions</a></li>
+          </ul>
+        </details>
+      </li>
+
+      <li class="nav-group">
+        <details <%= healthActive ? 'open' : '' %>>
+          <summary class="<%= healthActive ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-heartbeat" aria-hidden="true"></i></span> Health &amp; Wellness <i class="fas fa-chevron-down nav-chevron" aria-hidden="true"></i></summary>
+          <ul class="nav-subgroup">
+            <li><a href="/modules/health" class="<%= cp.indexOf('/modules/health') === 0 ? 'active' : '' %>">Overview</a></li>
+            <li><a href="/sleep" class="<%= cp.indexOf('/sleep') === 0 ? 'active' : '' %>">Sleep</a></li>
+            <li><a href="/water" class="<%= cp.indexOf('/water') === 0 ? 'active' : '' %>">Water Intake</a></li>
+            <li><a href="/exercise" class="<%= cp.indexOf('/exercise') === 0 ? 'active' : '' %>">Exercise</a></li>
+            <li><a href="/mood" class="<%= cp.indexOf('/mood') === 0 ? 'active' : '' %>">Mood</a></li>
+            <li><a href="/medications" class="<%= cp.indexOf('/medications') === 0 ? 'active' : '' %>">Medications</a></li>
+          </ul>
+        </details>
+      </li>
+
+      <li><a href="/habits" class="<%= cp.indexOf('/habits') === 0 ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-fire" aria-hidden="true"></i></span> Habits</a></li>
+
+      <li class="nav-group">
+        <details <%= digitalActive ? 'open' : '' %>>
+          <summary class="<%= digitalActive ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-mobile-alt" aria-hidden="true"></i></span> Digital Wellbeing <i class="fas fa-chevron-down nav-chevron" aria-hidden="true"></i></summary>
+          <ul class="nav-subgroup">
+            <li><a href="/modules/screentime" class="<%= cp.indexOf('/modules/screentime') === 0 ? 'active' : '' %>">Overview</a></li>
+            <li><a href="/screen-time" class="<%= cp.indexOf('/screen-time') === 0 ? 'active' : '' %>">Screen Time</a></li>
+            <li><a href="/social-media" class="<%= cp.indexOf('/social-media') === 0 ? 'active' : '' %>">Social Media</a></li>
+          </ul>
+        </details>
+      </li>
+
+      <li class="nav-group">
+        <details <%= financeActive ? 'open' : '' %>>
+          <summary class="<%= financeActive ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-wallet" aria-hidden="true"></i></span> Finance Tracker <i class="fas fa-chevron-down nav-chevron" aria-hidden="true"></i></summary>
+          <ul class="nav-subgroup">
+            <li><a href="/modules/finance" class="<%= cp.indexOf('/modules/finance') === 0 ? 'active' : '' %>">Overview</a></li>
+            <li><a href="/expenses" class="<%= cp.indexOf('/expenses') === 0 ? 'active' : '' %>">Expenses</a></li>
+            <li><a href="/savings-goals" class="<%= cp.indexOf('/savings-goals') === 0 ? 'active' : '' %>">Savings Goals</a></li>
+          </ul>
+        </details>
+      </li>
+
+      <li><a href="/goals" class="<%= cp.indexOf('/goals') === 0 ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-bullseye" aria-hidden="true"></i></span> Goals</a></li>
+      <li><a href="/journal" class="<%= cp.indexOf('/journal') === 0 ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-pen" aria-hidden="true"></i></span> Journal</a></li>
+      <li><a href="/modules/reports" class="<%= cp.indexOf('/modules/reports') === 0 ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></span> Reports</a></li>
+      <li><a href="/modules/settings" class="<%= (cp.indexOf('/modules/settings') === 0 || (cp.indexOf('/modules') === 0 && !studyActive && !healthActive && !digitalActive && !financeActive && cp.indexOf('/modules/reports') !== 0)) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-cog" aria-hidden="true"></i></span> Modules</a></li>
     </nav>
     <div class="sidebar-foot">
       <div class="user-chip">
@@ -85,7 +133,7 @@
     </div>
 <% } %>
 
-<% if(user && dueNotifications && dueNotifications.length){ %>
+<% if(setupDone && dueNotifications && dueNotifications.length){ %>
 <div class="flash-wrap" id="notifBanner">
   <div class="flash flash-warning" role="alert">
     <i class="fas fa-bell" aria-hidden="true"></i>
@@ -104,11 +152,12 @@
 <div class="flash-wrap"><div class="flash flash-error" role="alert"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> <%- error %></div></div>
 <% } %>
 
-<% if(user){ %>
+<% if(setupDone){ %>
 <script>
 (function() {
-  // Sidebar toggle (mobile / narrow viewports)
   var sidebar = document.querySelector('.sidebar');
+
+  // Sidebar toggle (mobile / narrow viewports) — temporary overlay
   var menuBtn = document.getElementById('topbarMenuBtn');
   if (menuBtn) {
     menuBtn.addEventListener('click', function() {
@@ -120,6 +169,16 @@
     if (sidebar.contains(e.target) || e.target === menuBtn || (e.target.closest && e.target.closest('#topbarMenuBtn'))) return;
     sidebar.classList.remove('open');
   });
+
+  // Hide / show sidebar — persists across page loads via localStorage
+  var hideBtn = document.getElementById('sidebarHideBtn');
+  var showBtn = document.getElementById('sidebarShowBtn');
+  function setSidebarHidden(hidden) {
+    document.body.classList.toggle('sidebar-hidden', hidden);
+    try { localStorage.setItem('alms_sidebar_hidden', hidden ? '1' : '0'); } catch (e) {}
+  }
+  if (hideBtn) hideBtn.addEventListener('click', function() { setSidebarHidden(true); });
+  if (showBtn) showBtn.addEventListener('click', function() { setSidebarHidden(false); });
 
   // Request browser notification permission
   if ("Notification" in window && Notification.permission === "default") {
