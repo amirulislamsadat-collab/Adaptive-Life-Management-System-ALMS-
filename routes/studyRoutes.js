@@ -6,6 +6,9 @@ const router       = express.Router();
 const assignCtrl    = require('../controllers/assignmentController');
 const examCtrl       = require('../controllers/examController');
 const sessionCtrl    = require('../controllers/studySessionController');
+const requireModule   = require('../middleware/moduleAccessMiddleware');
+
+router.use(requireModule('study'));
 
 // --- Assignments (Feature 15) ---
 router.get('/assignments',              assignCtrl.getAssignments);

@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const ctrl = require('../controllers/reminderController');
+const requireModule = require('../middleware/moduleAccessMiddleware');
+
+router.use(requireModule('reminders'));
 
 router.get('/reminders', ctrl.getReminders);
 router.get('/reminders/new', ctrl.getCreateReminder);

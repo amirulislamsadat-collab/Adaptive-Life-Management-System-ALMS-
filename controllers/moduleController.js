@@ -56,6 +56,13 @@ exports.getModulePage = async (req, res) => {
       return res.redirect('/dashboard');
     }
 
+    const enabledModules = await Module.findEnabledForUser(userId);
+    const isEnabled = enabledModules.some(m => m.slug === mod.slug);
+    if (!isEnabled) {
+      req.session.error = 'That module is currently disabled. Enable it in Module Settings to use this feature.';
+      return res.redirect('/modules/settings');
+    }
+
     if (mod.slug === 'study') {
       const [assignmentStats, upcomingExams, sessionStats] = await Promise.all([
         Assignment.getStats(userId),

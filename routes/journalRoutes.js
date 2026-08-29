@@ -4,6 +4,9 @@
 const express = require('express');
 const router  = express.Router();
 const ctrl    = require('../controllers/journalController');
+const requireModule = require('../middleware/moduleAccessMiddleware');
+
+router.use(requireModule('journal'));
 
 router.get('/journal',            ctrl.getEntries);
 router.get('/journal/new',        ctrl.getCreateEntry);

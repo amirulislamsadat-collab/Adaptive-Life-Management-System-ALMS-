@@ -5,6 +5,9 @@ const express    = require('express');
 const router     = express.Router();
 const expenseCtrl = require('../controllers/expenseController');
 const savingsCtrl  = require('../controllers/savingsGoalController');
+const requireModule = require('../middleware/moduleAccessMiddleware');
+
+router.use(requireModule('finance'));
 
 router.get('/expenses',             expenseCtrl.getExpenses);
 router.get('/expenses/new',         expenseCtrl.getCreateExpense);

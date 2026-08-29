@@ -42,13 +42,26 @@ if (localStorage.getItem('alms_sidebar_hidden') === '1') {
     </div>
     <nav class="nav-links" id="sidebarNav">
       <li><a href="/dashboard" class="<%= cp === '/dashboard' ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-th-large" aria-hidden="true"></i></span> Dashboard</a></li>
+      <% if(enabledSlugs.indexOf('tasks') !== -1){ %>
       <li><a href="/tasks/hub" class="<%= cp.indexOf('/tasks') === 0 ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-tasks" aria-hidden="true"></i></span> Tasks</a></li>
+      <% } %>
+      <% if(enabledSlugs.indexOf('notes') !== -1){ %>
       <li><a href="/notes" class="<%= cp.indexOf('/notes') === 0 ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-sticky-note" aria-hidden="true"></i></span> Notes</a></li>
+      <% } %>
+      <% if(enabledSlugs.indexOf('calendar') !== -1){ %>
       <li><a href="/calendar" class="<%= cp.indexOf('/calendar') === 0 ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-calendar-alt" aria-hidden="true"></i></span> Calendar</a></li>
+      <% } %>
+      <% if(enabledSlugs.indexOf('reminders') !== -1){ %>
       <li><a href="/reminders" class="<%= cp.indexOf('/reminders') === 0 ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-clock" aria-hidden="true"></i></span> Reminders</a></li>
+      <% } %>
+      <% if(enabledSlugs.indexOf('alarms') !== -1){ %>
       <li><a href="/alarms" class="<%= cp.indexOf('/alarms') === 0 ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-bell" aria-hidden="true"></i></span> Alarms</a></li>
+      <% } %>
+      <% if(enabledSlugs.indexOf('subjects') !== -1){ %>
       <li><a href="/subjects" class="<%= cp.indexOf('/subjects') === 0 ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-book" aria-hidden="true"></i></span> Subjects</a></li>
+      <% } %>
 
+      <% if(enabledSlugs.indexOf('study') !== -1){ %>
       <li class="nav-group">
         <details <%= studyActive ? 'open' : '' %>>
           <summary class="<%= studyActive ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-book-open" aria-hidden="true"></i></span> Study Planner <i class="fas fa-chevron-down nav-chevron" aria-hidden="true"></i></summary>
@@ -60,7 +73,9 @@ if (localStorage.getItem('alms_sidebar_hidden') === '1') {
           </ul>
         </details>
       </li>
+      <% } %>
 
+      <% if(enabledSlugs.indexOf('health') !== -1){ %>
       <li class="nav-group">
         <details <%= healthActive ? 'open' : '' %>>
           <summary class="<%= healthActive ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-heartbeat" aria-hidden="true"></i></span> Health &amp; Wellness <i class="fas fa-chevron-down nav-chevron" aria-hidden="true"></i></summary>
@@ -74,9 +89,13 @@ if (localStorage.getItem('alms_sidebar_hidden') === '1') {
           </ul>
         </details>
       </li>
+      <% } %>
 
+      <% if(enabledSlugs.indexOf('habits') !== -1){ %>
       <li><a href="/habits" class="<%= cp.indexOf('/habits') === 0 ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-fire" aria-hidden="true"></i></span> Habits</a></li>
+      <% } %>
 
+      <% if(enabledSlugs.indexOf('screentime') !== -1){ %>
       <li class="nav-group">
         <details <%= digitalActive ? 'open' : '' %>>
           <summary class="<%= digitalActive ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-mobile-alt" aria-hidden="true"></i></span> Digital Wellbeing <i class="fas fa-chevron-down nav-chevron" aria-hidden="true"></i></summary>
@@ -87,7 +106,9 @@ if (localStorage.getItem('alms_sidebar_hidden') === '1') {
           </ul>
         </details>
       </li>
+      <% } %>
 
+      <% if(enabledSlugs.indexOf('finance') !== -1){ %>
       <li class="nav-group">
         <details <%= financeActive ? 'open' : '' %>>
           <summary class="<%= financeActive ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-wallet" aria-hidden="true"></i></span> Finance Tracker <i class="fas fa-chevron-down nav-chevron" aria-hidden="true"></i></summary>
@@ -98,10 +119,17 @@ if (localStorage.getItem('alms_sidebar_hidden') === '1') {
           </ul>
         </details>
       </li>
+      <% } %>
 
+      <% if(enabledSlugs.indexOf('goals') !== -1){ %>
       <li><a href="/goals" class="<%= cp.indexOf('/goals') === 0 ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-bullseye" aria-hidden="true"></i></span> Goals</a></li>
+      <% } %>
+      <% if(enabledSlugs.indexOf('journal') !== -1){ %>
       <li><a href="/journal" class="<%= cp.indexOf('/journal') === 0 ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-pen" aria-hidden="true"></i></span> Journal</a></li>
+      <% } %>
+      <% if(enabledSlugs.indexOf('reports') !== -1){ %>
       <li><a href="/modules/reports" class="<%= cp.indexOf('/modules/reports') === 0 ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></span> Reports</a></li>
+      <% } %>
       <li><a href="/modules/settings" class="<%= (cp.indexOf('/modules/settings') === 0 || (cp.indexOf('/modules') === 0 && !studyActive && !healthActive && !digitalActive && !financeActive && cp.indexOf('/modules/reports') !== 0)) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-cog" aria-hidden="true"></i></span> Modules</a></li>
     </nav>
     <div class="sidebar-foot">

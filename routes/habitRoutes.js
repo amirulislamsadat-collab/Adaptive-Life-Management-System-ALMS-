@@ -4,6 +4,9 @@
 const express  = require('express');
 const router   = express.Router();
 const habitCtrl = require('../controllers/habitController');
+const requireModule = require('../middleware/moduleAccessMiddleware');
+
+router.use(requireModule('habits'));
 
 router.get('/habits',              habitCtrl.getHabits);
 router.get('/habits/new',          habitCtrl.getCreateHabit);

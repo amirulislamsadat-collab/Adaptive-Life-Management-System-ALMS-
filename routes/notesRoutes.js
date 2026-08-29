@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const ctrl = require('../controllers/notesController');
+const requireModule = require('../middleware/moduleAccessMiddleware');
+
+router.use(requireModule('notes'));
 
 router.get('/notes', ctrl.getNotes);
 router.get('/notes/new', ctrl.getCreateNote);

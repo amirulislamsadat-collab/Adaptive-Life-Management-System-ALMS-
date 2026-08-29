@@ -6,6 +6,9 @@ const express        = require('express');
 const router         = express.Router();
 const screenTimeCtrl  = require('../controllers/screenTimeController');
 const socialMediaCtrl = require('../controllers/socialMediaController');
+const requireModule    = require('../middleware/moduleAccessMiddleware');
+
+router.use(requireModule('screentime'));
 
 // --- Screen Time Recording (Feature 25) ---
 router.get('/screen-time',             screenTimeCtrl.getScreenTime);

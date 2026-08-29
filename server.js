@@ -30,6 +30,7 @@ const journalRoutes   = require('./routes/journalRoutes');
 
 // --- Middleware Imports ---
 const notificationMiddleware = require('./middleware/notificationMiddleware');
+const Module = require('./models/Module');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -69,6 +70,22 @@ app.use((req, res, next) => {
   const isSetupRelatedPath = req.path.startsWith('/setup') || req.path.startsWith('/logout') || req.path.startsWith('/api');
   if (user && user.setup_completed != 1 && !isSetupRelatedPath) {
     return res.redirect('/setup');
+  }
+  next();
+});
+
+// --- Enabled Modules Lookup (Feature 4) — so the sidebar can hide the nav
+// links for whatever a user has disabled, instead of only the dashboard
+// cards respecting it.
+app.use(async (req, res, next) => {
+  res.locals.enabledSlugs = [];
+  if (req.session.user && req.session.user.setup_completed == 1) {
+    try {
+      const enabled = await Module.findEnabledForUser(req.session.user.id);
+      res.locals.enabledSlugs = enabled.map(m => m.slug);
+    } catch (err) {
+      console.error('Enabled modules lookup error:', err);
+    }
   }
   next();
 });

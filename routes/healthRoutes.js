@@ -9,6 +9,9 @@ const waterCtrl     = require('../controllers/waterController');
 const exerciseCtrl  = require('../controllers/exerciseController');
 const moodCtrl      = require('../controllers/moodController');
 const medicationCtrl = require('../controllers/medicationController');
+const requireModule   = require('../middleware/moduleAccessMiddleware');
+
+router.use(requireModule('health'));
 
 // --- Sleep Tracking (Feature 18) ---
 router.get('/sleep',             sleepCtrl.getSleepLogs);
