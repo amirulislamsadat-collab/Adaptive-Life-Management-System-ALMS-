@@ -1,0 +1,44 @@
+<%- include('header', { currentPath: '/exams' }) %>
+<div class="page page-center">
+  <a href="/exams" class="back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Examinations</a>
+  <div class="form-card card">
+    <div class="form-header">
+      <i class="fas fa-<%= exam ? 'edit' : 'graduation-cap' %>" aria-hidden="true"></i>
+      <h1><%= pageTitle %></h1>
+    </div>
+    <form method="POST" action="<%= formAction %>" id="examForm">
+      <div class="fg">
+        <label for="eTitle">Title <span class="required">*</span></label>
+        <input id="eTitle" type="text" name="title" required placeholder="e.g. Midterm Exam, Final Exam" value="<%= exam ? exam.title : '' %>">
+      </div>
+      <div class="form-row">
+        <div class="fg">
+          <label for="eSubject">Subject</label>
+          <select id="eSubject" name="subject_id">
+            <option value="">— No subject —</option>
+            <% subjects.forEach(s => { %>
+            <option value="<%= s.id %>" <%= exam && exam.subject_id == s.id ? 'selected' : '' %>><%= s.name %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="fg">
+          <label for="eDate">Exam Date &amp; Time <span class="required">*</span></label>
+          <input id="eDate" type="datetime-local" name="exam_date" required value="<%= exam ? new Date(exam.exam_date).toISOString().slice(0,16) : '' %>">
+        </div>
+      </div>
+      <div class="fg">
+        <label for="eLocation">Location</label>
+        <input id="eLocation" type="text" name="location" placeholder="e.g. Room 401, Exam Hall" value="<%= exam ? exam.location || '' : '' %>">
+      </div>
+      <div class="fg">
+        <label for="eNotes">Notes</label>
+        <textarea id="eNotes" name="notes" placeholder="Syllabus scope, materials to bring..." rows="4"><%= exam ? exam.notes || '' : '' %></textarea>
+      </div>
+      <div class="form-actions">
+        <a class="btn secondary" href="/exams" id="cancelExamBtn"><i class="fas fa-times" aria-hidden="true"></i> Cancel</a>
+        <button class="btn primary" type="submit" id="saveExamBtn"><i class="fas fa-save" aria-hidden="true"></i> Save Examination</button>
+      </div>
+    </form>
+  </div>
+</div>
+<%- include('footer') %>

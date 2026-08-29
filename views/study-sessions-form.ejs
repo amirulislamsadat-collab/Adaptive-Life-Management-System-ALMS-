@@ -1,0 +1,56 @@
+<%- include('header', { currentPath: '/study-sessions' }) %>
+<div class="page page-center">
+  <a href="/study-sessions" class="back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Study Sessions</a>
+  <div class="form-card card">
+    <div class="form-header">
+      <i class="fas fa-<%= session ? 'edit' : 'stopwatch' %>" aria-hidden="true"></i>
+      <h1><%= pageTitle %></h1>
+    </div>
+    <form method="POST" action="<%= formAction %>" id="sessionForm">
+      <div class="fg">
+        <label for="sTitle">Title <span class="required">*</span></label>
+        <input id="sTitle" type="text" name="title" required placeholder="e.g. Revise Chapter 5, Practice Problems" value="<%= session ? session.title : '' %>">
+      </div>
+      <div class="form-row">
+        <div class="fg">
+          <label for="sSubject">Subject</label>
+          <select id="sSubject" name="subject_id">
+            <option value="">— No subject —</option>
+            <% subjects.forEach(sub => { %>
+            <option value="<%= sub.id %>" <%= session && session.subject_id == sub.id ? 'selected' : '' %>><%= sub.name %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="fg">
+          <label for="sDate">Session Date &amp; Time <span class="required">*</span></label>
+          <input id="sDate" type="datetime-local" name="session_date" required value="<%= session ? new Date(session.session_date).toISOString().slice(0,16) : '' %>">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="fg">
+          <label for="sDuration">Planned Duration (minutes)</label>
+          <input id="sDuration" type="number" name="duration_minutes" min="5" step="5" value="<%= session ? session.duration_minutes : 60 %>">
+        </div>
+        <% if(session){ %>
+        <div class="fg">
+          <label for="sStatus">Status</label>
+          <select id="sStatus" name="status">
+            <option value="planned" <%= session.status==='planned' ? 'selected' : '' %>>Planned</option>
+            <option value="completed" <%= session.status==='completed' ? 'selected' : '' %>>Completed</option>
+            <option value="missed" <%= session.status==='missed' ? 'selected' : '' %>>Missed</option>
+          </select>
+        </div>
+        <% } %>
+      </div>
+      <div class="fg">
+        <label for="sNotes">Notes</label>
+        <textarea id="sNotes" name="notes" placeholder="Topics to cover, goals for this session..." rows="4"><%= session ? session.notes || '' : '' %></textarea>
+      </div>
+      <div class="form-actions">
+        <a class="btn secondary" href="/study-sessions" id="cancelSessionBtn"><i class="fas fa-times" aria-hidden="true"></i> Cancel</a>
+        <button class="btn primary" type="submit" id="saveSessionBtn"><i class="fas fa-save" aria-hidden="true"></i> Save Session</button>
+      </div>
+    </form>
+  </div>
+</div>
+<%- include('footer') %>

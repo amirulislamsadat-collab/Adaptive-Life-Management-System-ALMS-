@@ -1,0 +1,25 @@
+<%- include('header', { currentPath: '/notes' }) %>
+<div class="page page-center">
+  <a href="/notes" class="back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Notes</a>
+  <div class="form-card card">
+    <div class="form-header">
+      <i class="fas fa-<%= note ? 'edit' : 'plus-circle' %>" aria-hidden="true"></i>
+      <h1><%= pageTitle %></h1>
+    </div>
+    <form method="POST" action="<%= formAction %>" id="noteForm">
+      <div class="fg">
+        <label for="noteTitle">Title <span class="required">*</span></label>
+        <input id="noteTitle" type="text" name="title" required placeholder="Enter note title..." value="<%= note ? note.title : '' %>">
+      </div>
+      <div class="fg">
+        <label for="noteContent">Content</label>
+        <textarea id="noteContent" name="content" placeholder="Write your note here..." rows="8"><%= note ? note.content : '' %></textarea>
+      </div>
+      <div class="form-actions">
+        <a class="btn secondary" href="/notes" id="cancelNoteBtn"><i class="fas fa-times" aria-hidden="true"></i> Cancel</a>
+        <button class="btn primary" type="submit" id="saveNoteBtn"><i class="fas fa-save" aria-hidden="true"></i> Save Note</button>
+      </div>
+    </form>
+  </div>
+</div>
+<%- include('footer') %>

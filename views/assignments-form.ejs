@@ -1,0 +1,58 @@
+<%- include('header', { currentPath: '/assignments' }) %>
+<div class="page page-center">
+  <a href="/assignments" class="back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Assignments</a>
+  <div class="form-card card">
+    <div class="form-header">
+      <i class="fas fa-<%= assignment ? 'edit' : 'file-signature' %>" aria-hidden="true"></i>
+      <h1><%= pageTitle %></h1>
+    </div>
+    <form method="POST" action="<%= formAction %>" id="assignmentForm">
+      <div class="fg">
+        <label for="aTitle">Title <span class="required">*</span></label>
+        <input id="aTitle" type="text" name="title" required placeholder="e.g. Database Design Report" value="<%= assignment ? assignment.title : '' %>">
+      </div>
+      <div class="form-row">
+        <div class="fg">
+          <label for="aSubject">Subject</label>
+          <select id="aSubject" name="subject_id">
+            <option value="">— No subject —</option>
+            <% subjects.forEach(s => { %>
+            <option value="<%= s.id %>" <%= assignment && assignment.subject_id == s.id ? 'selected' : '' %>><%= s.name %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="fg">
+          <label for="aDue">Due Date &amp; Time <span class="required">*</span></label>
+          <input id="aDue" type="datetime-local" name="due_date" required value="<%= assignment ? new Date(assignment.due_date).toISOString().slice(0,16) : '' %>">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="fg">
+          <label for="aPriority">Priority</label>
+          <select id="aPriority" name="priority">
+            <option value="low" <%= assignment && assignment.priority==='low' ? 'selected' : '' %>>Low</option>
+            <option value="medium" <%= !assignment || assignment.priority==='medium' ? 'selected' : '' %>>Medium</option>
+            <option value="high" <%= assignment && assignment.priority==='high' ? 'selected' : '' %>>High</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label for="aStatus">Status</label>
+          <select id="aStatus" name="status">
+            <option value="pending" <%= !assignment || assignment.status==='pending' ? 'selected' : '' %>>Pending</option>
+            <option value="in_progress" <%= assignment && assignment.status==='in_progress' ? 'selected' : '' %>>In Progress</option>
+            <option value="completed" <%= assignment && assignment.status==='completed' ? 'selected' : '' %>>Completed</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg">
+        <label for="aDesc">Description</label>
+        <textarea id="aDesc" name="description" placeholder="Add requirements or details..." rows="4"><%= assignment ? assignment.description || '' : '' %></textarea>
+      </div>
+      <div class="form-actions">
+        <a class="btn secondary" href="/assignments" id="cancelAssignmentBtn"><i class="fas fa-times" aria-hidden="true"></i> Cancel</a>
+        <button class="btn primary" type="submit" id="saveAssignmentBtn"><i class="fas fa-save" aria-hidden="true"></i> Save Assignment</button>
+      </div>
+    </form>
+  </div>
+</div>
+<%- include('footer') %>

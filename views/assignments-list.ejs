@@ -1,0 +1,57 @@
+<%- include('header', { currentPath: '/assignments' }) %>
+<div class="page">
+  <div class="top">
+    <div>
+      <a href="/modules/study" class="back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Study Planner</a>
+      <h1><i class="fas fa-file-signature" aria-hidden="true"></i> Assignments</h1>
+      <div class="page-desc">Create, update, and track your assignments through to completion.</div>
+    </div>
+    <a class="btn primary" href="/assignments/new" id="newAssignmentBtn"><i class="fas fa-plus" aria-hidden="true"></i> New Assignment</a>
+  </div>
+
+  <% if(assignments.length){ %>
+  <div class="list">
+    <% assignments.forEach(a => {
+      const overdue = a.status !== 'completed' && new Date(a.due_date) < new Date();
+    %>
+    <div class="item <%= a.status === 'completed' ? 'item-done' : '' %>">
+      <div class="item-body">
+        <div class="item-title"><%= a.title %></div>
+        <div class="meta">
+          <span class="badge-progress <%= a.status %>"><%= a.status.replace('_',' ') %></span>
+          <span class="badge-priority <%= a.priority %>"><i class="fas fa-flag" aria-hidden="true"></i> <%= a.priority %></span>
+          <% if(a.subject_name){ %><span class="badge-subject"><i class="fas fa-book" aria-hidden="true"></i> <%= a.subject_name %></span><% } %>
+          <% if(overdue){ %><span class="countdown-chip urgent"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Overdue</span><% } %>
+        </div>
+        <div class="meta">
+          <i class="fas fa-calendar-day" aria-hidden="true"></i> Due: <%= new Date(a.due_date).toLocaleString('en-US', {weekday:'short', month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit'}) %>
+        </div>
+        <% if(a.description){ %><div class="meta item-desc"><%= a.description %></div><% } %>
+      </div>
+      <div class="actions">
+        <% if(a.status !== 'completed'){ %>
+        <form method="POST" action="/assignments/status/<%= a.id %>" style="display:inline">
+          <input type="hidden" name="status" value="<%= a.status === 'pending' ? 'in_progress' : 'completed' %>">
+          <button type="submit" class="btn secondary btn-sm" id="advanceAssignment<%= a.id %>">
+            <i class="fas fa-<%= a.status === 'pending' ? 'play' : 'check' %>" aria-hidden="true"></i> <%= a.status === 'pending' ? 'Start' : 'Complete' %>
+          </button>
+        </form>
+        <% } %>
+        <a href="/assignments/edit/<%= a.id %>" class="btn secondary btn-sm" id="editAssignment<%= a.id %>"><i class="fas fa-edit" aria-hidden="true"></i> Edit</a>
+        <form method="POST" action="/assignments/delete/<%= a.id %>" style="display:inline" onsubmit="return confirm('Delete this assignment?');">
+          <button type="submit" class="btn danger btn-sm" id="deleteAssignment<%= a.id %>"><i class="fas fa-trash-alt" aria-hidden="true"></i> Delete</button>
+        </form>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+  <% } else { %>
+  <div class="empty-state">
+    <div class="empty-icon"><i class="fas fa-file-signature" aria-hidden="true"></i></div>
+    <h3>No assignments yet</h3>
+    <p>Add your coursework assignments to start tracking deadlines.</p>
+    <a href="/assignments/new" class="btn primary" id="createFirstAssignment"><i class="fas fa-plus" aria-hidden="true"></i> Create Assignment</a>
+  </div>
+  <% } %>
+</div>
+<%- include('footer') %>

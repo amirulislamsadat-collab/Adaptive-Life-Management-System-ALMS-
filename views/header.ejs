@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="ALMS - Adaptive Life Management System. Manage tasks, notes, calendar, reminders, alarms, subjects, study planning and health & wellness in one place.">
+<title>ALMS — Adaptive Life Management System</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<% if(user){ %>
+<div class="app-shell">
+  <aside class="sidebar" aria-label="Main navigation">
+    <a href="/dashboard" class="nav-brand" aria-label="ALMS Home">
+      <div class="nav-logo"><i class="fas fa-infinity" aria-hidden="true"></i></div>
+      ALMS
+    </a>
+    <nav class="nav-links" id="sidebarNav">
+      <li><a href="/dashboard" class="<%= (typeof currentPath !== 'undefined' && currentPath === '/dashboard') ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-th-large" aria-hidden="true"></i></span> Dashboard</a></li>
+      <li><a href="/tasks/hub" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/tasks')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-tasks" aria-hidden="true"></i></span> Tasks</a></li>
+      <li><a href="/notes" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/notes')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-sticky-note" aria-hidden="true"></i></span> Notes</a></li>
+      <li><a href="/calendar" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/calendar')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-calendar-alt" aria-hidden="true"></i></span> Calendar</a></li>
+      <li><a href="/reminders" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/reminders')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-clock" aria-hidden="true"></i></span> Reminders</a></li>
+      <li><a href="/alarms" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/alarms')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-bell" aria-hidden="true"></i></span> Alarms</a></li>
+      <li><a href="/subjects" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/subjects')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-book" aria-hidden="true"></i></span> Subjects</a></li>
+      <li class="nav-section-label">Study Planner</li>
+      <li><a href="/modules/study" class="<%= (typeof currentPath !== 'undefined' && (currentPath.startsWith('/modules/study'))) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-book-open" aria-hidden="true"></i></span> Study Overview</a></li>
+      <li><a href="/assignments" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/assignments')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-file-signature" aria-hidden="true"></i></span> Assignments</a></li>
+      <li><a href="/exams" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/exams')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-graduation-cap" aria-hidden="true"></i></span> Examinations</a></li>
+      <li><a href="/study-sessions" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/study-sessions')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-stopwatch" aria-hidden="true"></i></span> Study Sessions</a></li>
+      <li class="nav-section-label">Health &amp; Wellness</li>
+      <li><a href="/modules/health" class="<%= (typeof currentPath !== 'undefined' && (currentPath.startsWith('/modules/health'))) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-heartbeat" aria-hidden="true"></i></span> Health Overview</a></li>
+      <li><a href="/sleep" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/sleep')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-bed" aria-hidden="true"></i></span> Sleep</a></li>
+      <li><a href="/water" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/water')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-tint" aria-hidden="true"></i></span> Water Intake</a></li>
+      <li><a href="/exercise" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/exercise')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-running" aria-hidden="true"></i></span> Exercise</a></li>
+      <li><a href="/mood" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/mood')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-smile" aria-hidden="true"></i></span> Mood</a></li>
+      <li class="nav-section-label">Workspace</li>
+      <li><a href="/modules/settings" class="<%= (typeof currentPath !== 'undefined' && (currentPath.startsWith('/modules/settings') || (currentPath.startsWith('/modules') && !currentPath.startsWith('/modules/study') && !currentPath.startsWith('/modules/health')))) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-cog" aria-hidden="true"></i></span> Modules</a></li>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="user-chip">
+        <div class="user-avatar" aria-hidden="true"><%= user.name.charAt(0).toUpperCase() %></div>
+        <span class="user-name"><%= user.name %></span>
+      </div>
+      <a href="/logout" style="text-decoration:none">
+        <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout</button>
+      </a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar" role="navigation" aria-label="Notifications">
+      <button type="button" class="topbar-menu-btn" id="topbarMenuBtn" aria-label="Open navigation">
+        <i class="fas fa-bars" aria-hidden="true"></i>
+      </button>
+      <div class="topbar-spacer"></div>
+      <% if(dueNotifications && dueNotifications.length){ %>
+        <span class="notif-chip" id="notifChip" title="<%= dueNotifications.length %> due notification(s)">
+          <i class="fas fa-bell" aria-hidden="true"></i> <%= dueNotifications.length %> due
+        </span>
+      <% } else { %>
+        <span class="notif-chip notif-chip-hidden" id="notifChip" style="display:none">
+          <i class="fas fa-bell" aria-hidden="true"></i> <span id="notifCount">0</span> due
+        </span>
+      <% } %>
+    </div>
+<% } %>
+
+<% if(user && dueNotifications && dueNotifications.length){ %>
+<div class="flash-wrap" id="notifBanner">
+  <div class="flash flash-warning" role="alert">
+    <i class="fas fa-bell" aria-hidden="true"></i>
+    <strong>You have <%= dueNotifications.length %> due notification(s):</strong>
+    <% dueNotifications.slice(0, 3).forEach(function(item, idx){ %>
+      <span><%= idx ? ' &nbsp;|&nbsp; ' : '&nbsp;' %><i class="fas fa-<%= item.type === 'alarm' ? 'bell' : 'clock' %>" aria-hidden="true"></i> <%= item.title %></span>
+    <% }) %>
+  </div>
+</div>
+<% } %>
+
+<% if(success){ %>
+<div class="flash-wrap"><div class="flash flash-success" role="status"><i class="fas fa-check-circle" aria-hidden="true"></i> <%- success %></div></div>
+<% } %>
+<% if(error){ %>
+<div class="flash-wrap"><div class="flash flash-error" role="alert"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> <%- error %></div></div>
+<% } %>
+
+<% if(user){ %>
+<script>
+(function() {
+  // Sidebar toggle (mobile / narrow viewports)
+  var sidebar = document.querySelector('.sidebar');
+  var menuBtn = document.getElementById('topbarMenuBtn');
+  if (menuBtn) {
+    menuBtn.addEventListener('click', function() {
+      sidebar.classList.toggle('open');
+    });
+  }
+  document.addEventListener('click', function(e) {
+    if (!sidebar || !sidebar.classList.contains('open')) return;
+    if (sidebar.contains(e.target) || e.target === menuBtn || (e.target.closest && e.target.closest('#topbarMenuBtn'))) return;
+    sidebar.classList.remove('open');
+  });
+
+  // Request browser notification permission
+  if ("Notification" in window && Notification.permission === "default") {
+    Notification.requestPermission();
+  }
+
+  // Show native browser notifications for due items
+  <% if(typeof dueNotifications !== 'undefined' && dueNotifications && dueNotifications.length){ %>
+    if ("Notification" in window && Notification.permission === "granted") {
+      <% dueNotifications.forEach(function(item){ %>
+        new Notification("ALMS <%= item.type === 'alarm' ? 'Alarm' : 'Reminder' %>", {
+          body: "<%= item.title %> — due at <%= item.time %>",
+          icon: "/favicon.ico"
+        });
+      <% }) %>
+    }
+  <% } %>
+
+  // Client-side polling: check for new notifications every 60 seconds
+  // without requiring a full page refresh
+  function pollNotifications() {
+    fetch('/api/notifications')
+      .then(function(r){ return r.json(); })
+      .then(function(data) {
+        var chip = document.getElementById('notifChip');
+        var banner = document.getElementById('notifBanner');
+        if (data && data.count > 0) {
+          if (chip) {
+            chip.style.display = 'flex';
+            var countEl = chip.querySelector('#notifCount');
+            if (countEl) countEl.textContent = data.count;
+            else chip.innerHTML = '<i class="fas fa-bell"></i> ' + data.count + ' due';
+          }
+          if (!banner && data.items && data.items.length) {
+            var wrap = document.createElement('div');
+            wrap.className = 'flash-wrap';
+            wrap.id = 'notifBanner';
+            var msg = data.items.slice(0,3).map(function(i){
+              return '<i class="fas fa-' + (i.type==='alarm'?'bell':'clock') + '"></i> ' + i.title;
+            }).join(' &nbsp;|&nbsp; ');
+            wrap.innerHTML = '<div class="flash flash-warning" role="alert"><i class="fas fa-bell"></i> <strong>' + data.count + ' notification(s):</strong> ' + msg + '</div>';
+            var topbar = document.querySelector('.topbar');
+            if (topbar) topbar.insertAdjacentElement('afterend', wrap);
+          }
+          if ("Notification" in window && Notification.permission === "granted") {
+            data.items.forEach(function(item) {
+              new Notification("ALMS " + (item.type === 'alarm' ? 'Alarm' : 'Reminder'), {
+                body: item.title + " — due at " + item.time,
+                icon: "/favicon.ico"
+              });
+            });
+          }
+        }
+      })
+      .catch(function(){});
+  }
+
+  // Poll every 60 seconds
+  setInterval(pollNotifications, 60000);
+})();
+</script>
+<% } %>

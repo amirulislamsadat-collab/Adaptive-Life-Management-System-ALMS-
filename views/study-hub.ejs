@@ -1,0 +1,85 @@
+<%- include('header', { currentPath: '/modules/study' }) %>
+<div class="page">
+  <div class="top-header">
+    <h1 class="page-title"><i class="fas fa-book-open" aria-hidden="true"></i> <%= module.name %></h1>
+    <p class="page-desc"><%= module.description %></p>
+  </div>
+
+  <div class="summary-strip">
+    <div class="summary-tile">
+      <div class="val"><%= assignmentStats.total %></div>
+      <div class="lbl">Assignments</div>
+    </div>
+    <div class="summary-tile">
+      <div class="val"><%= assignmentStats.completed %></div>
+      <div class="lbl">Completed Assignments</div>
+    </div>
+    <div class="summary-tile">
+      <div class="val"><%= assignmentStats.overdue %></div>
+      <div class="lbl">Overdue Assignments</div>
+    </div>
+    <div class="summary-tile">
+      <div class="val"><%= sessionStats.completed %>/<%= sessionStats.total %></div>
+      <div class="lbl">Study Sessions Completed</div>
+    </div>
+    <div class="summary-tile">
+      <div class="val"><%= Math.floor(sessionStats.total_minutes / 60) %>h <%= sessionStats.total_minutes % 60 %>m</div>
+      <div class="lbl">Total Study Time</div>
+    </div>
+  </div>
+
+  <div class="section-header" style="margin-top:40px;">
+    <div class="section-title"><i class="fas fa-compass" aria-hidden="true"></i> Study Planner Tools</div>
+  </div>
+  <div class="hub-grid">
+    <a href="/assignments" class="hub-card">
+      <div class="hub-card-icon"><i class="fas fa-file-signature" aria-hidden="true"></i></div>
+      <div class="hub-card-title">Assignments</div>
+      <div class="hub-card-desc">Create, update, and track coursework assignments through to completion.</div>
+      <div class="hub-card-stat"><i class="fas fa-arrow-right" aria-hidden="true"></i> Manage Assignments</div>
+    </a>
+    <a href="/exams" class="hub-card">
+      <div class="hub-card-icon"><i class="fas fa-graduation-cap" aria-hidden="true"></i></div>
+      <div class="hub-card-title">Examinations</div>
+      <div class="hub-card-desc">Schedule exams and see a live countdown to each one.</div>
+      <div class="hub-card-stat"><i class="fas fa-arrow-right" aria-hidden="true"></i> Manage Examinations</div>
+    </a>
+    <a href="/study-sessions" class="hub-card">
+      <div class="hub-card-icon"><i class="fas fa-stopwatch" aria-hidden="true"></i></div>
+      <div class="hub-card-title">Study Sessions</div>
+      <div class="hub-card-desc">Plan focused study sessions and monitor your progress over time.</div>
+      <div class="hub-card-stat"><i class="fas fa-arrow-right" aria-hidden="true"></i> Manage Study Sessions</div>
+    </a>
+  </div>
+
+  <div class="section-header" style="margin-top:40px;">
+    <div class="section-title"><i class="fas fa-hourglass-half" aria-hidden="true"></i> Upcoming Examinations</div>
+    <a href="/exams" class="manage-btn"><i class="fas fa-plus" aria-hidden="true"></i> Schedule Exam</a>
+  </div>
+  <% if(upcomingExams && upcomingExams.length){ %>
+  <div class="upcoming-strip">
+    <% upcomingExams.forEach(exam => {
+      const diffMs = new Date(exam.exam_date) - new Date();
+      const diffDays = Math.floor(diffMs / (1000*60*60*24));
+      const diffHrs = Math.floor((diffMs % (1000*60*60*24)) / (1000*60*60));
+      let cls = 'urgent';
+      if (diffDays >= 7) cls = '';
+      else if (diffDays >= 2) cls = 'soon';
+      const label = diffDays > 0 ? `${diffDays}d ${diffHrs}h left` : (diffHrs > 0 ? `${diffHrs}h left` : 'Today');
+    %>
+    <div class="upcoming-row">
+      <span><strong><%= exam.title %></strong> <% if(exam.subject_name){ %>&mdash; <%= exam.subject_name %><% } %></span>
+      <span class="countdown-chip <%= cls %>"><i class="fas fa-hourglass-half" aria-hidden="true"></i> <%= label %></span>
+    </div>
+    <% }) %>
+  </div>
+  <% } else { %>
+  <p class="empty-msg">No upcoming examinations scheduled.</p>
+  <% } %>
+
+  <div class="action-buttons" style="margin-top:40px;">
+    <a href="/dashboard" class="btn secondary"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Dashboard</a>
+    <a href="/modules/settings" class="btn secondary"><i class="fas fa-cog" aria-hidden="true"></i> Module Settings</a>
+  </div>
+</div>
+<%- include('footer') %>

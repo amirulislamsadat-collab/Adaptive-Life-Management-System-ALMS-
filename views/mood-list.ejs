@@ -1,0 +1,46 @@
+<%- include('header', { currentPath: '/mood' }) %>
+<%
+  const moodMap = { great: { emoji: '😄', label: 'Great' }, good: { emoji: '🙂', label: 'Good' }, okay: { emoji: '😐', label: 'Okay' }, low: { emoji: '😕', label: 'Low' }, bad: { emoji: '😞', label: 'Bad' } };
+%>
+<div class="page">
+  <div class="top">
+    <div>
+      <a href="/modules/health" class="back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Health &amp; Wellness</a>
+      <h1><i class="fas fa-smile" aria-hidden="true"></i> Mood Tracking</h1>
+      <div class="page-desc">Record your daily mood and emotional state.</div>
+    </div>
+    <a class="btn primary" href="/mood/new" id="newMoodBtn"><i class="fas fa-plus" aria-hidden="true"></i> Log Mood</a>
+  </div>
+
+  <% if(logs.length){ %>
+  <div class="list">
+    <% logs.forEach(log => {
+      const info = moodMap[log.mood] || { emoji: '❔', label: log.mood };
+    %>
+    <div class="item">
+      <div class="item-body">
+        <div class="item-title mood-chip"><span style="font-size:22px;"><%= info.emoji %></span> <%= info.label %></div>
+        <div class="meta">
+          <i class="fas fa-calendar-day" aria-hidden="true"></i> <%= new Date(log.log_date).toLocaleDateString('en-US', {weekday:'long', month:'short', day:'numeric'}) %>
+        </div>
+        <% if(log.notes){ %><div class="meta item-desc"><%= log.notes %></div><% } %>
+      </div>
+      <div class="actions">
+        <a href="/mood/edit/<%= log.id %>" class="btn secondary btn-sm" id="editMood<%= log.id %>"><i class="fas fa-edit" aria-hidden="true"></i> Edit</a>
+        <form method="POST" action="/mood/delete/<%= log.id %>" style="display:inline" onsubmit="return confirm('Delete this mood log?');">
+          <button type="submit" class="btn danger btn-sm" id="deleteMood<%= log.id %>"><i class="fas fa-trash-alt" aria-hidden="true"></i> Delete</button>
+        </form>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+  <% } else { %>
+  <div class="empty-state">
+    <div class="empty-icon"><i class="fas fa-smile" aria-hidden="true"></i></div>
+    <h3>No mood logs yet</h3>
+    <p>Check in with yourself and log your first mood entry.</p>
+    <a href="/mood/new" class="btn primary" id="createFirstMood"><i class="fas fa-plus" aria-hidden="true"></i> Log Mood</a>
+  </div>
+  <% } %>
+</div>
+<%- include('footer') %>

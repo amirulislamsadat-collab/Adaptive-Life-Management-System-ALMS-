@@ -1,0 +1,46 @@
+<%- include('header', { currentPath: '/mood' }) %>
+<%
+  const moods = [
+    { value: 'great', emoji: '😄', label: 'Great' },
+    { value: 'good',  emoji: '🙂', label: 'Good' },
+    { value: 'okay',  emoji: '😐', label: 'Okay' },
+    { value: 'low',   emoji: '😕', label: 'Low' },
+    { value: 'bad',   emoji: '😞', label: 'Bad' }
+  ];
+  const selectedMood = log ? log.mood : 'okay';
+%>
+<div class="page page-center">
+  <a href="/mood" class="back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Mood Tracking</a>
+  <div class="form-card card">
+    <div class="form-header">
+      <i class="fas fa-<%= log ? 'edit' : 'smile' %>" aria-hidden="true"></i>
+      <h1><%= pageTitle %></h1>
+    </div>
+    <form method="POST" action="<%= formAction %>" id="moodForm">
+      <div class="fg">
+        <label for="mDate">Date <span class="required">*</span></label>
+        <input id="mDate" type="date" name="log_date" required value="<%= log ? new Date(log.log_date).toISOString().slice(0,10) : new Date().toISOString().slice(0,10) %>">
+      </div>
+      <div class="fg">
+        <label>How are you feeling? <span class="required">*</span></label>
+        <div class="mood-picker">
+          <% moods.forEach(m => { %>
+          <input class="mood-option" type="radio" name="mood" id="mood_<%= m.value %>" value="<%= m.value %>" <%= selectedMood === m.value ? 'checked' : '' %>>
+          <label class="mood-option-label" for="mood_<%= m.value %>">
+            <span class="mood-emoji"><%= m.emoji %></span> <%= m.label %>
+          </label>
+          <% }) %>
+        </div>
+      </div>
+      <div class="fg">
+        <label for="mNotes">Notes</label>
+        <textarea id="mNotes" name="notes" placeholder="What's on your mind today..." rows="3"><%= log ? log.notes || '' : '' %></textarea>
+      </div>
+      <div class="form-actions">
+        <a class="btn secondary" href="/mood" id="cancelMoodBtn"><i class="fas fa-times" aria-hidden="true"></i> Cancel</a>
+        <button class="btn primary" type="submit" id="saveMoodBtn"><i class="fas fa-save" aria-hidden="true"></i> Save Mood</button>
+      </div>
+    </form>
+  </div>
+</div>
+<%- include('footer') %>

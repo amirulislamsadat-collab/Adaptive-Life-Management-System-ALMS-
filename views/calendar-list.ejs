@@ -1,0 +1,48 @@
+<%- include('header', { currentPath: '/calendar' }) %>
+<div class="page">
+  <div class="top">
+    <div>
+      <h1><i class="fas fa-calendar-alt" aria-hidden="true"></i> Calendar Events</h1>
+      <div class="page-desc">Manage events and detect scheduling conflicts automatically.</div>
+    </div>
+    <a href="/calendar/new" class="btn primary" id="newEventBtn"><i class="fas fa-plus" aria-hidden="true"></i> New Event</a>
+  </div>
+  <% if(events.length){ %>
+  <div class="list">
+    <% events.forEach(event => { %>
+      <div class="item">
+        <div class="item-body">
+          <div class="item-title"><%= event.title %></div>
+          <div class="meta">
+            <span><i class="fas fa-clock" aria-hidden="true"></i> <%= new Date(event.start_time).toLocaleString() %></span>
+            <span class="meta-sep"><i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+            <span><%= new Date(event.end_time).toLocaleString() %></span>
+          </div>
+          <% if(event.location){ %>
+          <div class="meta">
+            <i class="fas fa-map-marker-alt" aria-hidden="true"></i> <%= event.location %>
+          </div>
+          <% } %>
+          <% if(event.description){ %>
+          <div class="meta item-desc"><%= event.description %></div>
+          <% } %>
+        </div>
+        <div class="actions">
+          <a href="/calendar/edit/<%= event.id %>" class="btn secondary btn-sm" id="editEvent<%= event.id %>"><i class="fas fa-edit" aria-hidden="true"></i> Edit</a>
+          <form method="POST" action="/calendar/delete/<%= event.id %>" style="display:inline" onsubmit="return confirm('Delete this event?');">
+            <button type="submit" class="btn danger btn-sm" id="deleteEvent<%= event.id %>"><i class="fas fa-trash-alt" aria-hidden="true"></i> Delete</button>
+          </form>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+  <% } else { %>
+    <div class="empty-state">
+      <div class="empty-icon"><i class="fas fa-calendar-alt" aria-hidden="true"></i></div>
+      <h3>No events yet</h3>
+      <p>Your calendar is empty. Schedule your first event!</p>
+      <a href="/calendar/new" class="btn primary" id="createFirstEvent"><i class="fas fa-plus" aria-hidden="true"></i> Create Event</a>
+    </div>
+  <% } %>
+</div>
+<%- include('footer') %>

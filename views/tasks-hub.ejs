@@ -1,0 +1,28 @@
+<%- include('header', { currentPath: '/tasks' }) %>
+<div class="page">
+  <div class="top">
+    <div>
+      <a href="/dashboard" class="back-link" style="margin-bottom:10px;display:inline-block;"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Dashboard</a>
+      <h1><i class="fas fa-tasks" aria-hidden="true"></i> Task Manager Gateway</h1>
+      <div class="page-desc">Organize your work, track your progress, and stay productive.</div>
+    </div>
+  </div>
+
+  <div class="gateway-grid">
+    <a href="/tasks/new" class="gateway-card">
+      <div class="gw-icon">
+        <i class="fas fa-plus-circle" aria-hidden="true"></i>
+      </div>
+      <div class="gw-title">New Task</div>
+      <div class="gw-desc">Create a new task and add it to your current active workload.</div>
+    </a>
+    <a href="/tasks/view" class="gateway-card alt">
+      <div class="gw-icon">
+        <i class="fas fa-list-ul" aria-hidden="true"></i>
+      </div>
+      <div class="gw-title">View All Tasks</div>
+      <div class="gw-desc">Browse, filter, and manage all your existing tasks in one place.</div>
+    </a>
+  </div>
+</div>
+<%- include('footer') %>

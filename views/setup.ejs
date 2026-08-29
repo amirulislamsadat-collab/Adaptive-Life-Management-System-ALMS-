@@ -1,0 +1,101 @@
+<%- include('header') %>
+<div class="setup-page">
+  <!-- Stepper -->
+  <div class="stepper">
+    <div class="step-item">
+      <div class="step-circle <%= step==='role' ? 'active' : 'done' %>">
+        <%= step==='role' ? '1' : '<i class="fas fa-check"></i>' %>
+      </div>
+      <span class="step-label <%= step==='role' ? 'active' : 'done' %>">Role</span>
+    </div>
+    <div class="step-connector <%= step==='modules' ? 'done' : '' %>"></div>
+    <div class="step-item">
+      <div class="step-circle <%= step==='modules' ? 'active' : 'inactive' %>">2</div>
+      <span class="step-label <%= step==='modules' ? 'active' : '' %>">Modules</span>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step-item">
+      <div class="step-circle inactive">3</div>
+      <span class="step-label">Ready</span>
+    </div>
+  </div>
+
+  <% if(step === 'role') { %>
+  <h1 class="setup-title"><i class="fas fa-user"></i> Who Are You?</h1>
+  <p class="setup-sub">Select your primary role so we can recommend the best modules for you</p>
+
+  <form method="POST" action="/setup/role" id="roleForm">
+    <input type="hidden" name="role_id" id="roleInput" value="">
+    <div class="role-grid">
+      <% roles.forEach(function(r){ %>
+      <div class="role-card" onclick="pickRole(<%= r.id %>,this)" id="rc_<%= r.id %>">
+        <div class="check"><i class="fas fa-check"></i></div>
+        <div class="role-icon <%= r.name.toLowerCase() %>">
+          <%- r.name==='Student' ? '<i class="fas fa-graduation-cap"></i>' : r.name==='Professional' ? '<i class="fas fa-briefcase"></i>' : '<i class="fas fa-rocket"></i>' %>
+        </div>
+        <div class="role-name"><%= r.name %></div>
+        <div class="role-desc"><%= r.description %></div>
+      </div>
+      <% }) %>
+    </div>
+    <button type="submit" class="btn-continue" id="contBtn" disabled>Continue →</button>
+  </form>
+  <script>
+    function pickRole(id,el){
+      document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('selected'));
+      el.classList.add('selected');
+      document.getElementById('roleInput').value=id;
+      document.getElementById('contBtn').disabled=false;
+    }
+  </script>
+
+  <% } else if(step === 'modules') { %>
+  <div class="role-badge-top">
+    <span class="role-badge"><i class="fas fa-user"></i> <%= user.role %></span>
+  </div>
+  <h1 class="setup-title"><i class="fas fa-puzzle-piece"></i> Customize Your Workspace</h1>
+  <p class="setup-sub">We've recommended modules based on your role. Toggle them to fit your needs.</p>
+  <p class="selected-count">Selected: <span id="selCount"><%= recommended.length %></span> modules</p>
+
+  <form method="POST" action="/setup/modules" id="modForm">
+    <div class="mod-grid">
+      <% modules.forEach(function(mod){ %>
+      <% const isRec = recommended.includes(mod.id); %>
+      <div class="mod-toggle-card <%= isRec ? 'on' : '' %>" id="mcard_<%= mod.id %>">
+        <% if(isRec){ %><div class="rec-badge">Recommended</div><% } %>
+        <div class="mod-top">
+          <div class="mod-icon-sm">
+            <%- mod.slug==='tasks'?'<i class="fas fa-tasks"></i>':mod.slug==='study'?'<i class="fas fa-book-open"></i>':mod.slug==='finance'?'<i class="fas fa-money-bill-wave"></i>':mod.slug==='health'?'<i class="fas fa-heart"></i>':mod.slug==='projects'?'<i class="fas fa-chart-bar"></i>':mod.slug==='notes'?'<i class="fas fa-sticky-note"></i>':mod.slug==='calendar'?'<i class="fas fa-calendar-alt"></i>':mod.slug==='reminders'?'<i class="fas fa-clock"></i>':mod.slug==='alarms'?'<i class="fas fa-bell"></i>':mod.slug==='subjects'?'<i class="fas fa-book"></i>':'<i class="fas fa-pencil-alt"></i>' %>
+          </div>
+          <div class="mod-info-sm">
+            <h4><%= mod.name %></h4>
+            <p><%= mod.description %></p>
+          </div>
+        </div>
+        <div class="toggle-row">
+          <label class="toggle-switch">
+            <input type="checkbox" name="modules" value="<%= mod.id %>" <%= isRec ? 'checked' : '' %> onchange="updateCount()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+      <% }) %>
+    </div>
+    <div class="setup-actions">
+      <a href="/setup" class="btn-back-setup">← Back</a>
+      <button type="submit" class="btn-launch"><i class="fas fa-rocket"></i> Launch Workspace</button>
+    </div>
+  </form>
+  <script>
+    function updateCount(){
+      const c=document.querySelectorAll('input[name="modules"]:checked').length;
+      document.getElementById('selCount').textContent=c;
+      document.querySelectorAll('.mod-toggle-card').forEach(card=>{
+        const cb=card.querySelector('input[type="checkbox"]');
+        if(cb.checked) card.classList.add('on'); else card.classList.remove('on');
+      });
+    }
+  </script>
+  <% } %>
+</div>
+<%- include('footer') %>

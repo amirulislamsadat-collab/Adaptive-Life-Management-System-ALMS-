@@ -1,0 +1,50 @@
+<%- include('header', { currentPath: '/alarms' }) %>
+<div class="page">
+  <div class="top">
+    <div>
+      <h1><i class="fas fa-bell" aria-hidden="true"></i> Alarms</h1>
+      <div class="page-desc">Create recurring alarms with flexible schedules.</div>
+    </div>
+    <a class="btn primary" href="/alarms/new" id="newAlarmBtn"><i class="fas fa-plus" aria-hidden="true"></i> New Alarm</a>
+  </div>
+  <% if(alarms.length){ %>
+  <div class="list">
+    <% alarms.forEach(alarm => { %>
+    <div class="item">
+      <div class="item-body">
+        <div class="item-title"><%= alarm.title %></div>
+        <div class="meta">
+          <span><i class="fas fa-clock" aria-hidden="true"></i> <%= alarm.time_of_day %></span>
+          <span class="meta-sep">|</span>
+          <span><i class="fas fa-redo" aria-hidden="true"></i> <%= alarm.frequency.charAt(0).toUpperCase() + alarm.frequency.slice(1) %></span>
+        </div>
+        <% if(alarm.frequency==='custom' && alarm.days_of_week){ %>
+        <div class="meta">
+          <i class="fas fa-calendar-day" aria-hidden="true"></i> <%= alarm.days_of_week.split(',').join(', ') %>
+        </div>
+        <% } %>
+        <% if(alarm.message){ %>
+        <div class="meta item-desc">
+          <i class="fas fa-comment-alt" aria-hidden="true"></i> <%= alarm.message %>
+        </div>
+        <% } %>
+      </div>
+      <div class="actions">
+        <a href="/alarms/edit/<%= alarm.id %>" class="btn secondary btn-sm" id="editAlarm<%= alarm.id %>"><i class="fas fa-edit" aria-hidden="true"></i> Edit</a>
+        <form method="POST" action="/alarms/delete/<%= alarm.id %>" style="display:inline" onsubmit="return confirm('Delete this alarm?');">
+          <button class="btn danger btn-sm" type="submit" id="deleteAlarm<%= alarm.id %>"><i class="fas fa-trash-alt" aria-hidden="true"></i> Delete</button>
+        </form>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+  <% } else { %>
+  <div class="empty-state">
+    <div class="empty-icon"><i class="fas fa-bell-slash" aria-hidden="true"></i></div>
+    <h3>No alarms found</h3>
+    <p>Set up an alarm to wake up on time or remember daily tasks.</p>
+    <a href="/alarms/new" class="btn primary" id="createFirstAlarm"><i class="fas fa-plus" aria-hidden="true"></i> Create Alarm</a>
+  </div>
+  <% } %>
+</div>
+<%- include('footer') %>

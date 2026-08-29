@@ -1,0 +1,66 @@
+<%- include('header', { currentPath: '/modules/health' }) %>
+<%
+  const moodMap = { great: { emoji: '😄', label: 'Great' }, good: { emoji: '🙂', label: 'Good' }, okay: { emoji: '😐', label: 'Okay' }, low: { emoji: '😕', label: 'Low' }, bad: { emoji: '😞', label: 'Bad' } };
+  const moodInfo = latestMood ? (moodMap[latestMood.mood] || { emoji: '❔', label: latestMood.mood }) : null;
+%>
+<div class="page">
+  <div class="top-header">
+    <h1 class="page-title"><i class="fas fa-heartbeat" aria-hidden="true"></i> <%= module.name %></h1>
+    <p class="page-desc"><%= module.description %></p>
+  </div>
+
+  <div class="summary-strip">
+    <div class="summary-tile">
+      <div class="val"><%= (avgSleepMinutes/60).toFixed(1) %>h</div>
+      <div class="lbl">Avg Sleep (7 days)</div>
+    </div>
+    <div class="summary-tile">
+      <div class="val"><%= todayWater %> ml</div>
+      <div class="lbl">Water Today</div>
+    </div>
+    <div class="summary-tile">
+      <div class="val"><%= weeklyExerciseMinutes %> min</div>
+      <div class="lbl">Exercise (7 days)</div>
+    </div>
+    <div class="summary-tile">
+      <div class="val"><%= moodInfo ? (moodInfo.emoji + ' ' + moodInfo.label) : '—' %></div>
+      <div class="lbl">Latest Mood</div>
+    </div>
+  </div>
+
+  <div class="section-header" style="margin-top:40px;">
+    <div class="section-title"><i class="fas fa-compass" aria-hidden="true"></i> Wellness Tools</div>
+  </div>
+  <div class="hub-grid">
+    <a href="/sleep" class="hub-card">
+      <div class="hub-card-icon"><i class="fas fa-bed" aria-hidden="true"></i></div>
+      <div class="hub-card-title">Sleep</div>
+      <div class="hub-card-desc">Log your bedtime, wake time, and sleep duration each day.</div>
+      <div class="hub-card-stat"><i class="fas fa-arrow-right" aria-hidden="true"></i> Track Sleep</div>
+    </a>
+    <a href="/water" class="hub-card">
+      <div class="hub-card-icon"><i class="fas fa-tint" aria-hidden="true"></i></div>
+      <div class="hub-card-title">Water Intake</div>
+      <div class="hub-card-desc">Quickly log glasses of water and monitor your daily goal.</div>
+      <div class="hub-card-stat"><i class="fas fa-arrow-right" aria-hidden="true"></i> Track Water</div>
+    </a>
+    <a href="/exercise" class="hub-card">
+      <div class="hub-card-icon"><i class="fas fa-running" aria-hidden="true"></i></div>
+      <div class="hub-card-title">Exercise</div>
+      <div class="hub-card-desc">Record daily physical activity, duration, and intensity.</div>
+      <div class="hub-card-stat"><i class="fas fa-arrow-right" aria-hidden="true"></i> Track Exercise</div>
+    </a>
+    <a href="/mood" class="hub-card">
+      <div class="hub-card-icon"><i class="fas fa-smile" aria-hidden="true"></i></div>
+      <div class="hub-card-title">Mood</div>
+      <div class="hub-card-desc">Check in on your mood and emotional state every day.</div>
+      <div class="hub-card-stat"><i class="fas fa-arrow-right" aria-hidden="true"></i> Track Mood</div>
+    </a>
+  </div>
+
+  <div class="action-buttons" style="margin-top:40px;">
+    <a href="/dashboard" class="btn secondary"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Dashboard</a>
+    <a href="/modules/settings" class="btn secondary"><i class="fas fa-cog" aria-hidden="true"></i> Module Settings</a>
+  </div>
+</div>
+<%- include('footer') %>

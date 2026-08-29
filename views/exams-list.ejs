@@ -1,0 +1,54 @@
+<%- include('header', { currentPath: '/exams' }) %>
+<div class="page">
+  <div class="top">
+    <div>
+      <a href="/modules/study" class="back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Study Planner</a>
+      <h1><i class="fas fa-graduation-cap" aria-hidden="true"></i> Examinations</h1>
+      <div class="page-desc">Schedule examinations and keep an eye on live countdowns.</div>
+    </div>
+    <a class="btn primary" href="/exams/new" id="newExamBtn"><i class="fas fa-plus" aria-hidden="true"></i> Schedule Exam</a>
+  </div>
+
+  <% if(exams.length){ %>
+  <div class="list">
+    <% exams.forEach(exam => {
+      const diffMs = new Date(exam.exam_date) - new Date();
+      const isPast = diffMs < 0;
+      const diffDays = Math.floor(Math.abs(diffMs) / (1000*60*60*24));
+      const diffHrs = Math.floor((Math.abs(diffMs) % (1000*60*60*24)) / (1000*60*60));
+      let cls = 'past';
+      if (!isPast) { cls = diffDays >= 7 ? '' : (diffDays >= 2 ? 'soon' : 'urgent'); }
+      const label = isPast ? 'Completed' : (diffDays > 0 ? `${diffDays}d ${diffHrs}h left` : (diffHrs > 0 ? `${diffHrs}h left` : 'Today'));
+    %>
+    <div class="item <%= isPast ? 'item-done' : '' %>">
+      <div class="item-body">
+        <div class="item-title"><%= exam.title %></div>
+        <div class="meta">
+          <span class="countdown-chip <%= cls %>"><i class="fas fa-hourglass-half" aria-hidden="true"></i> <%= label %></span>
+          <% if(exam.subject_name){ %><span class="badge-subject"><i class="fas fa-book" aria-hidden="true"></i> <%= exam.subject_name %></span><% } %>
+        </div>
+        <div class="meta">
+          <i class="fas fa-calendar-day" aria-hidden="true"></i> <%= new Date(exam.exam_date).toLocaleString('en-US', {weekday:'short', month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit'}) %>
+        </div>
+        <% if(exam.location){ %><div class="meta"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> <%= exam.location %></div><% } %>
+        <% if(exam.notes){ %><div class="meta item-desc"><%= exam.notes %></div><% } %>
+      </div>
+      <div class="actions">
+        <a href="/exams/edit/<%= exam.id %>" class="btn secondary btn-sm" id="editExam<%= exam.id %>"><i class="fas fa-edit" aria-hidden="true"></i> Edit</a>
+        <form method="POST" action="/exams/delete/<%= exam.id %>" style="display:inline" onsubmit="return confirm('Delete this examination?');">
+          <button type="submit" class="btn danger btn-sm" id="deleteExam<%= exam.id %>"><i class="fas fa-trash-alt" aria-hidden="true"></i> Delete</button>
+        </form>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+  <% } else { %>
+  <div class="empty-state">
+    <div class="empty-icon"><i class="fas fa-graduation-cap" aria-hidden="true"></i></div>
+    <h3>No examinations scheduled</h3>
+    <p>Schedule your first exam to see a live countdown.</p>
+    <a href="/exams/new" class="btn primary" id="createFirstExam"><i class="fas fa-plus" aria-hidden="true"></i> Schedule Exam</a>
+  </div>
+  <% } %>
+</div>
+<%- include('footer') %>

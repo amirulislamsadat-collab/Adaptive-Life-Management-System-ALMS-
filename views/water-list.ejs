@@ -1,0 +1,61 @@
+<%- include('header', { currentPath: '/water' }) %>
+<div class="page">
+  <div class="top">
+    <div>
+      <a href="/modules/health" class="back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Health &amp; Wellness</a>
+      <h1><i class="fas fa-tint" aria-hidden="true"></i> Water Intake</h1>
+      <div class="page-desc">Record and monitor your daily water intake.</div>
+    </div>
+  </div>
+
+  <div class="water-summary">
+    <div>
+      <div class="summary-tile" style="border:none;box-shadow:none;padding:0;">
+        <div class="val"><%= todayTotal %> / <%= goal %> ml</div>
+        <div class="lbl">Today's Progress (<%= progress %>%)</div>
+      </div>
+      <div class="progress-track" style="max-width:320px;margin-top:10px;">
+        <div class="progress-fill" style="width:<%= progress %>%"></div>
+      </div>
+    </div>
+    <form method="POST" action="/water/create" class="water-quick-form" id="quickWaterForm">
+      <input type="hidden" name="log_date" value="<%= new Date().toISOString().slice(0,10) %>">
+      <select name="amount_ml" id="waterAmount">
+        <option value="150">150 ml (Glass)</option>
+        <option value="250" selected>250 ml (Cup)</option>
+        <option value="500">500 ml (Bottle)</option>
+        <option value="1000">1000 ml (Large Bottle)</option>
+      </select>
+      <button type="submit" class="btn primary" id="addWaterBtn"><i class="fas fa-plus" aria-hidden="true"></i> Add Water</button>
+    </form>
+  </div>
+
+  <% if(logs.length){ %>
+  <div class="list">
+    <% logs.forEach(log => { %>
+    <div class="item">
+      <div class="item-body">
+        <div class="item-title"><i class="fas fa-tint" aria-hidden="true" style="color:var(--secondary);"></i> <%= log.amount_ml %> ml</div>
+        <div class="meta">
+          <i class="fas fa-calendar-day" aria-hidden="true"></i> <%= new Date(log.log_date).toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'}) %>
+          <% if(log.logged_at){ %><span><i class="fas fa-clock" aria-hidden="true"></i> <%= log.logged_at.slice(0,5) %></span><% } %>
+        </div>
+      </div>
+      <div class="actions">
+        <a href="/water/edit/<%= log.id %>" class="btn secondary btn-sm" id="editWater<%= log.id %>"><i class="fas fa-edit" aria-hidden="true"></i> Edit</a>
+        <form method="POST" action="/water/delete/<%= log.id %>" style="display:inline" onsubmit="return confirm('Delete this water log?');">
+          <button type="submit" class="btn danger btn-sm" id="deleteWater<%= log.id %>"><i class="fas fa-trash-alt" aria-hidden="true"></i> Delete</button>
+        </form>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+  <% } else { %>
+  <div class="empty-state">
+    <div class="empty-icon"><i class="fas fa-tint" aria-hidden="true"></i></div>
+    <h3>No water logged yet</h3>
+    <p>Use the quick-add form above to log your first glass of water.</p>
+  </div>
+  <% } %>
+</div>
+<%- include('footer') %>

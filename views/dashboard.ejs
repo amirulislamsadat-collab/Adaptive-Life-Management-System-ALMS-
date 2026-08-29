@@ -1,0 +1,98 @@
+<%- include('header', { currentPath: '/dashboard' }) %>
+<div class="page">
+  <div class="greeting-card">
+    <div class="greeting-left">
+      <h1>Good <%= (new Date().getHours()<12?'Morning':new Date().getHours()<18?'Afternoon':'Evening') %>, <%= user.name %>!</h1>
+      <p>Here's your workspace overview. Stay productive and organized.</p>
+      <div class="role-badge"><i class="fas fa-user-circle" aria-hidden="true"></i> <%= user.role %></div>
+    </div>
+    <div class="date-display">
+      <div class="date-day"><%= new Date().toLocaleDateString('en-US',{weekday:'long'}) %></div>
+      <div class="date-full"><%= new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) %></div>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon total">
+        <i class="fas fa-layer-group" aria-hidden="true"></i>
+      </div>
+      <div class="stat-info">
+        <div class="stat-val"><%= stats.total %></div>
+        <div class="stat-label">Total Tasks</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon completed">
+        <i class="fas fa-check-circle" aria-hidden="true"></i>
+      </div>
+      <div class="stat-info">
+        <div class="stat-val"><%= stats.completed %></div>
+        <div class="stat-label">Completed</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon pending">
+        <i class="fas fa-hourglass-half" aria-hidden="true"></i>
+      </div>
+      <div class="stat-info">
+        <div class="stat-val"><%= stats.pending %></div>
+        <div class="stat-label">Pending</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon high">
+        <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+      </div>
+      <div class="stat-info">
+        <div class="stat-val"><%= stats.high_priority %></div>
+        <div class="stat-label">High Priority</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <div class="section-title">
+      <i class="fas fa-th-large" aria-hidden="true"></i>
+      Active Modules <span class="section-badge"><%= modules.length %></span>
+    </div>
+    <a href="/modules/settings" class="manage-btn"><i class="fas fa-cog" aria-hidden="true"></i> Manage</a>
+  </div>
+
+  <% if(modules && modules.length){ %>
+  <div class="modules-grid">
+    <% modules.forEach(function(mod){ %>
+    <% const linkMap = { tasks:'/tasks/hub', notes:'/notes', calendar:'/calendar', reminders:'/reminders', alarms:'/alarms', subjects:'/subjects', study:'/modules/study', finance:'/modules/finance', health:'/modules/health', projects:'/modules/projects', journal:'/modules/journal' }; %>
+    <% const iconMap = { tasks:'fas fa-tasks', study:'fas fa-book-open', finance:'fas fa-wallet', health:'fas fa-heartbeat', projects:'fas fa-chart-bar', journal:'fas fa-pen', notes:'fas fa-sticky-note', calendar:'fas fa-calendar-alt', reminders:'fas fa-clock', alarms:'fas fa-bell', subjects:'fas fa-book' }; %>
+    <% const link = linkMap[mod.slug] || '/modules/settings'; %>
+    <% const icon = iconMap[mod.slug] || 'fas fa-cube'; %>
+    <a href="<%= link %>" class="module-card" aria-label="<%= mod.name %> module">
+      <div class="module-header">
+        <div class="module-icon">
+          <i class="<%= icon %>" aria-hidden="true"></i>
+        </div>
+        <div>
+          <div class="module-title"><%= mod.name %></div>
+        </div>
+      </div>
+      <p class="module-desc"><%= mod.description %></p>
+      <div class="module-footer">
+        <div class="status-dot"></div> Active
+      </div>
+    </a>
+    <% }) %>
+  </div>
+  <% } else { %>
+  <p class="empty-msg">No active workspaces. <a href="/modules/settings">Enable some modules</a> to get started.</p>
+  <% } %>
+
+  <div class="action-buttons">
+    <a href="/tasks/new" class="btn primary" id="newTaskBtn">
+      <i class="fas fa-plus" aria-hidden="true"></i> New Task
+    </a>
+    <a href="/tasks/hub" class="btn secondary" id="viewTasksBtn">
+      <i class="fas fa-list" aria-hidden="true"></i> View All Tasks
+    </a>
+  </div>
+</div>
+<%- include('footer') %>

@@ -1,0 +1,45 @@
+<%- include('header', { currentPath: '/sleep' }) %>
+<div class="page page-center">
+  <a href="/sleep" class="back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Sleep Tracking</a>
+  <div class="form-card card">
+    <div class="form-header">
+      <i class="fas fa-<%= log ? 'edit' : 'bed' %>" aria-hidden="true"></i>
+      <h1><%= pageTitle %></h1>
+    </div>
+    <form method="POST" action="<%= formAction %>" id="sleepForm">
+      <div class="fg">
+        <label for="slDate">Date <span class="required">*</span></label>
+        <input id="slDate" type="date" name="sleep_date" required value="<%= log ? new Date(log.sleep_date).toISOString().slice(0,10) : new Date().toISOString().slice(0,10) %>">
+      </div>
+      <div class="form-row">
+        <div class="fg">
+          <label for="slBed">Bedtime <span class="required">*</span></label>
+          <input id="slBed" type="time" name="bedtime" required value="<%= log ? log.bedtime.slice(0,5) : '23:00' %>">
+        </div>
+        <div class="fg">
+          <label for="slWake">Wake Time <span class="required">*</span></label>
+          <input id="slWake" type="time" name="wake_time" required value="<%= log ? log.wake_time.slice(0,5) : '07:00' %>">
+        </div>
+      </div>
+      <div class="fg">
+        <label for="slQuality">Sleep Quality</label>
+        <select id="slQuality" name="quality">
+          <option value="great" <%= log && log.quality==='great' ? 'selected' : '' %>>Great</option>
+          <option value="good" <%= log && log.quality==='good' ? 'selected' : '' %>>Good</option>
+          <option value="okay" <%= !log || log.quality==='okay' ? 'selected' : '' %>>Okay</option>
+          <option value="poor" <%= log && log.quality==='poor' ? 'selected' : '' %>>Poor</option>
+          <option value="bad" <%= log && log.quality==='bad' ? 'selected' : '' %>>Bad</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label for="slNotes">Notes</label>
+        <textarea id="slNotes" name="notes" placeholder="Anything that affected your sleep..." rows="3"><%= log ? log.notes || '' : '' %></textarea>
+      </div>
+      <div class="form-actions">
+        <a class="btn secondary" href="/sleep" id="cancelSleepBtn"><i class="fas fa-times" aria-hidden="true"></i> Cancel</a>
+        <button class="btn primary" type="submit" id="saveSleepBtn"><i class="fas fa-save" aria-hidden="true"></i> Save Sleep Log</button>
+      </div>
+    </form>
+  </div>
+</div>
+<%- include('footer') %>

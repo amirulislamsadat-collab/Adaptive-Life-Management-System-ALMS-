@@ -1,0 +1,31 @@
+<%- include('header') %>
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-icon-wrap">
+      <div class="auth-icon"><i class="fas fa-infinity"></i></div>
+      <div class="auth-title">Create Account</div>
+      <div class="auth-sub">Set up your ALMS workspace</div>
+    </div>
+    <form method="POST" action="/register">
+      <div class="form-grp">
+        <label class="form-lbl">Full Name</label>
+        <input class="form-inp" type="text" name="full_name" placeholder="Your full name" required>
+      </div>
+      <div class="form-grp">
+        <label class="form-lbl">Email Address</label>
+        <input class="form-inp" type="email" name="email" placeholder="you@example.com" required>
+      </div>
+      <div class="form-grp">
+        <label class="form-lbl">Password</label>
+        <input class="form-inp" type="password" name="password" placeholder="Create a password" required>
+      </div>
+      <div class="form-grp">
+        <label class="form-lbl">Confirm Password</label>
+        <input class="form-inp" type="password" name="confirm_password" placeholder="Repeat your password" required>
+      </div>
+      <button type="submit" class="btn-auth">Create Account</button>
+    </form>
+    <div class="auth-foot">Already have an account? <a href="/login">Sign in</a></div>
+  </div>
+</div>
+<%- include('footer') %>

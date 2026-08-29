@@ -1,0 +1,45 @@
+<%- include('header', { currentPath: '/subjects' }) %>
+<div class="page">
+  <div class="top">
+    <div>
+      <h1><i class="fas fa-book" aria-hidden="true"></i> Subjects</h1>
+      <div class="page-desc">Manage your study subjects.</div>
+    </div>
+    <a class="btn primary" href="/subjects/new" id="newSubjectBtn"><i class="fas fa-plus" aria-hidden="true"></i> New Subject</a>
+  </div>
+  <% if(subjects.length){ %>
+  <div class="list">
+    <% subjects.forEach(subject => { %>
+    <div class="item">
+      <div class="item-body">
+        <div class="item-title"><%= subject.name %></div>
+        <% if(subject.code){ %>
+        <div class="meta">
+          <i class="fas fa-hashtag" aria-hidden="true"></i> Code: <%= subject.code %>
+        </div>
+        <% } %>
+        <% if(subject.instructor){ %>
+        <div class="meta">
+          <i class="fas fa-chalkboard-teacher" aria-hidden="true"></i> Instructor: <%= subject.instructor %>
+        </div>
+        <% } %>
+      </div>
+      <div class="actions">
+        <a href="/subjects/edit/<%= subject.id %>" class="btn secondary btn-sm" id="editSubject<%= subject.id %>"><i class="fas fa-edit" aria-hidden="true"></i> Edit</a>
+        <form method="POST" action="/subjects/delete/<%= subject.id %>" style="display:inline" onsubmit="return confirm('Delete this subject?');">
+          <button class="btn danger btn-sm" type="submit" id="deleteSubject<%= subject.id %>"><i class="fas fa-trash-alt" aria-hidden="true"></i> Delete</button>
+        </form>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+  <% } else { %>
+  <div class="empty-state">
+    <div class="empty-icon"><i class="fas fa-book" aria-hidden="true"></i></div>
+    <h3>No subjects found</h3>
+    <p>Add your classes or subjects to keep things organized.</p>
+    <a href="/subjects/new" class="btn primary" id="createFirstSubject"><i class="fas fa-plus" aria-hidden="true"></i> Create Subject</a>
+  </div>
+  <% } %>
+</div>
+<%- include('footer') %>

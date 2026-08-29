@@ -1,0 +1,87 @@
+<%- include('header', { currentPath: '/tasks' }) %>
+<%
+  const currentTask = task || null;
+  const action = typeof formAction !== 'undefined' ? formAction : '/tasks/create';
+  const titleValue = currentTask ? currentTask.title : '';
+  const descriptionValue = currentTask ? currentTask.description || '' : '';
+  const submitText = typeof submitLabel !== 'undefined' ? submitLabel : 'Save Task';
+%>
+<div class="page page-center">
+  <a href="/tasks/hub" class="back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Tasks</a>
+  <div class="form-card card">
+    <div class="form-header">
+      <i class="fas fa-<%= currentTask ? 'edit' : 'plus-circle' %>" aria-hidden="true"></i>
+      <h1><%= pageTitle || 'Create New Task' %></h1>
+    </div>
+
+    <form action="<%= action %>" method="POST" id="taskForm">
+      <div class="fg">
+        <label for="taskTitle">Task Title <span class="required">*</span></label>
+        <input id="taskTitle" type="text" name="title" placeholder="What needs to be done?" required autofocus value="<%= titleValue %>">
+      </div>
+
+      <div class="form-row">
+        <div class="fg">
+          <label for="taskCategory">Category</label>
+          <select id="taskCategory" name="category_id">
+            <option value="">No Category</option>
+            <% categories.forEach(function(cat) { %>
+              <option value="<%= cat.id %>" <%= currentTask && String(currentTask.category_id) === String(cat.id) ? 'selected' : '' %>><%= cat.name %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div class="fg">
+          <label>Priority</label>
+          <div class="radio-group-inline" style="display:flex;gap:15px;margin-top:10px;">
+            <label style="display:flex;align-items:center;gap:5px;font-weight:normal;color:var(--text-main);">
+              <input type="radio" name="priority" value="low" <%= currentTask && currentTask.priority === 'low' ? 'checked' : '' %>>
+              <i class="fas fa-arrow-down" style="color:#10b981;" aria-hidden="true"></i> Low
+            </label>
+            <label style="display:flex;align-items:center;gap:5px;font-weight:normal;color:var(--text-main);">
+              <input type="radio" name="priority" value="medium" <%= !currentTask || currentTask.priority === 'medium' ? 'checked' : '' %>>
+              <i class="fas fa-minus" style="color:#f59e0b;" aria-hidden="true"></i> Medium
+            </label>
+            <label style="display:flex;align-items:center;gap:5px;font-weight:normal;color:var(--text-main);">
+              <input type="radio" name="priority" value="high" <%= currentTask && currentTask.priority === 'high' ? 'checked' : '' %>>
+              <i class="fas fa-arrow-up" style="color:#ef4444;" aria-hidden="true"></i> High
+            </label>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="fg">
+          <label for="taskDifficulty">Difficulty Level</label>
+          <select id="taskDifficulty" name="difficulty">
+          <option value="easy" <%= currentTask && currentTask.difficulty === 'easy' ? 'selected' : '' %>>Easy</option>
+          <option value="normal" <%= !currentTask || currentTask.difficulty === 'normal' ? 'selected' : '' %>>Normal</option>
+          <option value="hard" <%= currentTask && currentTask.difficulty === 'hard' ? 'selected' : '' %>>Hard</option>
+          </select>
+        </div>
+
+        <div class="fg">
+          <label for="taskAvail">Time Availability</label>
+          <select id="taskAvail" name="availability">
+          <option value="flexible" <%= !currentTask || currentTask.availability === 'flexible' ? 'selected' : '' %>>Flexible</option>
+          <option value="urgent" <%= currentTask && currentTask.availability === 'urgent' ? 'selected' : '' %>>Urgent</option>
+          <option value="weekend" <%= currentTask && currentTask.availability === 'weekend' ? 'selected' : '' %>>Weekend</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label for="taskDesc">Description (Optional)</label>
+        <textarea id="taskDesc" name="description" placeholder="Add details, links, or notes here..." rows="4"><%= descriptionValue %></textarea>
+      </div>
+
+      <div class="form-actions">
+        <a href="/tasks/hub" class="btn secondary"><i class="fas fa-times" aria-hidden="true"></i> Cancel</a>
+        <button type="submit" class="btn primary">
+          <i class="fas fa-save" aria-hidden="true"></i> <%= submitText %>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+<%- include('footer') %>

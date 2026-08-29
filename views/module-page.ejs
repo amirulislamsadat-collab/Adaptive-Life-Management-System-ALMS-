@@ -1,0 +1,19 @@
+<%- include('header', { currentPath: '/modules' }) %>
+<div class="page page-center">
+  <div class="card form-card">
+    <div class="form-header">
+      <i class="fas fa-cube" aria-hidden="true"></i>
+      <h1><%= module.name %></h1>
+    </div>
+    <div class="desc" style="margin-bottom:20px;text-align:center;"><%= module.description %></div>
+    <div class="note" style="background:var(--bg-card);padding:15px;border-radius:var(--radius);border-left:4px solid var(--accent);margin-bottom:25px;">
+      <i class="fas fa-info-circle" aria-hidden="true" style="color:var(--accent);margin-right:5px;"></i>
+      This module shell is connected to the MVC structure, but the detailed feature set for this workspace area is not implemented yet.
+    </div>
+    <div class="form-actions" style="justify-content:center;gap:15px;">
+      <a class="btn secondary" href="/dashboard"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Dashboard</a>
+      <a class="btn primary" href="/modules/settings"><i class="fas fa-cog" aria-hidden="true"></i> Module Settings</a>
+    </div>
+  </div>
+</div>
+<%- include('footer') %>

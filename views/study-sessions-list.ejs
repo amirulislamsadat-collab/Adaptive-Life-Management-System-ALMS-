@@ -1,0 +1,58 @@
+<%- include('header', { currentPath: '/study-sessions' }) %>
+<div class="page">
+  <div class="top">
+    <div>
+      <a href="/modules/study" class="back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Study Planner</a>
+      <h1><i class="fas fa-stopwatch" aria-hidden="true"></i> Study Sessions</h1>
+      <div class="page-desc">Plan focused study sessions and monitor your progress.</div>
+    </div>
+    <a class="btn primary" href="/study-sessions/new" id="newSessionBtn"><i class="fas fa-plus" aria-hidden="true"></i> Plan Session</a>
+  </div>
+
+  <div class="summary-strip" style="margin-bottom:32px;">
+    <div class="summary-tile"><div class="val"><%= stats.total %></div><div class="lbl">Total Sessions</div></div>
+    <div class="summary-tile"><div class="val"><%= stats.completed %></div><div class="lbl">Completed</div></div>
+    <div class="summary-tile"><div class="val"><%= Math.floor(stats.total_minutes/60) %>h <%= stats.total_minutes%60 %>m</div><div class="lbl">Time Studied</div></div>
+  </div>
+
+  <% if(sessions.length){ %>
+  <div class="list">
+    <% sessions.forEach(s => { %>
+    <div class="item <%= s.status === 'completed' ? 'item-done' : '' %>">
+      <div class="item-body">
+        <div class="item-title"><%= s.title %></div>
+        <div class="meta">
+          <span class="badge-progress <%= s.status %>"><%= s.status %></span>
+          <% if(s.subject_name){ %><span class="badge-subject"><i class="fas fa-book" aria-hidden="true"></i> <%= s.subject_name %></span><% } %>
+          <span><i class="fas fa-hourglass-half" aria-hidden="true"></i> <%= s.duration_minutes %> min</span>
+        </div>
+        <div class="meta">
+          <i class="fas fa-calendar-day" aria-hidden="true"></i> <%= new Date(s.session_date).toLocaleString('en-US', {weekday:'short', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) %>
+        </div>
+        <% if(s.notes){ %><div class="meta item-desc"><%= s.notes %></div><% } %>
+      </div>
+      <div class="actions">
+        <% if(s.status === 'planned'){ %>
+        <form method="POST" action="/study-sessions/status/<%= s.id %>" style="display:inline">
+          <input type="hidden" name="status" value="completed">
+          <button type="submit" class="btn secondary btn-sm" id="completeSession<%= s.id %>"><i class="fas fa-check" aria-hidden="true"></i> Complete</button>
+        </form>
+        <% } %>
+        <a href="/study-sessions/edit/<%= s.id %>" class="btn secondary btn-sm" id="editSession<%= s.id %>"><i class="fas fa-edit" aria-hidden="true"></i> Edit</a>
+        <form method="POST" action="/study-sessions/delete/<%= s.id %>" style="display:inline" onsubmit="return confirm('Delete this study session?');">
+          <button type="submit" class="btn danger btn-sm" id="deleteSession<%= s.id %>"><i class="fas fa-trash-alt" aria-hidden="true"></i> Delete</button>
+        </form>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+  <% } else { %>
+  <div class="empty-state">
+    <div class="empty-icon"><i class="fas fa-stopwatch" aria-hidden="true"></i></div>
+    <h3>No study sessions yet</h3>
+    <p>Plan a focused study session to start monitoring your progress.</p>
+    <a href="/study-sessions/new" class="btn primary" id="createFirstSession"><i class="fas fa-plus" aria-hidden="true"></i> Plan Session</a>
+  </div>
+  <% } %>
+</div>
+<%- include('footer') %>

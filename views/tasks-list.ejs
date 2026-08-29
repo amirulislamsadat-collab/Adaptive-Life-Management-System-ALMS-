@@ -1,0 +1,63 @@
+<%- include('header', { currentPath: '/tasks' }) %>
+<div class="page">
+  <div class="top">
+    <div>
+      <h1><i class="fas fa-tasks" aria-hidden="true"></i> Task Manager</h1>
+      <div class="page-desc">Organize your work and track your progress.</div>
+    </div>
+    <a href="/tasks/new" class="btn primary" id="newTaskBtn"><i class="fas fa-plus" aria-hidden="true"></i> New Task</a>
+  </div>
+
+  <div class="filter-bar">
+    <div class="filter-icon"><i class="fas fa-filter" aria-hidden="true"></i></div>
+    <select class="filter-select"><option>All Status ↕</option></select>
+    <select class="filter-select"><option>All Priorities ↕</option></select>
+    <select class="filter-select"><option>All Categories ↕</option></select>
+  </div>
+
+  <% if(tasks && tasks.length > 0) { %>
+    <div class="list">
+      <% tasks.forEach(task => { %>
+        <div class="item <%= task.status === 'done' ? 'item-done' : '' %>">
+          <div class="item-body" style="display:flex;align-items:flex-start;gap:15px;">
+            <div class="t-checkbox" style="margin-top:2px;">
+              <% if(task.status !== 'done') { %>
+                <form action="/tasks/done/<%= task.id %>" method="POST">
+                  <button type="submit" class="btn secondary btn-sm" style="border-radius:50%;width:30px;height:30px;padding:0;display:flex;align-items:center;justify-content:center;"><i class="fas fa-check" aria-hidden="true"></i></button>
+                </form>
+              <% } else { %>
+                <button type="button" class="btn primary btn-sm" disabled style="border-radius:50%;width:30px;height:30px;padding:0;display:flex;align-items:center;justify-content:center;opacity:1;"><i class="fas fa-check" aria-hidden="true"></i></button>
+              <% } %>
+            </div>
+            <div>
+              <div class="item-title" style="<%= task.status === 'done' ? 'text-decoration:line-through;color:#adb5bd;' : '' %>"><%= task.title %></div>
+              <div class="meta">
+                <span class="badge-status <%= task.status %>"><%= task.status === 'done' ? 'Completed' : 'Pending' %></span>
+                <% if(task.category_name) { %>
+                  <span class="badge-cat"><i class="fas fa-tag" aria-hidden="true"></i> <%= task.category_name %></span>
+                <% } %>
+                <span><i class="fas fa-flag" aria-hidden="true"></i> Priority: <%= task.priority %></span>
+              </div>
+            </div>
+          </div>
+          <div class="actions">
+            <a href="/tasks/edit/<%= task.id %>" class="btn secondary btn-sm"><i class="fas fa-edit" aria-hidden="true"></i> Edit</a>
+            <form action="/tasks/delete/<%= task.id %>" method="POST" onsubmit="return confirm('Delete this task?');" style="display:inline">
+              <button type="submit" class="btn danger btn-sm"><i class="fas fa-trash-alt" aria-hidden="true"></i> Delete</button>
+            </form>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-tasks" aria-hidden="true"></i>
+      </div>
+      <h3>No tasks found</h3>
+      <p>You're all caught up! Enjoy your free time or create a new task.</p>
+      <a href="/tasks/new" class="btn primary"><i class="fas fa-plus" aria-hidden="true"></i> Create First Task</a>
+    </div>
+  <% } %>
+</div>
+<%- include('footer') %>

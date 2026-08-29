@@ -1,0 +1,57 @@
+<%- include('header', { currentPath: '/notes' }) %>
+<div class="page">
+  <div class="top">
+    <div>
+      <h1><i class="fas fa-sticky-note" aria-hidden="true"></i> Notes</h1>
+      <div class="page-desc">Create, search, pin, and manage your notes.</div>
+    </div>
+    <a class="btn primary" href="/notes/new" id="newNoteBtn"><i class="fas fa-plus" aria-hidden="true"></i> New Note</a>
+  </div>
+
+  <form class="search-bar" method="GET" action="/notes" role="search" aria-label="Search notes">
+    <div class="search-input-wrap">
+      <i class="fas fa-search search-icon" aria-hidden="true"></i>
+      <input type="text" id="searchNotes" name="q" placeholder="Search notes by title or content..." value="<%= q || '' %>">
+    </div>
+    <button type="submit" class="btn primary" id="searchNotesBtn"><i class="fas fa-search" aria-hidden="true"></i> Search</button>
+    <% if(q){ %>
+    <a class="btn secondary" href="/notes" id="clearSearchBtn"><i class="fas fa-times" aria-hidden="true"></i> Clear</a>
+    <% } %>
+  </form>
+
+  <% if(notes.length){ %>
+    <div class="notes-grid">
+      <% notes.forEach(note => { %>
+        <div class="note-card <%= note.is_pinned ? 'pinned-card' : '' %>">
+          <div class="note-card-top">
+            <% if(note.is_pinned){ %>
+            <span class="pin-badge"><i class="fas fa-thumbtack" aria-hidden="true"></i> Pinned</span>
+            <% } %>
+            <div class="note-date"><%= new Date(note.updated_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) %></div>
+          </div>
+          <div class="note-title"><%= note.title %></div>
+          <div class="note-content"><%= note.content ? note.content.substring(0,120) + (note.content.length>120?'...':'') : 'No content.' %></div>
+          <div class="note-actions">
+            <a href="/notes/edit/<%= note.id %>" class="btn secondary btn-sm" id="editNote<%= note.id %>"><i class="fas fa-edit" aria-hidden="true"></i> Edit</a>
+            <form method="POST" action="/notes/pin/<%= note.id %>" style="display:inline">
+              <button type="submit" class="btn secondary btn-sm" id="pinNote<%= note.id %>">
+                <i class="fas fa-thumbtack" aria-hidden="true"></i> <%= note.is_pinned ? 'Unpin' : 'Pin' %>
+              </button>
+            </form>
+            <form method="POST" action="/notes/delete/<%= note.id %>" style="display:inline" onsubmit="return confirm('Delete this note?');">
+              <button type="submit" class="btn danger btn-sm" id="deleteNote<%= note.id %>"><i class="fas fa-trash-alt" aria-hidden="true"></i> Delete</button>
+            </form>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <div class="empty-state">
+      <div class="empty-icon"><i class="fas fa-sticky-note" aria-hidden="true"></i></div>
+      <h3>No notes found</h3>
+      <p><% if(q){ %>No results for "<%= q %>". Try a different search.<% } else { %>You haven't created any notes yet.<% } %></p>
+      <a href="/notes/new" class="btn primary" id="createFirstNote"><i class="fas fa-plus" aria-hidden="true"></i> Create Note</a>
+    </div>
+  <% } %>
+</div>
+<%- include('footer') %>

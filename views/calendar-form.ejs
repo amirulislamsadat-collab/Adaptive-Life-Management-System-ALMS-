@@ -1,0 +1,43 @@
+<%- include('header', { currentPath: '/calendar' }) %>
+<div class="page page-center">
+  <a href="/calendar" class="back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Calendar</a>
+  <div class="form-card card">
+    <div class="form-header">
+      <i class="fas fa-<%= event ? 'edit' : 'calendar-plus' %>" aria-hidden="true"></i>
+      <h1><%= pageTitle %></h1>
+    </div>
+    <form method="POST" action="<%= formAction %>" id="eventForm">
+      <div class="fg">
+        <label for="eventTitle">Event Title <span class="required">*</span></label>
+        <input id="eventTitle" type="text" name="title" required placeholder="e.g. Team Meeting, Exam, Doctor Appointment" value="<%= event ? event.title : '' %>">
+      </div>
+      <div class="form-row">
+        <div class="fg">
+          <label for="startTime">Start Date & Time <span class="required">*</span></label>
+          <input id="startTime" type="datetime-local" name="start_time" required value="<%= event ? new Date(event.start_time).toISOString().slice(0,16) : '' %>">
+        </div>
+        <div class="fg">
+          <label for="endTime">End Date & Time <span class="required">*</span></label>
+          <input id="endTime" type="datetime-local" name="end_time" required value="<%= event ? new Date(event.end_time).toISOString().slice(0,16) : '' %>">
+        </div>
+      </div>
+      <div class="fg">
+        <label for="eventLocation">Location</label>
+        <input id="eventLocation" type="text" name="location" placeholder="e.g. Room 201, Online, Library" value="<%= event ? event.location || '' : '' %>">
+      </div>
+      <div class="fg">
+        <label for="eventDesc">Description</label>
+        <textarea id="eventDesc" name="description" placeholder="Add details about this event..." rows="4"><%= event ? event.description || '' : '' %></textarea>
+      </div>
+      <div class="conflict-notice">
+        <i class="fas fa-shield-alt" aria-hidden="true"></i>
+        <span>Schedule conflict detection is active. Overlapping events will be flagged automatically.</span>
+      </div>
+      <div class="form-actions">
+        <a class="btn secondary" href="/calendar" id="cancelEventBtn"><i class="fas fa-times" aria-hidden="true"></i> Cancel</a>
+        <button class="btn primary" type="submit" id="saveEventBtn"><i class="fas fa-save" aria-hidden="true"></i> Save Event</button>
+      </div>
+    </form>
+  </div>
+</div>
+<%- include('footer') %>

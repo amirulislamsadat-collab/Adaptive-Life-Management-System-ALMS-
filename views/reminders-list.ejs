@@ -1,0 +1,49 @@
+<%- include('header', { currentPath: '/reminders' }) %>
+<div class="page">
+  <div class="top">
+    <div>
+      <h1><i class="fas fa-clock" aria-hidden="true"></i> Reminders</h1>
+      <div class="page-desc">Track reminders with due date and time. Get notified automatically.</div>
+    </div>
+    <a class="btn primary" href="/reminders/new" id="newReminderBtn"><i class="fas fa-plus" aria-hidden="true"></i> New Reminder</a>
+  </div>
+  <% if(reminders.length){ %>
+  <div class="list">
+    <% reminders.forEach(reminder => { %>
+    <div class="item">
+      <div class="item-body">
+        <div class="item-title"><%= reminder.title %></div>
+        <div class="meta">
+          <i class="fas fa-calendar-day" aria-hidden="true"></i>
+          <strong>Due:</strong> <%= new Date(reminder.due_at).toLocaleString('en-US', {weekday:'short', month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit'}) %>
+        </div>
+        <% if(reminder.message){ %>
+        <div class="meta item-desc">
+          <i class="fas fa-comment-alt" aria-hidden="true"></i> <%= reminder.message %>
+        </div>
+        <% } %>
+        <% if(reminder.notified_at){ %>
+        <span class="badge-notified"><i class="fas fa-check" aria-hidden="true"></i> Notified</span>
+        <% } else { %>
+        <span class="badge-pending-notif"><i class="fas fa-hourglass-half" aria-hidden="true"></i> Pending</span>
+        <% } %>
+      </div>
+      <div class="actions">
+        <a href="/reminders/edit/<%= reminder.id %>" class="btn secondary btn-sm" id="editReminder<%= reminder.id %>"><i class="fas fa-edit" aria-hidden="true"></i> Edit</a>
+        <form method="POST" action="/reminders/delete/<%= reminder.id %>" style="display:inline" onsubmit="return confirm('Delete this reminder?');">
+          <button class="btn danger btn-sm" type="submit" id="deleteReminder<%= reminder.id %>"><i class="fas fa-trash-alt" aria-hidden="true"></i> Delete</button>
+        </form>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+  <% } else { %>
+  <div class="empty-state">
+    <div class="empty-icon"><i class="fas fa-clock" aria-hidden="true"></i></div>
+    <h3>No reminders yet</h3>
+    <p>Create a reminder and you will be notified when it is due.</p>
+    <a href="/reminders/new" class="btn primary" id="createFirstReminder"><i class="fas fa-plus" aria-hidden="true"></i> Create Reminder</a>
+  </div>
+  <% } %>
+</div>
+<%- include('footer') %>
