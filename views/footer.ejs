@@ -1,6 +1,19 @@
 <% if(typeof user !== 'undefined' && user) { %>
   </main>
 </div>
+<script>
+(function() {
+  // Click a list row / note card to highlight it (border turns red and stays
+  // that way until clicked again) — but ignore clicks on the actual buttons,
+  // links, and form controls inside it so Edit/Delete/etc. keep working.
+  document.addEventListener('click', function(e) {
+    var box = e.target.closest('.item, .note-card');
+    if (!box) return;
+    if (e.target.closest('a, button, input, select, textarea, label, form')) return;
+    box.classList.toggle('selected');
+  });
+})();
+</script>
 <% } %>
 </body>
 </html>

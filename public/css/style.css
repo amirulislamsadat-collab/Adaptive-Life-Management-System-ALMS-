@@ -192,7 +192,7 @@ p { color: var(--text-muted); }
   display: flex; justify-content: space-between; align-items: center; gap: 24px;
   box-shadow: var(--shadow-sm);
 }
-.item:hover { border-color: var(--primary); }
+.item:active, .item.selected { border-color: var(--primary); }
 .item-title { font-size: 18px; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; }
 .meta { font-size: 13px; color: var(--text-muted); display: flex; gap: 12px; align-items: center; margin-top: 4px; }
 
@@ -235,14 +235,14 @@ p { color: var(--text-muted); }
 .setup-title { text-align: center; font-size: 36px; font-weight: 800; color: var(--text-dark); margin-bottom: 12px; }
 .setup-sub { text-align: center; color: var(--text-muted); font-size: 16px; margin-bottom: 48px; }
 .role-card { background: #fff; border: 2px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px 24px; text-align: center; cursor: pointer; transition: all 0.2s; }
-.role-card:hover { border-color: var(--primary); }
+.role-card:active { border-color: var(--primary); }
 .role-card.selected { border-color: var(--primary); background: rgba(255, 90, 95, 0.05); }
 .role-icon { width: 64px; height: 64px; border-radius: var(--radius-md); background: rgba(14, 165, 233, 0.1); color: var(--secondary); display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 20px; }
 
 /* Checkboxes */
 .days { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 .day { background: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; display: flex; gap: 8px; align-items: center; font-size: 13px; font-weight: 500; cursor: pointer; }
-.day:hover { border-color: var(--primary); }
+.day:active { border-color: var(--primary); }
 
 /* --- Empty States --- */
 .empty-state { text-align: center; padding: 60px 20px; background: #fff; border: 1px dashed var(--border-color); border-radius: var(--radius-lg); color: var(--text-muted); }
@@ -262,7 +262,8 @@ p { color: var(--text-muted); }
 /* --- Days Grid (Custom Alarms) --- */
 .days-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; }
 .day-checkbox { display: flex; align-items: center; gap: 8px; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.2s; }
-.day-checkbox:hover { border-color: var(--primary); background: rgba(255, 90, 95, 0.05); }
+.day-checkbox:active { border-color: var(--primary); background: rgba(255, 90, 95, 0.05); }
+.day-checkbox:has(input:checked) { border-color: var(--primary); background: rgba(255, 90, 95, 0.05); }
 
 /* --- Badges --- */
 .badge-notified { background: rgba(16, 185, 129, 0.1); color: var(--success); padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
@@ -297,7 +298,7 @@ p { color: var(--text-muted); }
 .manage-btn:hover { color: var(--primary); border-color: var(--primary); }
 .modules-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; margin-bottom: 40px; }
 .module-card { background: white; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; text-decoration: none; color: inherit; display: block; box-shadow: var(--shadow-sm); transition: border-color 0.2s; }
-.module-card:hover { border-color: var(--primary); }
+.module-card:active { border-color: var(--primary); }
 .module-header { display: flex; gap: 16px; align-items: center; margin-bottom: 16px; }
 .module-icon { width: 48px; height: 48px; border-radius: 12px; background: rgba(14, 165, 233, 0.1); color: var(--secondary); display: flex; align-items: center; justify-content: center; font-size: 20px; }
 .module-title { font-size: 18px; font-weight: bold; color: var(--text-dark); }
@@ -321,8 +322,8 @@ p { color: var(--text-muted); }
 /* Task Hub Gateway */
 .gateway-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 32px; }
 .gateway-card { background: white; border: 2px solid var(--border-color); border-radius: var(--radius-lg); padding: 40px 32px; text-align: center; text-decoration: none; color: inherit; transition: all 0.2s; box-shadow: var(--shadow-sm); display: block; }
-.gateway-card:hover { border-color: var(--primary); }
-.gateway-card.alt:hover { border-color: var(--secondary); }
+.gateway-card:active { border-color: var(--primary); }
+.gateway-card.alt:active { border-color: var(--secondary); }
 .gw-icon { width: 72px; height: 72px; border-radius: 50%; background: rgba(255, 90, 95, 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 24px; }
 .gateway-card.alt .gw-icon { background: rgba(14, 165, 233, 0.1); color: var(--secondary); }
 .gw-title { font-size: 22px; font-weight: bold; color: var(--text-dark); margin-bottom: 12px; }
@@ -390,7 +391,7 @@ p { color: var(--text-muted); }
   padding: 20px; box-shadow: var(--shadow-sm); transition: border-color 0.2s;
   display: flex; flex-direction: column; gap: 10px;
 }
-.note-card:hover { border-color: var(--primary); }
+.note-card:active, .note-card.selected { border-color: var(--primary); }
 .note-card.pinned-card { border-color: var(--primary); background: rgba(255, 90, 95, 0.03); }
 .note-card-top { display: flex; justify-content: space-between; align-items: center; }
 .note-date { font-size: 12px; color: var(--text-muted); }
@@ -490,7 +491,7 @@ p { color: var(--text-muted); }
   padding: 28px; text-decoration: none; color: inherit; display: block;
   box-shadow: var(--shadow-sm); transition: border-color 0.2s;
 }
-.hub-card:hover { border-color: var(--primary); }
+.hub-card:active { border-color: var(--primary); }
 .hub-card-icon {
   width: 56px; height: 56px; border-radius: var(--radius-md); background: rgba(255, 90, 95, 0.1); color: var(--primary);
   display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 20px;
@@ -559,7 +560,6 @@ p { color: var(--text-muted); }
   font-size: 13px; font-weight: 600; color: var(--text-muted); text-align: center;
 }
 .mood-option-label .mood-emoji { font-size: 28px; }
-.mood-option-label:hover { border-color: var(--primary); }
 .mood-option:checked + .mood-option-label { border-color: var(--primary); background: rgba(255, 90, 95, 0.06); color: var(--text-dark); }
 .mood-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; }
 
