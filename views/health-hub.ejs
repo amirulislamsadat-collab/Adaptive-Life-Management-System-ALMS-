@@ -26,6 +26,10 @@
       <div class="val"><%= moodInfo ? (moodInfo.emoji + ' ' + moodInfo.label) : '—' %></div>
       <div class="lbl">Latest Mood</div>
     </div>
+    <div class="summary-tile">
+      <div class="val"><%= medicationCount %></div>
+      <div class="lbl">Medication Reminders</div>
+    </div>
   </div>
 
   <div class="section-header" style="margin-top:40px;">
@@ -55,6 +59,12 @@
       <div class="hub-card-title">Mood</div>
       <div class="hub-card-desc">Check in on your mood and emotional state every day.</div>
       <div class="hub-card-stat"><i class="fas fa-arrow-right" aria-hidden="true"></i> Track Mood</div>
+    </a>
+    <a href="/medications" class="hub-card">
+      <div class="hub-card-icon"><i class="fas fa-pills" aria-hidden="true"></i></div>
+      <div class="hub-card-title">Medication Reminders</div>
+      <div class="hub-card-desc">Schedule medication reminders so you never miss a dose.</div>
+      <div class="hub-card-stat"><i class="fas fa-arrow-right" aria-hidden="true"></i> Manage Medications</div>
     </a>
   </div>
 

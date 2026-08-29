@@ -9,6 +9,10 @@ const WaterLog       = require('../models/WaterLog');
 const MoodLog        = require('../models/MoodLog');
 const SleepLog       = require('../models/SleepLog');
 const ExerciseLog    = require('../models/ExerciseLog');
+const Medication     = require('../models/Medication');
+const ScreenTimeLog  = require('../models/ScreenTimeLog');
+const SocialMediaLog = require('../models/SocialMediaLog');
+const Expense        = require('../models/Expense');
 
 exports.getSettings = async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
@@ -60,13 +64,27 @@ exports.getModulePage = async (req, res) => {
     }
 
     if (mod.slug === 'health') {
-      const [todayWater, latestMood, avgSleepMinutes, weeklyExerciseMinutes] = await Promise.all([
+      const [todayWater, latestMood, avgSleepMinutes, weeklyExerciseMinutes, medications] = await Promise.all([
         WaterLog.getTodayTotal(userId),
         MoodLog.findLatest(userId),
         SleepLog.getAverageMinutes(userId, 7),
-        ExerciseLog.getWeeklyMinutes(userId)
+        ExerciseLog.getWeeklyMinutes(userId),
+        Medication.findAllByUser(userId)
       ]);
-      return res.render('health-hub', { user: req.session.user, module: mod, todayWater, latestMood, avgSleepMinutes, weeklyExerciseMinutes });
+      return res.render('health-hub', { user: req.session.user, module: mod, todayWater, latestMood, avgSleepMinutes, weeklyExerciseMinutes, medicationCount: medications.length });
+    }
+
+    if (mod.slug === 'finance') {
+      const summary = await Expense.getSummary(userId);
+      return res.render('finance-hub', { user: req.session.user, module: mod, summary });
+    }
+
+    if (mod.slug === 'screentime') {
+      const [summary, weeklyByPlatform] = await Promise.all([
+        ScreenTimeLog.getSummary(userId, 7),
+        SocialMediaLog.getWeeklyByPlatform(userId)
+      ]);
+      return res.render('digital-hub', { user: req.session.user, module: mod, summary, weeklyByPlatform });
     }
 
     res.render('module-page', { user: req.session.user, module: mod });

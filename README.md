@@ -1,6 +1,6 @@
 # ALMS — Adaptive Life Management System
 
-CSE470 (Software Engineering) — Group 09 project. A modular Node.js / Express / MySQL life-management platform: task manager, notes, calendar, reminders/alarms, subjects, study planner, and health & wellness tracking, all with per-user module enable/disable.
+CSE470 (Software Engineering) — Group 09 project. A modular Node.js / Express / MySQL life-management platform: task manager, notes, calendar, reminders/alarms, subjects, study planner, health & wellness tracking, habit tracker, digital wellbeing, and finance tracker, all with per-user module enable/disable.
 
 Built with plain **MVC**: `models/` (MySQL data access), `views/` (EJS templates), `controllers/` (request handling), `routes/` (Express routers), `config/` (DB connection), `middleware/` (notification checks).
 
@@ -19,6 +19,18 @@ Built with plain **MVC**: `models/` (MySQL data access), `views/` (EJS templates
 | 19 | Water Intake Tracking | `/water` (Health & Wellness) |
 | 20 | Exercise Tracking | `/exercise` (Health & Wellness) |
 | 21 | Mood Tracking | `/mood` (Health & Wellness) |
+
+22–28 (this increment):
+
+| # | Feature | Where |
+|---|---|---|
+| 22 | Medication Reminder | `/medications` (Health & Wellness) |
+| 23 | Habit Management | `/habits` (Habit Tracker) |
+| 24 | Habit Streak Calculation | `/habits` (Habit Tracker — current & longest streak per habit) |
+| 25 | Screen Time Recording | `/screen-time` (Digital Wellbeing) |
+| 26 | Social Media Usage Tracking | `/social-media` (Digital Wellbeing) |
+| 27 | Productive Time Analysis | `/modules/screentime` (Digital Wellbeing hub — productive vs. non-productive breakdown) |
+| 28 | Expense Tracking | `/expenses` (Finance Tracker) |
 
 ## Local development (XAMPP)
 

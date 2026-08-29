@@ -1,5 +1,6 @@
 // ============================================================
-// Routes: Health & Wellness — Sleep (18), Water (19), Exercise (20), Mood (21)
+// Routes: Health & Wellness — Sleep (18), Water (19), Exercise (20), Mood (21),
+// Medication Reminders (22)
 // ============================================================
 const express     = require('express');
 const router      = express.Router();
@@ -7,6 +8,7 @@ const sleepCtrl    = require('../controllers/sleepController');
 const waterCtrl     = require('../controllers/waterController');
 const exerciseCtrl  = require('../controllers/exerciseController');
 const moodCtrl      = require('../controllers/moodController');
+const medicationCtrl = require('../controllers/medicationController');
 
 // --- Sleep Tracking (Feature 18) ---
 router.get('/sleep',             sleepCtrl.getSleepLogs);
@@ -38,5 +40,14 @@ router.post('/mood/create',     moodCtrl.postCreateMoodLog);
 router.get('/mood/edit/:id',    moodCtrl.getEditMoodLog);
 router.post('/mood/edit/:id',   moodCtrl.postEditMoodLog);
 router.post('/mood/delete/:id', moodCtrl.deleteMoodLog);
+
+// --- Medication Reminders (Feature 22) ---
+router.get('/medications',                medicationCtrl.getMedications);
+router.get('/medications/new',            medicationCtrl.getCreateMedication);
+router.post('/medications/create',        medicationCtrl.postCreateMedication);
+router.get('/medications/edit/:id',       medicationCtrl.getEditMedication);
+router.post('/medications/edit/:id',      medicationCtrl.postEditMedication);
+router.post('/medications/toggle/:id',    medicationCtrl.toggleMedication);
+router.post('/medications/delete/:id',    medicationCtrl.deleteMedication);
 
 module.exports = router;

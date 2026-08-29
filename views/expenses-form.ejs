@@ -1,0 +1,51 @@
+<%- include('header', { currentPath: '/expenses' }) %>
+<%
+  const selectedType = expense ? expense.type : 'expense';
+%>
+<div class="page page-center">
+  <a href="/expenses" class="back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Expenses</a>
+  <div class="form-card card">
+    <div class="form-header">
+      <i class="fas fa-<%= expense ? 'edit' : 'money-bill-wave' %>" aria-hidden="true"></i>
+      <h1><%= pageTitle %></h1>
+    </div>
+    <form method="POST" action="<%= formAction %>" id="expenseForm">
+      <div class="fg">
+        <label>Type</label>
+        <div class="category-toggle">
+          <input type="radio" id="typeExpense" name="type" value="expense" <%= selectedType !== 'income' ? 'checked' : '' %>>
+          <label for="typeExpense" class="non-productive-label"><i class="fas fa-arrow-down" aria-hidden="true"></i> Expense</label>
+          <input type="radio" id="typeIncome" name="type" value="income" <%= selectedType === 'income' ? 'checked' : '' %>>
+          <label for="typeIncome" class="productive-label"><i class="fas fa-arrow-up" aria-hidden="true"></i> Income</label>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="fg">
+          <label for="exCategory">Category <span class="required">*</span></label>
+          <input id="exCategory" type="text" name="category" list="categoryOptions" required placeholder="e.g. Food, Transport, Salary" value="<%= expense ? expense.category : '' %>">
+          <datalist id="categoryOptions">
+            <option value="Food"><option value="Transport"><option value="Rent"><option value="Salary">
+            <option value="Entertainment"><option value="Utilities"><option value="Education"><option value="Other">
+          </datalist>
+        </div>
+        <div class="fg">
+          <label for="exAmount">Amount <span class="required">*</span></label>
+          <input id="exAmount" type="number" name="amount" min="0.01" step="0.01" required value="<%= expense ? expense.amount : '' %>">
+        </div>
+      </div>
+      <div class="fg">
+        <label for="exDate">Date <span class="required">*</span></label>
+        <input id="exDate" type="date" name="expense_date" required value="<%= expense ? new Date(expense.expense_date).toISOString().slice(0,10) : new Date().toISOString().slice(0,10) %>">
+      </div>
+      <div class="fg">
+        <label for="exDesc">Description</label>
+        <textarea id="exDesc" name="description" placeholder="Optional note about this entry..." rows="3"><%= expense ? expense.description || '' : '' %></textarea>
+      </div>
+      <div class="form-actions">
+        <a class="btn secondary" href="/expenses" id="cancelExpenseBtn"><i class="fas fa-times" aria-hidden="true"></i> Cancel</a>
+        <button class="btn primary" type="submit" id="saveExpenseBtn"><i class="fas fa-save" aria-hidden="true"></i> Save Entry</button>
+      </div>
+    </form>
+  </div>
+</div>
+<%- include('footer') %>

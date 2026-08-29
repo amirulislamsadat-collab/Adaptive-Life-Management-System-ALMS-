@@ -1,0 +1,33 @@
+<%- include('header', { currentPath: '/habits' }) %>
+<div class="page page-center">
+  <a href="/habits" class="back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Habits</a>
+  <div class="form-card card">
+    <div class="form-header">
+      <i class="fas fa-<%= habit ? 'edit' : 'fire' %>" aria-hidden="true"></i>
+      <h1><%= pageTitle %></h1>
+    </div>
+    <form method="POST" action="<%= formAction %>" id="habitForm">
+      <div class="fg">
+        <label for="hName">Habit Name <span class="required">*</span></label>
+        <input id="hName" type="text" name="name" required placeholder="e.g. Read 20 minutes, No phone after 10pm" value="<%= habit ? habit.name : '' %>">
+      </div>
+      <div class="fg">
+        <label for="hFreq">Frequency</label>
+        <select id="hFreq" name="frequency">
+          <option value="daily" <%= !habit || habit.frequency==='daily' ? 'selected' : '' %>>Daily</option>
+          <option value="weekdays" <%= habit && habit.frequency==='weekdays' ? 'selected' : '' %>>Weekdays (Mon-Fri)</option>
+          <option value="weekly" <%= habit && habit.frequency==='weekly' ? 'selected' : '' %>>Weekly</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label for="hDesc">Description</label>
+        <textarea id="hDesc" name="description" placeholder="Why does this habit matter to you?" rows="3"><%= habit ? habit.description || '' : '' %></textarea>
+      </div>
+      <div class="form-actions">
+        <a class="btn secondary" href="/habits" id="cancelHabitBtn"><i class="fas fa-times" aria-hidden="true"></i> Cancel</a>
+        <button class="btn primary" type="submit" id="saveHabitBtn"><i class="fas fa-save" aria-hidden="true"></i> Save Habit</button>
+      </div>
+    </form>
+  </div>
+</div>
+<%- include('footer') %>

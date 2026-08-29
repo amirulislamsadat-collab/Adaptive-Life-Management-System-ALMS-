@@ -36,8 +36,18 @@
       <li><a href="/water" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/water')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-tint" aria-hidden="true"></i></span> Water Intake</a></li>
       <li><a href="/exercise" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/exercise')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-running" aria-hidden="true"></i></span> Exercise</a></li>
       <li><a href="/mood" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/mood')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-smile" aria-hidden="true"></i></span> Mood</a></li>
+      <li><a href="/medications" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/medications')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-pills" aria-hidden="true"></i></span> Medications</a></li>
+      <li class="nav-section-label">Habit Tracker</li>
+      <li><a href="/habits" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/habits')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-fire" aria-hidden="true"></i></span> Habits</a></li>
+      <li class="nav-section-label">Digital Wellbeing</li>
+      <li><a href="/modules/screentime" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/modules/screentime')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-mobile-alt" aria-hidden="true"></i></span> Digital Overview</a></li>
+      <li><a href="/screen-time" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/screen-time')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-hourglass-half" aria-hidden="true"></i></span> Screen Time</a></li>
+      <li><a href="/social-media" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/social-media')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-hashtag" aria-hidden="true"></i></span> Social Media</a></li>
+      <li class="nav-section-label">Finance Tracker</li>
+      <li><a href="/modules/finance" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/modules/finance')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-wallet" aria-hidden="true"></i></span> Finance Overview</a></li>
+      <li><a href="/expenses" class="<%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/expenses')) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-money-bill-wave" aria-hidden="true"></i></span> Expenses</a></li>
       <li class="nav-section-label">Workspace</li>
-      <li><a href="/modules/settings" class="<%= (typeof currentPath !== 'undefined' && (currentPath.startsWith('/modules/settings') || (currentPath.startsWith('/modules') && !currentPath.startsWith('/modules/study') && !currentPath.startsWith('/modules/health')))) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-cog" aria-hidden="true"></i></span> Modules</a></li>
+      <li><a href="/modules/settings" class="<%= (typeof currentPath !== 'undefined' && (currentPath.startsWith('/modules/settings') || (currentPath.startsWith('/modules') && !currentPath.startsWith('/modules/study') && !currentPath.startsWith('/modules/health') && !currentPath.startsWith('/modules/finance') && !currentPath.startsWith('/modules/screentime')))) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-cog" aria-hidden="true"></i></span> Modules</a></li>
     </nav>
     <div class="sidebar-foot">
       <div class="user-chip">

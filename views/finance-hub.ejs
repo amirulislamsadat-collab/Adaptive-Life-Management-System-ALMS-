@@ -1,0 +1,40 @@
+<%- include('header', { currentPath: '/modules/finance' }) %>
+<div class="page">
+  <div class="top-header">
+    <h1 class="page-title"><i class="fas fa-wallet" aria-hidden="true"></i> <%= module.name %></h1>
+    <p class="page-desc"><%= module.description %></p>
+  </div>
+
+  <div class="summary-strip">
+    <div class="summary-tile">
+      <div class="val amount-income">$<%= summary.totalIncome.toFixed(2) %></div>
+      <div class="lbl">Total Income</div>
+    </div>
+    <div class="summary-tile">
+      <div class="val amount-expense">$<%= summary.totalExpense.toFixed(2) %></div>
+      <div class="lbl">Total Expenses</div>
+    </div>
+    <div class="summary-tile">
+      <div class="val <%= summary.balance >= 0 ? 'amount-income' : 'amount-expense' %>">$<%= summary.balance.toFixed(2) %></div>
+      <div class="lbl">Balance</div>
+    </div>
+  </div>
+
+  <div class="section-header" style="margin-top:40px;">
+    <div class="section-title"><i class="fas fa-compass" aria-hidden="true"></i> Finance Tools</div>
+  </div>
+  <div class="hub-grid">
+    <a href="/expenses" class="hub-card">
+      <div class="hub-card-icon"><i class="fas fa-money-bill-wave" aria-hidden="true"></i></div>
+      <div class="hub-card-title">Expenses &amp; Income</div>
+      <div class="hub-card-desc">Record and categorize your income and expenses.</div>
+      <div class="hub-card-stat"><i class="fas fa-arrow-right" aria-hidden="true"></i> Manage Expenses</div>
+    </a>
+  </div>
+
+  <div class="action-buttons" style="margin-top:40px;">
+    <a href="/dashboard" class="btn secondary"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Dashboard</a>
+    <a href="/modules/settings" class="btn secondary"><i class="fas fa-cog" aria-hidden="true"></i> Module Settings</a>
+  </div>
+</div>
+<%- include('footer') %>

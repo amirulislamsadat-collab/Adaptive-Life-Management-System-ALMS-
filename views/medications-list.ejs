@@ -1,0 +1,52 @@
+<%- include('header', { currentPath: '/medications' }) %>
+<div class="page">
+  <div class="top">
+    <div>
+      <a href="/modules/health" class="back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Health &amp; Wellness</a>
+      <h1><i class="fas fa-pills" aria-hidden="true"></i> Medication Reminders</h1>
+      <div class="page-desc">Schedule reminders so you never miss a dose.</div>
+    </div>
+    <a class="btn primary" href="/medications/new" id="newMedicationBtn"><i class="fas fa-plus" aria-hidden="true"></i> New Reminder</a>
+  </div>
+
+  <% if(medications.length){ %>
+  <div class="list">
+    <% medications.forEach(m => { %>
+    <div class="item <%= m.is_enabled ? '' : 'item-done' %>">
+      <div class="item-body">
+        <div class="item-title"><%= m.medication_name %></div>
+        <div class="meta">
+          <span><i class="fas fa-clock" aria-hidden="true"></i> <%= m.time_of_day.slice(0,5) %></span>
+          <span class="badge-progress <%= m.frequency === 'daily' ? 'completed' : 'pending' %>"><%= m.frequency %></span>
+          <% if(m.dosage){ %><span><i class="fas fa-prescription-bottle" aria-hidden="true"></i> <%= m.dosage %></span><% } %>
+          <% if(!m.is_enabled){ %><span class="countdown-chip past">Paused</span><% } %>
+        </div>
+        <% if(m.frequency === 'custom' && m.days_of_week){ %>
+        <div class="meta"><i class="fas fa-calendar-week" aria-hidden="true"></i> <%= m.days_of_week.split(',').join(', ') %></div>
+        <% } %>
+        <% if(m.notes){ %><div class="meta item-desc"><%= m.notes %></div><% } %>
+      </div>
+      <div class="actions">
+        <form method="POST" action="/medications/toggle/<%= m.id %>" style="display:inline">
+          <button type="submit" class="btn secondary btn-sm" id="toggleMedication<%= m.id %>">
+            <i class="fas fa-<%= m.is_enabled ? 'pause' : 'play' %>" aria-hidden="true"></i> <%= m.is_enabled ? 'Pause' : 'Resume' %>
+          </button>
+        </form>
+        <a href="/medications/edit/<%= m.id %>" class="btn secondary btn-sm" id="editMedication<%= m.id %>"><i class="fas fa-edit" aria-hidden="true"></i> Edit</a>
+        <form method="POST" action="/medications/delete/<%= m.id %>" style="display:inline" onsubmit="return confirm('Delete this medication reminder?');">
+          <button type="submit" class="btn danger btn-sm" id="deleteMedication<%= m.id %>"><i class="fas fa-trash-alt" aria-hidden="true"></i> Delete</button>
+        </form>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+  <% } else { %>
+  <div class="empty-state">
+    <div class="empty-icon"><i class="fas fa-pills" aria-hidden="true"></i></div>
+    <h3>No medication reminders yet</h3>
+    <p>Add a medication to schedule a daily reminder.</p>
+    <a href="/medications/new" class="btn primary" id="createFirstMedication"><i class="fas fa-plus" aria-hidden="true"></i> New Reminder</a>
+  </div>
+  <% } %>
+</div>
+<%- include('footer') %>

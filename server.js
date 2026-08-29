@@ -22,6 +22,9 @@ const alarmRoutes     = require('./routes/alarmRoutes');
 const subjectRoutes   = require('./routes/subjectRoutes');
 const studyRoutes     = require('./routes/studyRoutes');
 const healthRoutes    = require('./routes/healthRoutes');
+const habitRoutes     = require('./routes/habitRoutes');
+const digitalRoutes   = require('./routes/digitalRoutes');
+const financeRoutes   = require('./routes/financeRoutes');
 
 // --- Middleware Imports ---
 const notificationMiddleware = require('./middleware/notificationMiddleware');
@@ -70,6 +73,9 @@ app.use('/', alarmRoutes);
 app.use('/', subjectRoutes);
 app.use('/', studyRoutes);
 app.use('/', healthRoutes);
+app.use('/', habitRoutes);
+app.use('/', digitalRoutes);
+app.use('/', financeRoutes);
 
 // --- Notifications API (for client-side polling without page refresh) ---
 const Reminder = require('./models/Reminder');
@@ -180,7 +186,9 @@ async function initDB() {
       (8, 'Calendar',         'calendar', 'Manage calendar events and detect scheduling conflicts',              'calendar'),
       (9, 'Reminders',        'reminders','Track reminders with due date and time',                              'bell'),
       (10, 'Alarms',          'alarms',   'Set recurring alarms with customizable schedules',                    'alarm'),
-      (11, 'Subjects',        'subjects', 'Manage your academic subjects and instructors',                       'subject')
+      (11, 'Subjects',        'subjects', 'Manage your academic subjects and instructors',                       'subject'),
+      (12, 'Habit Tracker',   'habits',     'Build consistent habits and track your daily completion streaks',            'habit'),
+      (13, 'Digital Wellbeing','screentime','Track screen time and social media usage, and see how productive your time really is', 'mobile')
     `);
 
     // ---------- TABLE 4: user_modules ----------
@@ -427,7 +435,101 @@ async function initDB() {
       )
     `);
 
-    console.log('[DB] All 18 tables created and seeded successfully.');
+    // ---------- TABLE 19: medications (Feature 22) ----------
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS medications (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        medication_name VARCHAR(255) NOT NULL,
+        dosage VARCHAR(100),
+        frequency VARCHAR(20) NOT NULL DEFAULT 'daily',
+        days_of_week VARCHAR(64),
+        time_of_day TIME NOT NULL,
+        notes TEXT,
+        is_enabled TINYINT(1) DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    // ---------- TABLE 20: habits (Feature 23) ----------
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS habits (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        description TEXT,
+        frequency VARCHAR(20) NOT NULL DEFAULT 'daily',
+        is_active TINYINT(1) DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    // ---------- TABLE 21: habit_logs (Feature 24) ----------
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS habit_logs (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        habit_id INT NOT NULL,
+        user_id INT NOT NULL,
+        log_date DATE NOT NULL,
+        completed TINYINT(1) DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY uq_habit_date (habit_id, log_date),
+        FOREIGN KEY (habit_id) REFERENCES habits(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    // ---------- TABLE 22: screen_time_logs (Features 25, 27) ----------
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS screen_time_logs (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        log_date DATE NOT NULL,
+        activity_name VARCHAR(150) NOT NULL,
+        minutes INT NOT NULL,
+        category VARCHAR(20) NOT NULL DEFAULT 'non_productive',
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    // ---------- TABLE 23: social_media_logs (Feature 26) ----------
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS social_media_logs (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        log_date DATE NOT NULL,
+        platform VARCHAR(100) NOT NULL,
+        minutes INT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    // ---------- TABLE 24: expenses (Feature 28) ----------
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS expenses (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        type VARCHAR(10) NOT NULL DEFAULT 'expense',
+        category VARCHAR(100) NOT NULL,
+        amount DECIMAL(10,2) NOT NULL,
+        description VARCHAR(255),
+        expense_date DATE NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    console.log('[DB] All 24 tables created and seeded successfully.');
   } catch (err) {
     console.error('[DB] Initialization error ->', err.message);
   }

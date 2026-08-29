@@ -1,0 +1,49 @@
+<%- include('header', { currentPath: '/habits' }) %>
+<div class="page">
+  <div class="top">
+    <div>
+      <a href="/dashboard" class="back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Dashboard</a>
+      <h1><i class="fas fa-fire" aria-hidden="true"></i> Habit Tracker</h1>
+      <div class="page-desc">Build consistent habits and track your daily completion streaks.</div>
+    </div>
+    <a class="btn primary" href="/habits/new" id="newHabitBtn"><i class="fas fa-plus" aria-hidden="true"></i> New Habit</a>
+  </div>
+
+  <% if(habits.length){ %>
+  <div class="list">
+    <% habits.forEach(h => { %>
+    <div class="item">
+      <div class="item-body">
+        <div class="item-title"><%= h.name %></div>
+        <div class="meta">
+          <span class="streak-badge <%= h.currentStreak === 0 ? 'zero' : '' %>"><i class="fas fa-fire" aria-hidden="true"></i> <%= h.currentStreak %> day streak</span>
+          <span><i class="fas fa-trophy" aria-hidden="true"></i> Best: <%= h.longestStreak %></span>
+          <span><i class="fas fa-check-circle" aria-hidden="true"></i> <%= h.totalCheckIns %> total check-ins</span>
+          <span class="badge-progress <%= h.frequency === 'daily' ? 'completed' : 'pending' %>"><%= h.frequency %></span>
+        </div>
+        <% if(h.description){ %><div class="meta item-desc"><%= h.description %></div><% } %>
+      </div>
+      <div class="actions">
+        <form method="POST" action="/habits/checkin/<%= h.id %>" style="display:inline">
+          <button type="submit" class="btn secondary btn-sm habit-checkin-btn <%= h.checkedInToday ? 'done' : '' %>" id="checkinHabit<%= h.id %>">
+            <i class="fas fa-<%= h.checkedInToday ? 'check-double' : 'check' %>" aria-hidden="true"></i> <%= h.checkedInToday ? 'Done Today' : 'Mark Done' %>
+          </button>
+        </form>
+        <a href="/habits/edit/<%= h.id %>" class="btn secondary btn-sm" id="editHabit<%= h.id %>"><i class="fas fa-edit" aria-hidden="true"></i> Edit</a>
+        <form method="POST" action="/habits/delete/<%= h.id %>" style="display:inline" onsubmit="return confirm('Delete this habit?');">
+          <button type="submit" class="btn danger btn-sm" id="deleteHabit<%= h.id %>"><i class="fas fa-trash-alt" aria-hidden="true"></i> Delete</button>
+        </form>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+  <% } else { %>
+  <div class="empty-state">
+    <div class="empty-icon"><i class="fas fa-fire" aria-hidden="true"></i></div>
+    <h3>No habits yet</h3>
+    <p>Create a habit and check in daily to start building your streak.</p>
+    <a href="/habits/new" class="btn primary" id="createFirstHabit"><i class="fas fa-plus" aria-hidden="true"></i> Create Habit</a>
+  </div>
+  <% } %>
+</div>
+<%- include('footer') %>

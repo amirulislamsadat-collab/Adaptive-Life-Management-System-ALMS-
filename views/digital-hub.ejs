@@ -1,0 +1,69 @@
+<%- include('header', { currentPath: '/modules/screentime' }) %>
+<div class="page">
+  <div class="top-header">
+    <h1 class="page-title"><i class="fas fa-mobile-alt" aria-hidden="true"></i> <%= module.name %></h1>
+    <p class="page-desc"><%= module.description %></p>
+  </div>
+
+  <div class="section-header">
+    <div class="section-title"><i class="fas fa-chart-pie" aria-hidden="true"></i> Productive Time Analysis (Last 7 Days)</div>
+  </div>
+  <div class="card" style="margin-bottom:32px;">
+    <% if(summary.totalMinutes > 0){ %>
+      <div class="split-bar">
+        <div class="productive" style="width:<%= summary.productivePct %>%"></div>
+        <div class="non-productive" style="width:<%= summary.nonProductivePct %>%"></div>
+      </div>
+      <div class="split-legend">
+        <span><span class="legend-dot productive"></span> Productive — <%= summary.productiveMinutes %> min (<%= summary.productivePct %>%)</span>
+        <span><span class="legend-dot non-productive"></span> Non-Productive — <%= summary.nonProductiveMinutes %> min (<%= summary.nonProductivePct %>%)</span>
+      </div>
+    <% } else { %>
+      <p class="empty-msg">No screen time recorded in the last 7 days yet. Log some activity to see your breakdown.</p>
+    <% } %>
+  </div>
+
+  <div class="summary-strip" style="margin-bottom:32px;">
+    <div class="summary-tile"><div class="val"><%= summary.totalMinutes %> min</div><div class="lbl">Total Screen Time (7d)</div></div>
+    <div class="summary-tile"><div class="val"><%= summary.productiveMinutes %> min</div><div class="lbl">Productive (7d)</div></div>
+    <div class="summary-tile"><div class="val"><%= summary.nonProductiveMinutes %> min</div><div class="lbl">Non-Productive (7d)</div></div>
+  </div>
+
+  <% if(weeklyByPlatform && weeklyByPlatform.length){ %>
+  <div class="section-header">
+    <div class="section-title"><i class="fas fa-hashtag" aria-hidden="true"></i> Social Media This Week</div>
+  </div>
+  <div class="upcoming-strip" style="margin-bottom:32px;">
+    <% weeklyByPlatform.forEach(p => { %>
+    <div class="upcoming-row">
+      <span><strong><%= p.platform %></strong></span>
+      <span class="badge-expense"><i class="fas fa-hourglass-half" aria-hidden="true"></i> <%= p.total_minutes %> min</span>
+    </div>
+    <% }) %>
+  </div>
+  <% } %>
+
+  <div class="section-header">
+    <div class="section-title"><i class="fas fa-compass" aria-hidden="true"></i> Digital Wellbeing Tools</div>
+  </div>
+  <div class="hub-grid">
+    <a href="/screen-time" class="hub-card">
+      <div class="hub-card-icon"><i class="fas fa-hourglass-half" aria-hidden="true"></i></div>
+      <div class="hub-card-title">Screen Time</div>
+      <div class="hub-card-desc">Manually record your daily device usage by activity.</div>
+      <div class="hub-card-stat"><i class="fas fa-arrow-right" aria-hidden="true"></i> Log Screen Time</div>
+    </a>
+    <a href="/social-media" class="hub-card">
+      <div class="hub-card-icon"><i class="fas fa-hashtag" aria-hidden="true"></i></div>
+      <div class="hub-card-title">Social Media</div>
+      <div class="hub-card-desc">Track usage time for individual social media platforms.</div>
+      <div class="hub-card-stat"><i class="fas fa-arrow-right" aria-hidden="true"></i> Log Social Media</div>
+    </a>
+  </div>
+
+  <div class="action-buttons" style="margin-top:40px;">
+    <a href="/dashboard" class="btn secondary"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Dashboard</a>
+    <a href="/modules/settings" class="btn secondary"><i class="fas fa-cog" aria-hidden="true"></i> Module Settings</a>
+  </div>
+</div>
+<%- include('footer') %>

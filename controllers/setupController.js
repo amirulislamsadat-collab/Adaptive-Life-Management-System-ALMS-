@@ -6,9 +6,9 @@ const Module = require('../models/Module');
 const User   = require('../models/User');
 
 const roleRecommendations = {
-  'Student':      [1, 2, 4, 6],
-  'Professional': [1, 3, 5],
-  'Freelancer':   [1, 3, 5, 6]
+  'Student':      [1, 2, 4, 6, 12, 13],
+  'Professional': [1, 3, 5, 13],
+  'Freelancer':   [1, 3, 5, 6, 12, 13]
 };
 
 exports.getSetup = async (req, res) => {

@@ -1,0 +1,66 @@
+<%- include('header', { currentPath: '/medications' }) %>
+<%
+  const selectedDays = medication && medication.days_of_week ? medication.days_of_week.split(',') : [];
+%>
+<div class="page page-center">
+  <a href="/medications" class="back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Medications</a>
+  <div class="form-card card">
+    <div class="form-header">
+      <i class="fas fa-<%= medication ? 'edit' : 'pills' %>" aria-hidden="true"></i>
+      <h1><%= pageTitle %></h1>
+    </div>
+    <form method="POST" action="<%= formAction %>" id="medicationForm">
+      <div class="fg">
+        <label for="medName">Medication Name <span class="required">*</span></label>
+        <input id="medName" type="text" name="medication_name" required placeholder="e.g. Vitamin D, Amoxicillin" value="<%= medication ? medication.medication_name : '' %>">
+      </div>
+      <div class="form-row">
+        <div class="fg">
+          <label for="medDosage">Dosage</label>
+          <input id="medDosage" type="text" name="dosage" placeholder="e.g. 1 tablet, 500mg" value="<%= medication ? medication.dosage || '' : '' %>">
+        </div>
+        <div class="fg">
+          <label for="medTime">Reminder Time <span class="required">*</span></label>
+          <input id="medTime" type="time" name="time_of_day" required value="<%= medication ? medication.time_of_day.slice(0,5) : '09:00' %>">
+        </div>
+      </div>
+      <div class="fg">
+        <label for="medFreq">Frequency <span class="required">*</span></label>
+        <select id="medFreq" name="frequency">
+          <option value="daily" <%= !medication || medication.frequency==='daily' ? 'selected' : '' %>>Daily</option>
+          <option value="weekdays" <%= medication && medication.frequency==='weekdays' ? 'selected' : '' %>>Weekdays (Mon-Fri)</option>
+          <option value="custom" <%= medication && medication.frequency==='custom' ? 'selected' : '' %>>Custom weekdays</option>
+        </select>
+      </div>
+      <div class="fg" id="daysWrap" style="display:none;">
+        <label>Custom Weekdays</label>
+        <div class="days-grid">
+          <% ['MO','TU','WE','TH','FR','SA','SU'].forEach(day => { %>
+            <label class="day-checkbox">
+              <input type="checkbox" name="days_of_week" value="<%= day %>" <%= selectedDays.includes(day) ? 'checked' : '' %>>
+              <span class="day-label"><%= day %></span>
+            </label>
+          <% }) %>
+        </div>
+      </div>
+      <div class="fg">
+        <label for="medNotes">Notes</label>
+        <textarea id="medNotes" name="notes" placeholder="Instructions, reason, etc..." rows="3"><%= medication ? medication.notes || '' : '' %></textarea>
+      </div>
+      <div class="form-actions">
+        <a class="btn secondary" href="/medications" id="cancelMedicationBtn"><i class="fas fa-times" aria-hidden="true"></i> Cancel</a>
+        <button class="btn primary" type="submit" id="saveMedicationBtn"><i class="fas fa-save" aria-hidden="true"></i> Save Reminder</button>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+(function(){
+  const freq = document.getElementById('medFreq');
+  const wrap = document.getElementById('daysWrap');
+  function toggleDays(){ wrap.style.display = freq.value === 'custom' ? 'block' : 'none'; }
+  freq.addEventListener('change', toggleDays);
+  toggleDays();
+})();
+</script>
+<%- include('footer') %>

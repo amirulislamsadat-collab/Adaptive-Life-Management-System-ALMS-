@@ -1,0 +1,49 @@
+<%- include('header', { currentPath: '/social-media' }) %>
+<div class="page">
+  <div class="top">
+    <div>
+      <a href="/modules/screentime" class="back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Digital Wellbeing</a>
+      <h1><i class="fas fa-hashtag" aria-hidden="true"></i> Social Media Usage</h1>
+      <div class="page-desc">Record daily usage time for individual social media platforms.</div>
+    </div>
+    <a class="btn primary" href="/social-media/new" id="newSocialMediaBtn"><i class="fas fa-plus" aria-hidden="true"></i> Log Usage</a>
+  </div>
+
+  <% if(byPlatform && byPlatform.length){ %>
+  <div class="summary-strip" style="margin-bottom:32px;">
+    <% byPlatform.forEach(p => { %>
+    <div class="summary-tile"><div class="val"><%= p.total_minutes %> min</div><div class="lbl"><%= p.platform %> (7d)</div></div>
+    <% }) %>
+  </div>
+  <% } %>
+
+  <% if(logs.length){ %>
+  <div class="list">
+    <% logs.forEach(log => { %>
+    <div class="item">
+      <div class="item-body">
+        <div class="item-title"><%= log.platform %></div>
+        <div class="meta">
+          <span><i class="fas fa-calendar-day" aria-hidden="true"></i> <%= new Date(log.log_date).toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'}) %></span>
+          <span><i class="fas fa-clock" aria-hidden="true"></i> <%= log.minutes %> min</span>
+        </div>
+      </div>
+      <div class="actions">
+        <a href="/social-media/edit/<%= log.id %>" class="btn secondary btn-sm" id="editSocialMedia<%= log.id %>"><i class="fas fa-edit" aria-hidden="true"></i> Edit</a>
+        <form method="POST" action="/social-media/delete/<%= log.id %>" style="display:inline" onsubmit="return confirm('Delete this log?');">
+          <button type="submit" class="btn danger btn-sm" id="deleteSocialMedia<%= log.id %>"><i class="fas fa-trash-alt" aria-hidden="true"></i> Delete</button>
+        </form>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+  <% } else { %>
+  <div class="empty-state">
+    <div class="empty-icon"><i class="fas fa-hashtag" aria-hidden="true"></i></div>
+    <h3>No social media usage logged yet</h3>
+    <p>Log time spent on each platform to see a weekly breakdown.</p>
+    <a href="/social-media/new" class="btn primary" id="createFirstSocialMedia"><i class="fas fa-plus" aria-hidden="true"></i> Log Usage</a>
+  </div>
+  <% } %>
+</div>
+<%- include('footer') %>
