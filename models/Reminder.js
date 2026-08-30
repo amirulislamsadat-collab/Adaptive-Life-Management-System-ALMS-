@@ -32,6 +32,15 @@ const Reminder = {
     return rows;
   },
 
+  // Across ALL users, for the push-notification cron job (not scoped to
+  // whoever's browsing right now, unlike findDue).
+  findAllDueGlobal: async () => {
+    const [rows] = await db.query(
+      `SELECT id, user_id, title, due_at FROM reminders WHERE due_at <= NOW() AND notified_at IS NULL`
+    );
+    return rows;
+  },
+
   markNotified: async (userId, reminderIds) => {
     if (!reminderIds.length) return;
     const placeholders = reminderIds.map(() => '?').join(',');

@@ -31,6 +31,8 @@ const journalRoutes   = require('./routes/journalRoutes');
 const focusRoutes     = require('./routes/focusRoutes');
 const assistantRoutes = require('./routes/assistantRoutes');
 const checkinRoutes   = require('./routes/checkinRoutes');
+const pushRoutes      = require('./routes/pushRoutes');
+const pushCtrl        = require('./controllers/pushController');
 const assistantCtrl   = require('./controllers/assistantController');
 
 // --- Middleware Imports ---
@@ -63,6 +65,8 @@ app.use(session({
 app.use(passport.initialize());
 app.locals.googleAuthConfigured = googleAuthConfigured;
 app.locals.assistantConfigured = assistantCtrl.isConfigured;
+app.locals.pushConfigured = pushCtrl.isConfigured;
+app.locals.pushPublicKey = pushCtrl.publicKey;
 
 // --- Flash Messages Middleware ---
 app.use((req, res, next) => {
@@ -158,6 +162,10 @@ app.use('/', journalRoutes);
 app.use('/', focusRoutes);
 app.use('/', assistantRoutes);
 app.use('/', checkinRoutes);
+app.use('/', pushRoutes);
+
+const cronCtrl = require('./controllers/cronController');
+app.get('/api/cron/notify', cronCtrl.runNotificationSweep);
 
 // --- Notifications API (for client-side polling without page refresh) ---
 const Reminder = require('./models/Reminder');
@@ -779,7 +787,21 @@ async function initDB() {
       )
     `);
 
-    console.log('[DB] All 32 tables created and seeded successfully.');
+    // ---------- TABLE 33: push_subscriptions (real OS-level push notifications) ----------
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS push_subscriptions (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        endpoint VARCHAR(700) NOT NULL,
+        p256dh VARCHAR(255) NOT NULL,
+        auth VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY uq_endpoint (endpoint),
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    console.log('[DB] All 33 tables created and seeded successfully.');
   } catch (err) {
     console.error('[DB] Initialization error ->', err.message);
   }

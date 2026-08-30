@@ -30,6 +30,15 @@ const Alarm = {
     return rows;
   },
 
+  // Across ALL users, for the push-notification cron job.
+  findAllEnabledGlobal: async () => {
+    const [rows] = await db.query(
+      `SELECT id, user_id, title, frequency, days_of_week, time_of_day, last_triggered_at
+       FROM alarms WHERE is_enabled = 1`
+    );
+    return rows;
+  },
+
   markTriggered: async (id, userId) => {
     await db.query('UPDATE alarms SET last_triggered_at = NOW() WHERE id = ? AND user_id = ?', [id, userId]);
   },

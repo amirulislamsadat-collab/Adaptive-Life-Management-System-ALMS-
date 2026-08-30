@@ -12,5 +12,8 @@
     { "src": "/service-worker.js", "dest": "/public/service-worker.js" },
     { "src": "/offline.html", "dest": "/public/offline.html" },
     { "src": "/(.*)", "dest": "/server.js" }
+  ],
+  "crons": [
+    { "path": "/api/cron/notify", "schedule": "*/15 * * * *" }
   ]
 }

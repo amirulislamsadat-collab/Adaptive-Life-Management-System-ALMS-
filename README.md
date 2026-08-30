@@ -61,6 +61,14 @@ This `alms-vercel-deploy` folder has been upgraded well past the original 35-fea
 
 All 35 original features remain fully functional and were regression-tested end-to-end after these changes (all routes return 200, module enable/disable still gates every new and old feature correctly, no server errors).
 
+## Later additions
+
+- **Native Windows (`desktop-app/`) and Android (`mobile-app/`) apps** — real installers, not just the PWA, built via GitHub Actions (`.github/workflows/build-apps.yml`) and attached to GitHub Releases. See each folder's README.
+- **Google Sign-In**, **AI Assistant** (Claude-powered chat bubble, server-persisted history), **Daily Check-In** (energy/water goal/today's focus, one per local day), **customizable Today dashboard** (drag-reorder and hide widgets, saved per user), **cross-module insights** (Reports page — rules that correlate two modules at once, e.g. low sleep + low task completion), and an **expanded gamification system** (cumulative XP levels, priority multipliers, streak bonuses) — each documented in its own commit message; set the corresponding env vars in `.env.example` to activate the ones that need a third-party key (Google OAuth, Anthropic).
+- **Daily streak** (Duolingo-style) — any meaningful action keeps a running daily streak alive, shown as a flame badge in the sidebar with a "streak at risk" nudge on the dashboard if nothing's been done yet today.
+- **Real push notifications** for reminders/alarms (Settings > Notifications), so they can notify even when ALMS isn't open in a tab — unlike the in-app banner, which only ever fires while someone has a page loaded. Needs `VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY` set (generate with `npx web-push generate-vapid-keys`) and is delivered by a scheduled job (`vercel.json`'s `crons` → `/api/cron/notify`, secured by `CRON_SECRET`).
+  > **Vercel plan note:** cron jobs on Vercel's free **Hobby** plan run **at most once per day**, regardless of the schedule configured (`*/15 * * * *` here) — Vercel silently throttles it. On Hobby, this means reminders/alarms get swept for delivery roughly once daily, not every 15 minutes. True near-real-time delivery needs a **Pro** plan, or pinging `/api/cron/notify` yourself from a free external scheduler (e.g. cron-job.org) with the `Authorization: Bearer <CRON_SECRET>` header.
+
 ## Local development (XAMPP)
 
 1. Install [XAMPP](https://www.apachefriends.org/) and start **MySQL** from the XAMPP Control Panel (Apache is not required — this app runs its own Node server).
