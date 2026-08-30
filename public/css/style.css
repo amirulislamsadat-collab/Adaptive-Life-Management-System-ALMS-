@@ -1,5 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
+/* Any element toggled via JS setting/removing the `hidden` attribute
+   (install button, iOS install modal, command palette, etc.) must actually
+   disappear — without this, a component rule like `.foo { display: flex }`
+   silently outranks the browser's built-in `[hidden]{display:none}` default
+   (author-origin CSS always beats user-agent-origin CSS), so the element
+   stays visible and its close button appears to do nothing. */
+[hidden] { display: none !important; }
+
 /* --- Reset & Base Variables --- */
 :root {
   --font-family: 'Poppins', sans-serif;
