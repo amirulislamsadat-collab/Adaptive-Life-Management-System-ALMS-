@@ -13,6 +13,7 @@ const WaterLog              = require('../models/WaterLog');
 const FocusSession            = require('../models/FocusSession');
 const Gamification             = require('../models/Gamification');
 const User                       = require('../models/User');
+const DailyQuote                   = require('../models/DailyQuote');
 
 const DAY_CODES = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
 
@@ -79,8 +80,9 @@ exports.getDashboard = async (req, res) => {
     };
 
     const levelInfo = Gamification.getLevelInfo(req.session.user.xp || 0);
+    const dailyQuote = DailyQuote.today();
 
-    res.render('dashboard', { user: req.session.user, modules, stats, today, levelInfo, widgetLayout });
+    res.render('dashboard', { user: req.session.user, modules, stats, today, levelInfo, widgetLayout, dailyQuote });
   } catch (err) {
     console.error('Dashboard error:', err);
     req.session.error = 'Dashboard error: ' + err.message;

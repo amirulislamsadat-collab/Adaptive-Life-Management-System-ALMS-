@@ -44,6 +44,25 @@
   </div>
 
   <div class="section-header">
+    <div class="section-title"><i class="fas fa-trophy" aria-hidden="true"></i> Achievements</div>
+    <span class="badges-count"><%= badges.filter(b => b.unlocked).length %> / <%= badges.length %> unlocked</span>
+  </div>
+  <div class="badges-grid" style="margin-bottom:40px;">
+    <% badges.forEach(function(b){ %>
+    <div class="badge-card <%= b.unlocked ? 'unlocked' : 'locked' %>" title="<%= b.desc %>">
+      <div class="badge-emoji"><%= b.emoji %></div>
+      <div class="badge-name"><%= b.name %></div>
+      <div class="badge-desc"><%= b.desc %></div>
+      <% if(b.unlocked) { %>
+        <div class="badge-date"><%= new Date(b.unlockedAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) %></div>
+      <% } else { %>
+        <div class="badge-date badge-locked-label"><i class="fas fa-lock" aria-hidden="true"></i> Locked</div>
+      <% } %>
+    </div>
+    <% }) %>
+  </div>
+
+  <div class="section-header">
     <div class="section-title"><i class="fas fa-palette" aria-hidden="true"></i> Customize Avatar</div>
   </div>
   <div class="card" style="margin-bottom:40px;">
@@ -170,4 +189,12 @@
   wireSwatches('shirtSwatches', 'shirtInput', '--av-shirt');
 })();
 </script>
+<% if(newlyUnlocked.length) { %>
+<script>
+window.addEventListener('load', function() {
+  if (window.almsCelebrate) window.almsCelebrate();
+  if (window.almsToast) window.almsToast('New badge<%= newlyUnlocked.length > 1 ? "s" : "" %> unlocked: <%= badges.filter(function(b){ return newlyUnlocked.indexOf(b.key) !== -1; }).map(function(b){ return b.emoji + " " + b.name; }).join(", ") %>!');
+});
+</script>
+<% } %>
 <%- include('footer') %>

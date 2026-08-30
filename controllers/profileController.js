@@ -7,13 +7,15 @@
 const User = require('../models/User');
 const Gamification = require('../models/Gamification');
 const HealthGuidelines = require('../models/HealthGuidelines');
+const Achievements = require('../models/Achievements');
 
 exports.getProfile = async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
   try {
     const fullUser = await User.findById(req.session.user.id);
     const levelInfo = Gamification.getLevelInfo(req.session.user.xp || 0);
-    res.render('profile', { user: req.session.user, fullUser, levelInfo });
+    const { badges, newlyUnlocked } = await Achievements.checkAndUnlock(req.session.user.id, fullUser, levelInfo);
+    res.render('profile', { user: req.session.user, fullUser, levelInfo, badges, newlyUnlocked });
   } catch (err) {
     console.error('Profile load error:', err);
     req.session.error = 'Failed to load your profile.';

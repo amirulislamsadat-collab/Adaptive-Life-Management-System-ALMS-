@@ -4,6 +4,7 @@
     <div class="greeting-left">
       <h1>Good <%= (new Date().getHours()<12?'Morning':new Date().getHours()<18?'Afternoon':'Evening') %>, <%= user.name.split(' ')[0] %>!</h1>
       <p>Here's what actually needs you today, nothing more.</p>
+      <p class="daily-quote"><i class="fas fa-quote-left" aria-hidden="true"></i> <%= dailyQuote %></p>
       <div class="role-badge"><i class="fas fa-user-circle" aria-hidden="true"></i> <%= user.role %></div>
     </div>
     <div class="date-display">

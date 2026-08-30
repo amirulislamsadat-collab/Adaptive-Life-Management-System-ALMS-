@@ -337,6 +337,23 @@ body.sidebar-hidden .sidebar { display: none; }
 .profile-stat-icon.streak { background: rgba(249, 115, 22, 0.12); color: #f97316; }
 .profile-stat-title { font-weight: 700; font-size: 15px; color: var(--text-dark); }
 .profile-stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+/* --- Achievements / badge wall --- */
+.badges-count { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+.badges-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 14px; }
+.badge-card {
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px; padding: 18px 12px;
+  border-radius: var(--radius-lg); border: 1px solid var(--border-color); background: var(--card-bg);
+  transition: transform 0.15s ease;
+}
+.badge-card.unlocked { border-color: rgba(255, 90, 95, 0.3); box-shadow: var(--glow-primary); }
+.badge-card.unlocked:hover { transform: translateY(-3px); }
+.badge-card.locked { opacity: 0.5; filter: grayscale(1); }
+.badge-emoji { font-size: 34px; margin-bottom: 4px; }
+.badge-name { font-weight: 700; font-size: 13px; color: var(--text-dark); }
+.badge-desc { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+.badge-date { font-size: 10px; color: var(--primary); font-weight: 600; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.03em; }
+.badge-locked-label { color: var(--text-muted); }
 .role-card { background: var(--card-bg); border: 2px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px 24px; text-align: center; cursor: pointer; transition: all 0.2s; }
 .role-card:active { border-color: var(--primary); }
 .role-card.selected { border-color: var(--primary); background: rgba(255, 90, 95, 0.05); }
@@ -378,6 +395,8 @@ body.sidebar-hidden .sidebar { display: none; }
 .greeting-left h1, .page-title { margin: 0; font-size: 32px; color: white; display: flex; align-items: center; gap: 12px; }
 .greeting-left p, .page-desc { color: rgba(255,255,255,0.9); margin-top: 8px; font-size: 16px; }
 .role-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.2); padding: 6px 12px; border-radius: 99px; font-size: 14px; margin-top: 16px; }
+.greeting-left .daily-quote { font-size: 13px; font-style: italic; color: rgba(255,255,255,0.75); margin-top: 4px; }
+.daily-quote i { font-size: 11px; margin-right: 4px; opacity: 0.8; }
 .date-display { text-align: right; }
 .date-day { font-size: 24px; font-weight: bold; }
 .date-full { opacity: 0.9; }

@@ -851,7 +851,19 @@ async function initDB() {
       )
     `);
 
-    console.log('[DB] All 34 tables created and seeded successfully.');
+    // ---------- TABLE 35: user_achievements (unlocked badges) ----------
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS user_achievements (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        badge_key VARCHAR(50) NOT NULL,
+        unlocked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY uq_user_badge (user_id, badge_key),
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    console.log('[DB] All 35 tables created and seeded successfully.');
   } catch (err) {
     console.error('[DB] Initialization error ->', err.message);
   }
