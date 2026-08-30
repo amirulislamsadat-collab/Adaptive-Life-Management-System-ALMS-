@@ -26,7 +26,7 @@ async function callGroq(systemPrompt, messages) {
     },
     body: JSON.stringify({
       model: GROQ_MODEL,
-      max_tokens: 500,
+      max_completion_tokens: 500,
       messages: [{ role: 'system', content: systemPrompt }, ...messages]
     })
   });

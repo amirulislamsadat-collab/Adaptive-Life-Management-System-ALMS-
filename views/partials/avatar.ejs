@@ -1,12 +1,21 @@
 <%
 // Locals: gender ('male'|'female'), skin (hex), hair (hex), size (px, default 40), avClass (extra CSS class, optional)
+// skin/hair are deliberately only written into this SVG's own inline style
+// when explicitly passed in. A descendant's own inline custom-property
+// declaration always wins over one set on an ancestor (e.g. a JS-driven
+// live preview updating a wrapper div's style) — so when this partial is
+// used inside a builder that recolors it dynamically via CSS variables on
+// a parent element, it must inherit --av-skin/--av-hair rather than
+// re-declare its own default, or those updates would never visibly apply.
+// Falls back to the :root defaults in style.css when nothing sets them.
 const avGender = typeof gender !== 'undefined' && gender ? gender : 'male';
-const avSkin = typeof skin !== 'undefined' && skin ? skin : '#F0B594';
-const avHair = typeof hair !== 'undefined' && hair ? hair : '#3B2314';
 const avSize = typeof size !== 'undefined' && size ? size : 40;
 const avExtraClass = typeof avClass !== 'undefined' && avClass ? avClass : '';
+const avStyleParts = [];
+if (typeof skin !== 'undefined' && skin) avStyleParts.push('--av-skin:' + skin);
+if (typeof hair !== 'undefined' && hair) avStyleParts.push('--av-hair:' + hair);
 %>
-<svg class="alms-avatar <%= avExtraClass %>" width="<%= avSize %>" height="<%= avSize %>" viewBox="0 0 100 100" style="--av-skin:<%= avSkin %>;--av-hair:<%= avHair %>;" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+<svg class="alms-avatar <%= avExtraClass %>" width="<%= avSize %>" height="<%= avSize %>" viewBox="0 0 100 100" style="<%= avStyleParts.join(';') %>" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
   <circle cx="50" cy="50" r="50" fill="var(--av-skin)" opacity="0.18"></circle>
   <ellipse cx="50" cy="80" rx="30" ry="20" fill="var(--av-skin)"></ellipse>
   <circle cx="50" cy="46" r="24" fill="var(--av-skin)"></circle>
