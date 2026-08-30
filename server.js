@@ -174,6 +174,9 @@ app.use('/', pushRoutes);
 const cronCtrl = require('./controllers/cronController');
 app.get('/api/cron/notify', cronCtrl.runNotificationSweep);
 
+const searchCtrl = require('./controllers/searchController');
+app.get('/search', searchCtrl.search);
+
 // --- Notifications API (for client-side polling without page refresh) ---
 const Reminder = require('./models/Reminder');
 const Alarm    = require('./models/Alarm');

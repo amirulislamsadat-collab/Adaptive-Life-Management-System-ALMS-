@@ -126,25 +126,47 @@ window.almsCelebrate = function () {
   }
 
   // --- Command palette (Ctrl+K / Cmd+K) ---
+  // Real search: whatever the user has actually created (tasks, notes,
+  // alarms, reminders, etc. — fetched live from /search) is shown first,
+  // then module/nav links fill any remaining slots, capped at 4 total so
+  // this never turns into an overwhelming wall of results.
   var palette = document.getElementById('commandPalette');
   var paletteInput = document.getElementById('commandPaletteInput');
   var paletteList = document.getElementById('commandPaletteList');
-  if (palette && paletteInput && paletteList) {
-    var items = Array.prototype.slice.call(paletteList.querySelectorAll('a'));
+  var paletteResults = document.getElementById('commandPaletteResults');
+  if (palette && paletteInput && paletteList && paletteResults) {
+    var moduleItems = Array.prototype.slice.call(paletteList.querySelectorAll('a'));
+    var TOTAL_CAP = 4;
+    var searchDebounce = null;
+    var searchSeq = 0;
 
     function openPalette() {
       palette.hidden = false;
       paletteInput.value = '';
-      filterPalette('');
+      renderResults('', []);
       paletteInput.focus();
     }
     function closePalette() { palette.hidden = true; }
 
-    function filterPalette(query) {
+    function renderResults(query, contentResults) {
       var q = query.trim().toLowerCase();
-      items.forEach(function (a) {
+      paletteResults.innerHTML = '';
+
+      contentResults.forEach(function (r) {
+        var a = document.createElement('a');
+        a.href = r.url;
+        a.innerHTML = '<i class="fas ' + r.icon + '" aria-hidden="true"></i> ' + r.title + ' <small>' + r.type + '</small>';
+        paletteResults.appendChild(a);
+      });
+
+      var remaining = TOTAL_CAP - contentResults.length;
+      var shown = 0;
+      moduleItems.forEach(function (a) {
         var text = a.textContent.toLowerCase();
-        a.style.display = !q || text.indexOf(q) !== -1 ? 'flex' : 'none';
+        var matches = !q || text.indexOf(q) !== -1;
+        var fits = matches && shown < remaining;
+        a.style.display = fits ? 'flex' : 'none';
+        if (fits) shown++;
       });
     }
 
@@ -159,7 +181,25 @@ window.almsCelebrate = function () {
     palette.addEventListener('click', function (e) {
       if (e.target === palette) closePalette();
     });
-    paletteInput.addEventListener('input', function () { filterPalette(paletteInput.value); });
+
+    paletteInput.addEventListener('input', function () {
+      var query = paletteInput.value;
+      clearTimeout(searchDebounce);
+      if (query.trim().length < 2) {
+        renderResults(query, []);
+        return;
+      }
+      var mySeq = ++searchSeq;
+      searchDebounce = setTimeout(function () {
+        fetch('/search?q=' + encodeURIComponent(query.trim()))
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            if (mySeq !== searchSeq) return; // a newer keystroke already superseded this
+            renderResults(query, data.results || []);
+          })
+          .catch(function () { renderResults(query, []); });
+      }, 200);
+    });
 
     var paletteTrigger = document.getElementById('commandPaletteTrigger');
     if (paletteTrigger) paletteTrigger.addEventListener('click', openPalette);

@@ -877,6 +877,17 @@ body.sidebar-hidden .sidebar { display: none; }
 .command-palette-list a:hover { background: rgba(255, 90, 95, 0.08); color: var(--primary); }
 .command-palette-list a i { width: 16px; color: var(--text-muted); }
 
+.command-palette-results { padding: 8px 8px 0; }
+.command-palette-results:empty { padding: 0; }
+.command-palette-results a {
+  display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: var(--radius-sm);
+  color: var(--text-dark); text-decoration: none; font-size: 14px; border: 1px solid rgba(255, 90, 95, 0.15);
+  margin-bottom: 4px;
+}
+.command-palette-results a:hover { background: rgba(255, 90, 95, 0.08); color: var(--primary); }
+.command-palette-results a i { width: 16px; color: var(--primary); }
+.command-palette-results a small { margin-left: auto; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 10px; letter-spacing: 0.04em; }
+
 /* --- Focus Mode banner --- */
 .focus-banner {
   display: flex; align-items: center; gap: 16px; background: linear-gradient(135deg, #1e293b, #334155); color: #fff;

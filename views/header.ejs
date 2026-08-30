@@ -206,8 +206,9 @@ if (savedTheme === 'dark') {
       <div class="command-palette-box">
         <div class="command-palette-input-wrap">
           <i class="fas fa-search" aria-hidden="true"></i>
-          <input type="text" id="commandPaletteInput" placeholder="Jump to..." autocomplete="off">
+          <input type="text" id="commandPaletteInput" placeholder="Search tasks, notes, alarms, anything..." autocomplete="off">
         </div>
+        <div class="command-palette-results" id="commandPaletteResults"></div>
         <div class="command-palette-list" id="commandPaletteList">
           <a href="/dashboard"><i class="fas fa-th-large" aria-hidden="true"></i> Dashboard</a>
           <% if(enabledSlugs.indexOf('tasks') !== -1){ %><a href="/tasks/hub"><i class="fas fa-tasks" aria-hidden="true"></i> Tasks</a><% } %>
