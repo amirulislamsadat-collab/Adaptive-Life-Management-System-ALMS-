@@ -1,0 +1,12 @@
+{
+  "appId": "com.cse470.alms",
+  "appName": "ALMS",
+  "webDir": "www",
+  "server": {
+    "url": "https://your-app.vercel.app",
+    "cleartext": false
+  },
+  "android": {
+    "appendUserAgent": "ALMSMobile/1.0"
+  }
+}

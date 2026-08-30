@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ALMS</string>
+    <string name="title_activity_main">ALMS</string>
+    <string name="package_name">com.cse470.alms</string>
+    <string name="custom_url_scheme">com.cse470.alms</string>
+</resources>

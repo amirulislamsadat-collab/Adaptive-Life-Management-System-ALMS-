@@ -15,8 +15,8 @@
   // --- Install App button ---
   var deferredPrompt = null;
   var installBtns = document.querySelectorAll('.js-install-app');
-  var isDesktopApp = /ALMSDesktop/i.test(navigator.userAgent);
-  var isStandalone = isDesktopApp || window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  var isNativeApp = /ALMSDesktop|ALMSMobile/i.test(navigator.userAgent);
+  var isStandalone = isNativeApp || window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
 
   function setInstallButtonsVisible(visible) {
