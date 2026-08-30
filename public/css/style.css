@@ -816,3 +816,68 @@ body.sidebar-hidden .sidebar { display: none; }
   color: var(--success); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; flex-shrink: 0;
 }
 .today-check-btn:hover { background: var(--success); color: #fff; border-color: var(--success); }
+
+/* ============================================================
+   Neon / Glow accent system
+   Subtle "inner glow" light-emitting strokes on the interactive
+   surfaces users actually touch (buttons, hero cards, overlays),
+   not slathered over every element. Glows brighten automatically
+   in dark mode, where they're meant to actually pop, via the
+   --glow-* variables below (redefined once in the dark block).
+   ============================================================ */
+:root {
+  --glow-primary: 0 0 0 1px rgba(255, 90, 95, 0.4), 0 0 20px rgba(255, 90, 95, 0.25);
+  --glow-primary-strong: 0 0 0 1px rgba(255, 90, 95, 0.55), 0 0 32px rgba(255, 90, 95, 0.4), 0 0 64px rgba(255, 90, 95, 0.15);
+  --glow-cool: 0 0 0 1px rgba(14, 165, 233, 0.4), 0 0 24px rgba(14, 165, 233, 0.25);
+}
+:root[data-theme="dark"] {
+  --glow-primary: 0 0 0 1px rgba(255, 90, 95, 0.5), 0 0 26px rgba(255, 90, 95, 0.4);
+  --glow-primary-strong: 0 0 0 1px rgba(255, 90, 95, 0.7), 0 0 40px rgba(255, 90, 95, 0.55), 0 0 80px rgba(255, 90, 95, 0.25);
+  --glow-cool: 0 0 0 1px rgba(56, 189, 248, 0.55), 0 0 30px rgba(56, 189, 248, 0.35);
+}
+
+.btn.primary, .btn-auth, .install-app-btn, .btn-primary {
+  box-shadow: var(--glow-primary);
+  transition: box-shadow 0.2s ease, transform 0.15s ease, background 0.2s ease;
+}
+.btn.primary:hover, .btn-auth:hover, .install-app-btn:hover, .btn-primary:hover {
+  box-shadow: var(--glow-primary-strong);
+}
+
+.auth-card {
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15), var(--glow-primary);
+  border: 1px solid rgba(255, 90, 95, 0.15);
+}
+.auth-icon { box-shadow: var(--glow-primary-strong); }
+
+.form-card, .ios-install-box, .command-palette-box {
+  border: 1px solid rgba(255, 90, 95, 0.12);
+  box-shadow: var(--shadow-lg), var(--glow-primary);
+}
+
+.module-card:hover, .hub-card:hover { box-shadow: var(--shadow-lg), var(--glow-primary); }
+
+.focus-banner { box-shadow: var(--glow-cool); }
+.focus-banner-icon { box-shadow: 0 0 20px rgba(255,255,255,0.35); }
+
+.xp-level { box-shadow: var(--glow-primary); }
+
+.today-check-btn:hover { box-shadow: 0 0 16px rgba(16, 185, 129, 0.5); }
+
+/* Overlay surfaces read as "floating glass" rather than flat panels —
+   subtle translucency + blur on the box, not the whole backdrop (heavy
+   blur on every panel reads dated; a light touch on floating chrome
+   reads current). */
+.ios-install-box, .command-palette-box {
+  background: color-mix(in srgb, var(--card-bg) 92%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes glow-pulse {
+    0%, 100% { box-shadow: var(--glow-primary-strong); }
+    50% { box-shadow: var(--glow-primary); }
+  }
+  .auth-icon, .focus-banner-icon { animation: glow-pulse 2.4s ease-in-out infinite; }
+}
