@@ -21,6 +21,7 @@
     "directories": {
       "output": "dist"
     },
+    "artifactName": "ALMS-Setup.${ext}",
     "files": [
       "main.js",
       "config.json",

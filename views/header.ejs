@@ -239,6 +239,33 @@ if (savedTheme === 'dark') {
       </div>
     </div>
 
+    <div class="ios-install-modal" id="installPickerModal" hidden>
+      <div class="ios-install-box install-picker-box">
+        <button type="button" class="ios-install-close" id="installPickerClose" aria-label="Close">&times;</button>
+        <div class="ios-install-icon"><i class="fas fa-download" aria-hidden="true"></i></div>
+        <h3>Get ALMS as an app</h3>
+        <p class="install-picker-sub">Pick what fits how you use ALMS — the browser install auto-updates itself; the downloads below are standalone installers.</p>
+        <div class="install-picker-options">
+          <button type="button" class="install-picker-opt" id="installPickerBrowser" hidden>
+            <i class="fas fa-globe" aria-hidden="true"></i>
+            <span><strong>Install in this browser</strong><small>One click, updates automatically</small></span>
+          </button>
+          <button type="button" class="install-picker-opt" id="installPickerIOS" hidden>
+            <i class="fas fa-mobile-alt" aria-hidden="true"></i>
+            <span><strong>Add to Home Screen</strong><small>Instructions for iPhone/iPad</small></span>
+          </button>
+          <a class="install-picker-opt" href="https://github.com/amirulislamsadat-collab/Adaptive-Life-Management-System-ALMS-/releases/latest/download/ALMS-Setup.exe">
+            <i class="fab fa-windows" aria-hidden="true"></i>
+            <span><strong>Download for Windows</strong><small>.exe installer — unsigned, SmartScreen will warn once</small></span>
+          </a>
+          <a class="install-picker-opt" href="https://github.com/amirulislamsadat-collab/Adaptive-Life-Management-System-ALMS-/releases/latest/download/ALMS.apk">
+            <i class="fab fa-android" aria-hidden="true"></i>
+            <span><strong>Download for Android</strong><small>.apk — enable "install unknown apps" for your browser</small></span>
+          </a>
+        </div>
+      </div>
+    </div>
+
     <div class="ios-install-modal" id="iosInstallModal" hidden>
       <div class="ios-install-box">
         <button type="button" class="ios-install-close" id="iosInstallModalClose" aria-label="Close">&times;</button>

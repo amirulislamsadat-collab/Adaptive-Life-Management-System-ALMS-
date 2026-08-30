@@ -12,7 +12,10 @@
     });
   }
 
-  // --- Install App button ---
+  // --- Install App button: opens a picker (browser install / iOS steps /
+  // Windows & Android downloads) rather than guessing a single action,
+  // since a native download is always an option even when this browser
+  // doesn't support installing the PWA directly. ---
   var deferredPrompt = null;
   var installBtns = document.querySelectorAll('.js-install-app');
   var isNativeApp = /ALMSDesktop|ALMSMobile/i.test(navigator.userAgent);
@@ -23,42 +26,52 @@
     installBtns.forEach(function (btn) { btn.hidden = !visible; });
   }
 
-  if (isStandalone) {
+  setInstallButtonsVisible(!isStandalone);
+
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    var browserOpt = document.getElementById('installPickerBrowser');
+    if (browserOpt) browserOpt.hidden = false;
+  });
+  window.addEventListener('appinstalled', function () {
     setInstallButtonsVisible(false);
-  } else if (isIOS) {
-    setInstallButtonsVisible(true);
-  } else {
-    setInstallButtonsVisible(false);
-    window.addEventListener('beforeinstallprompt', function (e) {
-      e.preventDefault();
-      deferredPrompt = e;
-      setInstallButtonsVisible(true);
+    deferredPrompt = null;
+  });
+
+  var iosOpt = document.getElementById('installPickerIOS');
+  if (iosOpt) iosOpt.hidden = !isIOS;
+
+  var pickerModal = document.getElementById('installPickerModal');
+  installBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (pickerModal) pickerModal.hidden = false;
     });
-    window.addEventListener('appinstalled', function () {
-      setInstallButtonsVisible(false);
-      deferredPrompt = null;
+  });
+  var pickerClose = document.getElementById('installPickerClose');
+  if (pickerClose) pickerClose.addEventListener('click', function () { pickerModal.hidden = true; });
+
+  var browserOptBtn = document.getElementById('installPickerBrowser');
+  if (browserOptBtn) {
+    browserOptBtn.addEventListener('click', function () {
+      if (!deferredPrompt) return;
+      pickerModal.hidden = true;
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.finally(function () { deferredPrompt = null; });
     });
   }
 
-  installBtns.forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      if (isIOS) {
-        var modal = document.getElementById('iosInstallModal');
-        if (modal) modal.hidden = false;
-        return;
-      }
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.finally(function () { deferredPrompt = null; });
-      }
+  var iosOptBtn = document.getElementById('installPickerIOS');
+  var iosModal = document.getElementById('iosInstallModal');
+  if (iosOptBtn && iosModal) {
+    iosOptBtn.addEventListener('click', function () {
+      pickerModal.hidden = true;
+      iosModal.hidden = false;
     });
-  });
-
+  }
   var iosModalClose = document.getElementById('iosInstallModalClose');
   if (iosModalClose) {
-    iosModalClose.addEventListener('click', function () {
-      document.getElementById('iosInstallModal').hidden = true;
-    });
+    iosModalClose.addEventListener('click', function () { iosModal.hidden = true; });
   }
 
   // --- Command palette (Ctrl+K / Cmd+K) ---
