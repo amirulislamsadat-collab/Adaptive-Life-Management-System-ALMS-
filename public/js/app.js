@@ -4,7 +4,48 @@
 // instructions since Safari doesn't support beforeinstallprompt), and a
 // Ctrl+K / Cmd+K command palette for fast navigation.
 // ============================================================
+// --- Confetti celebration (level-ups, streak milestones, setup complete) ---
+// Lightweight, self-contained — no external library, respects reduced-motion.
+window.almsCelebrate = function () {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var colors = ['#FF5A5F', '#ff8a8e', '#38BDF8', '#FFD700', '#39D353'];
+  var container = document.createElement('div');
+  container.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden;';
+  document.body.appendChild(container);
+  for (var i = 0; i < 40; i++) {
+    var piece = document.createElement('div');
+    var size = 6 + Math.random() * 6;
+    var left = Math.random() * 100;
+    var duration = 2.2 + Math.random() * 1.4;
+    var delay = Math.random() * 0.4;
+    var rotation = Math.random() * 720 - 360;
+    piece.style.cssText =
+      'position:absolute;top:-20px;left:' + left + 'vw;width:' + size + 'px;height:' + (size * 0.4) + 'px;' +
+      'background:' + colors[i % colors.length] + ';opacity:0.9;border-radius:2px;' +
+      'animation:confetti-fall ' + duration + 's ease-in ' + delay + 's forwards;' +
+      '--rot:' + rotation + 'deg;';
+    container.appendChild(piece);
+  }
+  setTimeout(function () { container.remove(); }, 4200);
+};
+
 (function () {
+  // Auto-trigger confetti for any flash message that reads as a celebration
+  // (level-up, streak milestone, freshly-finished setup) — one place to
+  // handle it instead of wiring a JS call into every controller.
+  var flashEls = document.querySelectorAll('.flash-success');
+  flashEls.forEach(function (el) {
+    if (/🎉|🔥 \d+-day|all set! Welcome/.test(el.textContent)) {
+      window.almsCelebrate();
+    }
+  });
+  if (new URLSearchParams(location.search).get('justSetup') === '1') {
+    window.almsCelebrate();
+    var url = new URL(location.href);
+    url.searchParams.delete('justSetup');
+    history.replaceState({}, '', url);
+  }
+
   // --- Service worker (installability + offline fallback) ---
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {

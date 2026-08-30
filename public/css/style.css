@@ -275,6 +275,14 @@ body.sidebar-hidden .sidebar { display: none; }
 .setup-page { max-width: 800px; margin: 60px auto; padding: 0 20px; }
 .setup-title { text-align: center; font-size: 36px; font-weight: 800; color: var(--text-dark); margin-bottom: 12px; }
 .setup-sub { text-align: center; color: var(--text-muted); font-size: 16px; margin-bottom: 48px; }
+.setup-mascot { text-align: center; font-size: 64px; margin-bottom: 8px; animation: mascot-bob 2.4s ease-in-out infinite; }
+@keyframes mascot-bob { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-8px) rotate(3deg); } }
+.profile-step-card { display: flex; flex-direction: column; align-items: center; gap: 16px; margin: 0 auto 40px; }
+.profile-step-photo {
+  width: 120px; height: 120px; border-radius: 50%; overflow: hidden; box-shadow: var(--glow-primary-strong);
+  border: 3px solid var(--card-bg);
+}
+.profile-step-photo img { width: 100%; height: 100%; object-fit: cover; }
 .role-card { background: var(--card-bg); border: 2px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px 24px; text-align: center; cursor: pointer; transition: all 0.2s; }
 .role-card:active { border-color: var(--primary); }
 .role-card.selected { border-color: var(--primary); background: rgba(255, 90, 95, 0.05); }
@@ -768,6 +776,15 @@ body.sidebar-hidden .sidebar { display: none; }
 }
 .streak-chip i { font-size: 15px; }
 .streak-chip-cold { color: var(--text-muted); opacity: 0.7; }
+@media (prefers-reduced-motion: no-preference) {
+  .streak-chip:not(.streak-chip-cold) i { animation: flame-flicker 1.8s ease-in-out infinite; transform-origin: bottom center; }
+  @keyframes flame-flicker {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.08, 0.95) rotate(-3deg); }
+    50% { transform: scale(0.95, 1.05) rotate(2deg); }
+    75% { transform: scale(1.05, 0.97) rotate(-1deg); }
+  }
+}
 .xp-chip { display: flex; align-items: center; gap: 10px; text-decoration: none; padding: 8px; border-radius: var(--radius-sm); transition: background 0.15s; }
 .xp-chip:hover { background: rgba(255, 90, 95, 0.08); }
 .xp-level {
@@ -985,4 +1002,10 @@ body.sidebar-hidden .sidebar { display: none; }
 @media (max-width: 480px) {
   .assistant-panel { right: 16px; bottom: 84px; width: calc(100vw - 32px); }
   .assistant-fab { right: 16px; bottom: 16px; }
+}
+
+/* --- Confetti celebration --- */
+@keyframes confetti-fall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(var(--rot)); opacity: 0; }
 }

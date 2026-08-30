@@ -57,13 +57,34 @@ exports.postModules = async (req, res) => {
     for (const modId of selected) {
       await Module.enableForUser(userId, modId);
     }
-    await User.completeSetup(userId);
-    req.session.user.setup_completed = 1;
-    req.session.success = 'Workspace launched! Welcome to ALMS.';
-    res.redirect('/dashboard');
+    res.redirect('/setup?step=profile');
   } catch (err) {
     console.error('Setup modules error:', err);
     req.session.error = 'Failed to save modules.';
     res.redirect('/setup?step=modules');
+  }
+};
+
+exports.postProfile = async (req, res) => {
+  if (!req.session.user) return res.redirect('/login');
+  const userId = req.session.user.id;
+  try {
+    const photoData = req.body.photo_data;
+    if (photoData && photoData.startsWith('data:image/') && photoData.length < 2_800_000) {
+      await User.updateProfilePicture(userId, photoData);
+      req.session.user.profile_picture = photoData;
+    }
+    if (req.body.name && req.body.name.trim()) {
+      await User.updateName(userId, req.body.name.trim());
+      req.session.user.name = req.body.name.trim();
+    }
+    await User.completeSetup(userId);
+    req.session.user.setup_completed = 1;
+    req.session.success = "You're all set! Welcome to ALMS — let's build some great habits. 🎉";
+    res.redirect('/dashboard?justSetup=1');
+  } catch (err) {
+    console.error('Setup profile error:', err);
+    req.session.error = 'Failed to finish setup.';
+    res.redirect('/setup?step=profile');
   }
 };

@@ -1,22 +1,25 @@
 <%- include('header') %>
 <div class="setup-page">
   <!-- Stepper -->
+  <% const stepOrder = ['role','modules','profile']; const stepIdx = stepOrder.indexOf(step); %>
   <div class="stepper">
     <div class="step-item">
-      <div class="step-circle <%= step==='role' ? 'active' : 'done' %>">
-        <%- step==='role' ? '1' : '<i class="fas fa-check"></i>' %>
+      <div class="step-circle <%= stepIdx===0 ? 'active' : 'done' %>">
+        <%- stepIdx===0 ? '1' : '<i class="fas fa-check"></i>' %>
       </div>
-      <span class="step-label <%= step==='role' ? 'active' : 'done' %>">Role</span>
+      <span class="step-label <%= stepIdx===0 ? 'active' : 'done' %>">Role</span>
     </div>
-    <div class="step-connector <%= step==='modules' ? 'done' : '' %>"></div>
+    <div class="step-connector <%= stepIdx>=1 ? 'done' : '' %>"></div>
     <div class="step-item">
-      <div class="step-circle <%= step==='modules' ? 'active' : 'inactive' %>">2</div>
-      <span class="step-label <%= step==='modules' ? 'active' : '' %>">Modules</span>
+      <div class="step-circle <%= stepIdx===1 ? 'active' : (stepIdx>1 ? 'done' : 'inactive') %>">
+        <%- stepIdx>1 ? '<i class="fas fa-check"></i>' : '2' %>
+      </div>
+      <span class="step-label <%= stepIdx===1 ? 'active' : (stepIdx>1 ? 'done' : '') %>">Modules</span>
     </div>
-    <div class="step-connector"></div>
+    <div class="step-connector <%= stepIdx>=2 ? 'done' : '' %>"></div>
     <div class="step-item">
-      <div class="step-circle inactive">3</div>
-      <span class="step-label">Ready</span>
+      <div class="step-circle <%= stepIdx===2 ? 'active' : 'inactive' %>">3</div>
+      <span class="step-label <%= stepIdx===2 ? 'active' : '' %>">You</span>
     </div>
   </div>
 
@@ -83,7 +86,7 @@
     </div>
     <div class="setup-actions">
       <a href="/setup" class="btn-back-setup">← Back</a>
-      <button type="submit" class="btn-launch"><i class="fas fa-rocket"></i> Launch Workspace</button>
+      <button type="submit" class="btn-launch"><i class="fas fa-arrow-right"></i> Continue</button>
     </div>
   </form>
   <script>
@@ -95,6 +98,64 @@
         if(cb.checked) card.classList.add('on'); else card.classList.remove('on');
       });
     }
+  </script>
+
+  <% } else if(step === 'profile') { %>
+  <div class="setup-mascot">🦉</div>
+  <h1 class="setup-title">One last thing, <%= user.name.split(' ')[0] %>!</h1>
+  <p class="setup-sub">Add a profile picture so it's really you in there — totally optional, skip it if you're not feeling it right now.</p>
+
+  <div class="profile-step-card">
+    <div class="profile-step-photo">
+      <img id="setupPhotoPreview" src="<%= user.profile_picture || '' %>" alt="" style="<%= user.profile_picture ? '' : 'display:none;' %>">
+      <div id="setupPhotoPlaceholder" class="user-avatar" style="width:100%;height:100%;font-size:36px;<%= user.profile_picture ? 'display:none;' : '' %>"><%= user.name.charAt(0).toUpperCase() %></div>
+    </div>
+    <input type="file" accept="image/*" id="setupPhotoInput" style="display:none;">
+    <button type="button" class="btn secondary btn-sm" id="setupChoosePhotoBtn"><i class="fas fa-camera" aria-hidden="true"></i> Choose a photo</button>
+  </div>
+
+  <form method="POST" action="/setup/profile" id="profileForm">
+    <input type="hidden" name="photo_data" id="setupPhotoData">
+    <div class="setup-actions">
+      <button type="submit" class="btn-back-setup" id="skipProfileBtn">Skip for now</button>
+      <button type="submit" class="btn-launch"><i class="fas fa-rocket"></i> Launch Workspace</button>
+    </div>
+  </form>
+  <script>
+  (function() {
+    var chooseBtn = document.getElementById('setupChoosePhotoBtn');
+    var fileInput = document.getElementById('setupPhotoInput');
+    var dataField = document.getElementById('setupPhotoData');
+    var preview = document.getElementById('setupPhotoPreview');
+    var placeholder = document.getElementById('setupPhotoPlaceholder');
+
+    chooseBtn.addEventListener('click', function() { fileInput.click(); });
+
+    fileInput.addEventListener('change', function() {
+      var file = fileInput.files[0];
+      if (!file) return;
+      var img = new Image();
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        img.onload = function() {
+          var maxDim = 320;
+          var scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+          var canvas = document.createElement('canvas');
+          canvas.width = Math.round(img.width * scale);
+          canvas.height = Math.round(img.height * scale);
+          var ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          dataField.value = dataUrl;
+          preview.src = dataUrl;
+          preview.style.display = 'block';
+          placeholder.style.display = 'none';
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  })();
   </script>
   <% } %>
 </div>
