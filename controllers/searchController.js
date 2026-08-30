@@ -13,7 +13,9 @@ exports.search = async (req, res) => {
   try {
     const enabled = await Module.findEnabledForUser(req.session.user.id);
     const enabledSlugs = enabled.map(m => m.slug);
-    const results = await SearchService.searchAll(req.session.user.id, q, enabledSlugs, 4);
+    // The palette shows these in a scrollable box (top matches land up front,
+    // the rest is a scroll away) rather than hard-cutting off at a handful.
+    const results = await SearchService.searchAll(req.session.user.id, q, enabledSlugs, 20);
     res.json({ results });
   } catch (err) {
     console.error('Search error:', err);

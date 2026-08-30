@@ -309,7 +309,57 @@ if (savedTheme === 'dark') {
       </form>
     </div>
     <% } %>
+<% } else { %>
+<!-- Logged-out / pre-setup pages (login, register, setup wizard) still get an
+     install option — someone might grab the app before ever signing in. Reuses
+     the exact same element IDs as the full app shell's picker, so the shared
+     JS in app.js wires it up with no extra code. -->
+<button type="button" class="install-app-btn guest-install-btn js-install-app" hidden>
+  <i class="fas fa-arrow-down" aria-hidden="true"></i> Get the App
+</button>
+
+<div class="ios-install-modal" id="installPickerModal" hidden>
+  <div class="ios-install-box install-picker-box">
+    <button type="button" class="ios-install-close" id="installPickerClose" aria-label="Close">&times;</button>
+    <div class="ios-install-icon"><i class="fas fa-download" aria-hidden="true"></i></div>
+    <h3>Get ALMS as an app</h3>
+    <p class="install-picker-sub">Pick whatever fits you best. The browser install keeps itself updated automatically; the downloads below are regular standalone installers.</p>
+    <div class="install-picker-options">
+      <button type="button" class="install-picker-opt" id="installPickerBrowser" hidden>
+        <i class="fas fa-globe" aria-hidden="true"></i>
+        <span><strong>Install in this browser</strong><small>One click and you're done, updates itself</small></span>
+      </button>
+      <button type="button" class="install-picker-opt" id="installPickerIOS" hidden>
+        <i class="fas fa-mobile-alt" aria-hidden="true"></i>
+        <span><strong>Add to Home Screen</strong><small>Quick steps for iPhone/iPad</small></span>
+      </button>
+      <a class="install-picker-opt" href="https://github.com/amirulislamsadat-collab/Adaptive-Life-Management-System-ALMS-/releases/latest/download/ALMS-Setup.exe">
+        <i class="fab fa-windows" aria-hidden="true"></i>
+        <span><strong>Download for Windows</strong><small>Windows might flag it as unrecognized since it's not code-signed, that's normal, just click "Run anyway"</small></span>
+      </a>
+      <a class="install-picker-opt" href="https://github.com/amirulislamsadat-collab/Adaptive-Life-Management-System-ALMS-/releases/latest/download/ALMS.apk">
+        <i class="fab fa-android" aria-hidden="true"></i>
+        <span><strong>Download for Android</strong><small>You'll need to allow "install unknown apps" for your browser first</small></span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="ios-install-modal" id="iosInstallModal" hidden>
+  <div class="ios-install-box">
+    <button type="button" class="ios-install-close" id="iosInstallModalClose" aria-label="Close">&times;</button>
+    <div class="ios-install-icon"><i class="fas fa-mobile-alt" aria-hidden="true"></i></div>
+    <h3>Install ALMS on iPhone/iPad</h3>
+    <ol>
+      <li>Tap the <strong>Share</strong> button <i class="fas fa-arrow-up-from-bracket" aria-hidden="true"></i> in Safari's toolbar</li>
+      <li>Scroll down and tap <strong>Add to Home Screen</strong></li>
+      <li>Tap <strong>Add</strong> and you're set, ALMS now opens just like any other app</li>
+    </ol>
+  </div>
+</div>
 <% } %>
+
+<script src="/js/app.js" defer></script>
 
 <% if(setupDone && dueNotifications && dueNotifications.length){ %>
 <div class="flash-wrap" id="notifBanner">
@@ -418,5 +468,4 @@ if (savedTheme === 'dark') {
   setInterval(pollNotifications, 60000);
 })();
 </script>
-<script src="/js/app.js" defer></script>
 <% } %>

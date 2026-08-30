@@ -803,6 +803,8 @@ body.sidebar-hidden .sidebar { display: none; }
 }
 .install-app-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255, 90, 95, 0.45); }
 .install-app-btn-top { width: auto; padding: 9px 16px; margin-right: 16px; }
+.guest-install-btn { position: fixed; top: 20px; right: 20px; width: auto; z-index: 50; }
+@media (max-width: 640px) { .guest-install-btn { top: 12px; right: 12px; padding: 9px 14px; font-size: 12px; } }
 
 .ios-install-modal {
   position: fixed; inset: 0; z-index: 500; background: rgba(15, 23, 42, 0.55);
@@ -888,7 +890,7 @@ body.sidebar-hidden .sidebar { display: none; }
 .command-palette-list a:hover { background: rgba(255, 90, 95, 0.08); color: var(--primary); }
 .command-palette-list a i { width: 16px; color: var(--text-muted); }
 
-.command-palette-results { padding: 8px 8px 0; }
+.command-palette-results { padding: 8px 8px 0; max-height: 208px; overflow-y: auto; }
 .command-palette-results:empty { padding: 0; }
 .command-palette-results a {
   display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: var(--radius-sm);

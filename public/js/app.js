@@ -128,15 +128,15 @@ window.almsCelebrate = function () {
   // --- Command palette (Ctrl+K / Cmd+K) ---
   // Real search: whatever the user has actually created (tasks, notes,
   // alarms, reminders, etc. — fetched live from /search) is shown first,
-  // then module/nav links fill any remaining slots, capped at 4 total so
-  // this never turns into an overwhelming wall of results.
+  // then module/nav links below. Both lists scroll independently instead of
+  // hard-cutting off, so the best few matches are visible up front and
+  // anything beyond that is just a scroll away.
   var palette = document.getElementById('commandPalette');
   var paletteInput = document.getElementById('commandPaletteInput');
   var paletteList = document.getElementById('commandPaletteList');
   var paletteResults = document.getElementById('commandPaletteResults');
   if (palette && paletteInput && paletteList && paletteResults) {
     var moduleItems = Array.prototype.slice.call(paletteList.querySelectorAll('a'));
-    var TOTAL_CAP = 4;
     var searchDebounce = null;
     var searchSeq = 0;
 
@@ -159,14 +159,10 @@ window.almsCelebrate = function () {
         paletteResults.appendChild(a);
       });
 
-      var remaining = TOTAL_CAP - contentResults.length;
-      var shown = 0;
       moduleItems.forEach(function (a) {
         var text = a.textContent.toLowerCase();
         var matches = !q || text.indexOf(q) !== -1;
-        var fits = matches && shown < remaining;
-        a.style.display = fits ? 'flex' : 'none';
-        if (fits) shown++;
+        a.style.display = matches ? 'flex' : 'none';
       });
     }
 
