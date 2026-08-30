@@ -6,6 +6,7 @@ const modCtrl         = require('../controllers/moduleController');
 const accountCtrl       = require('../controllers/accountController');
 
 router.get('/dashboard', dashCtrl.getDashboard);
+router.post('/dashboard/widgets', dashCtrl.postWidgetLayout);
 
 router.get('/setup',          setupCtrl.getSetup);
 router.post('/setup/role',    setupCtrl.postRole);

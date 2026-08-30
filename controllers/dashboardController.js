@@ -12,8 +12,21 @@ const CalendarEvent       = require('../models/CalendarEvent');
 const WaterLog              = require('../models/WaterLog');
 const FocusSession            = require('../models/FocusSession');
 const Gamification             = require('../models/Gamification');
+const User                       = require('../models/User');
 
 const DAY_CODES = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+
+const DEFAULT_WIDGET_ORDER = ['tasks', 'habits', 'meds', 'reminders', 'events', 'water'];
+
+function resolveWidgetLayout(savedJson) {
+  let saved = [];
+  try { saved = savedJson ? JSON.parse(savedJson) : []; } catch (e) { saved = []; }
+  const known = new Set(DEFAULT_WIDGET_ORDER);
+  const layout = saved.filter(w => w && known.has(w.key));
+  const seen = new Set(layout.map(w => w.key));
+  DEFAULT_WIDGET_ORDER.forEach(key => { if (!seen.has(key)) layout.push({ key, visible: true }); });
+  return layout;
+}
 
 function medicationDueToday(med) {
   const dayCode = DAY_CODES[new Date().getDay()];
@@ -29,11 +42,13 @@ exports.getDashboard = async (req, res) => {
   if (req.session.user.setup_completed != 1) return res.redirect('/setup');
   const userId = req.session.user.id;
   try {
-    const [modules, stats] = await Promise.all([
+    const [modules, stats, fullUser] = await Promise.all([
       Module.findEnabledForUser(userId),
-      Task.getStats(userId)
+      Task.getStats(userId),
+      User.findById(userId)
     ]);
     const enabled = new Set(modules.map(m => m.slug));
+    const widgetLayout = resolveWidgetLayout(fullUser && fullUser.widget_layout);
 
     const [
       tasksDue, habits, medications, remindersDue, eventsToday, waterTotal, activeFocus
@@ -65,10 +80,29 @@ exports.getDashboard = async (req, res) => {
 
     const levelInfo = Gamification.getLevelInfo(req.session.user.xp || 0);
 
-    res.render('dashboard', { user: req.session.user, modules, stats, today, levelInfo });
+    res.render('dashboard', { user: req.session.user, modules, stats, today, levelInfo, widgetLayout });
   } catch (err) {
     console.error('Dashboard error:', err);
     req.session.error = 'Dashboard error: ' + err.message;
     res.redirect('/login');
+  }
+};
+
+exports.postWidgetLayout = async (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Please log in.' });
+  const layout = req.body.layout;
+  if (!Array.isArray(layout) || layout.length > 20) {
+    return res.status(400).json({ error: 'Invalid layout.' });
+  }
+  const known = new Set(DEFAULT_WIDGET_ORDER);
+  const clean = layout
+    .filter(w => w && known.has(w.key))
+    .map(w => ({ key: w.key, visible: !!w.visible }));
+  try {
+    await User.updateWidgetLayout(req.session.user.id, JSON.stringify(clean));
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Widget layout save error:', err);
+    res.status(500).json({ error: 'Failed to save layout.' });
   }
 };

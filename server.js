@@ -264,6 +264,9 @@ async function initDB() {
     if (!userColNames.includes('daily_water_goal_ml')) {
       await db.query(`ALTER TABLE users ADD COLUMN daily_water_goal_ml INT DEFAULT 2000`);
     }
+    if (!userColNames.includes('widget_layout')) {
+      await db.query(`ALTER TABLE users ADD COLUMN widget_layout TEXT DEFAULT NULL`);
+    }
 
     // ---------- TABLE 3: modules ----------
     await db.query(`

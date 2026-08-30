@@ -73,12 +73,19 @@
 
   <div class="section-header" style="margin-top:36px;">
     <div class="section-title"><i class="fas fa-sun" aria-hidden="true"></i> Today</div>
+    <button type="button" class="manage-btn" id="customizeWidgetsBtn"><i class="fas fa-sliders-h" aria-hidden="true"></i> Customize</button>
   </div>
-  <div class="today-grid">
+
+  <div class="widget-customize-panel" id="widgetCustomizePanel" hidden>
+    <div class="widget-customize-hint">Drag cards below to reorder. Toggle to show/hide.</div>
+    <div id="widgetToggleList"></div>
+  </div>
+
+  <div class="today-grid" id="todayGrid">
 
     <% if(today.tasksDue.length){ %>
-    <div class="today-card">
-      <div class="today-card-head"><i class="fas fa-tasks" aria-hidden="true"></i> Tasks due today</div>
+    <div class="today-card" data-widget-key="tasks" draggable="true">
+      <div class="today-card-head"><i class="fas fa-grip-vertical widget-drag-handle" aria-hidden="true"></i><i class="fas fa-tasks" aria-hidden="true"></i> Tasks due today</div>
       <% today.tasksDue.forEach(t => { %>
       <div class="today-row">
         <span><%= t.title %></span>
@@ -89,8 +96,8 @@
     <% } %>
 
     <% if(today.habitsToCheckIn.length){ %>
-    <div class="today-card">
-      <div class="today-card-head"><i class="fas fa-fire" aria-hidden="true"></i> Habits to check in</div>
+    <div class="today-card" data-widget-key="habits" draggable="true">
+      <div class="today-card-head"><i class="fas fa-grip-vertical widget-drag-handle" aria-hidden="true"></i><i class="fas fa-fire" aria-hidden="true"></i> Habits to check in</div>
       <% today.habitsToCheckIn.forEach(h => { %>
       <div class="today-row">
         <span><%= h.name %> <span class="streak-badge <%= h.currentStreak === 0 ? 'zero' : '' %>" style="margin-left:6px;"><%= h.currentStreak %>🔥</span></span>
@@ -101,8 +108,8 @@
     <% } %>
 
     <% if(today.medsDueToday.length){ %>
-    <div class="today-card">
-      <div class="today-card-head"><i class="fas fa-pills" aria-hidden="true"></i> Medications today</div>
+    <div class="today-card" data-widget-key="meds" draggable="true">
+      <div class="today-card-head"><i class="fas fa-grip-vertical widget-drag-handle" aria-hidden="true"></i><i class="fas fa-pills" aria-hidden="true"></i> Medications today</div>
       <% today.medsDueToday.forEach(m => { %>
       <div class="today-row">
         <span><%= m.medication_name %></span>
@@ -113,8 +120,8 @@
     <% } %>
 
     <% if(today.remindersDue.length){ %>
-    <div class="today-card">
-      <div class="today-card-head"><i class="fas fa-clock" aria-hidden="true"></i> Reminders due</div>
+    <div class="today-card" data-widget-key="reminders" draggable="true">
+      <div class="today-card-head"><i class="fas fa-grip-vertical widget-drag-handle" aria-hidden="true"></i><i class="fas fa-clock" aria-hidden="true"></i> Reminders due</div>
       <% today.remindersDue.forEach(r => { %>
       <div class="today-row"><span><%= r.title %></span></div>
       <% }) %>
@@ -122,8 +129,8 @@
     <% } %>
 
     <% if(today.todaysEvents.length){ %>
-    <div class="today-card">
-      <div class="today-card-head"><i class="fas fa-calendar-alt" aria-hidden="true"></i> Today's events</div>
+    <div class="today-card" data-widget-key="events" draggable="true">
+      <div class="today-card-head"><i class="fas fa-grip-vertical widget-drag-handle" aria-hidden="true"></i><i class="fas fa-calendar-alt" aria-hidden="true"></i> Today's events</div>
       <% today.todaysEvents.forEach(e => { %>
       <div class="today-row">
         <span><%= e.title %></span>
@@ -134,8 +141,8 @@
     <% } %>
 
     <% if(enabledSlugs.indexOf('health') !== -1){ %>
-    <div class="today-card">
-      <div class="today-card-head"><i class="fas fa-tint" aria-hidden="true"></i> Water intake</div>
+    <div class="today-card" data-widget-key="water" draggable="true">
+      <div class="today-card-head"><i class="fas fa-grip-vertical widget-drag-handle" aria-hidden="true"></i><i class="fas fa-tint" aria-hidden="true"></i> Water intake</div>
       <div class="progress-track" style="margin:8px 0;"><div class="progress-fill" style="width:<%= Math.min(100, Math.round(today.waterTotal/today.waterGoal*100)) %>%"></div></div>
       <div class="today-row">
         <span class="meta"><%= today.waterTotal %> / <%= today.waterGoal %> ml</span>
@@ -295,6 +302,96 @@
     toast.innerHTML = '<i class="fas fa-' + (isError ? 'exclamation-triangle' : 'check-circle') + '" aria-hidden="true"></i> ' + text;
     document.body.appendChild(toast);
     setTimeout(function() { toast.remove(); }, isError ? 4000 : 2200);
+  }
+})();
+</script>
+<script id="widgetLayoutData" type="application/json"><%- JSON.stringify(widgetLayout) %></script>
+<script>
+(function() {
+  var WIDGET_LABELS = { tasks: 'Tasks due today', habits: 'Habits to check in', meds: 'Medications today', reminders: 'Reminders due', events: "Today's events", water: 'Water intake' };
+  var grid = document.getElementById('todayGrid');
+  var toggleList = document.getElementById('widgetToggleList');
+  var customizeBtn = document.getElementById('customizeWidgetsBtn');
+  var customizePanel = document.getElementById('widgetCustomizePanel');
+  if (!grid) return;
+
+  var layout;
+  try { layout = JSON.parse(document.getElementById('widgetLayoutData').textContent) || []; } catch (e) { layout = []; }
+
+  function saveLayout() {
+    fetch('/dashboard/widgets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ layout: layout })
+    }).catch(function() {});
+  }
+
+  function applyLayout() {
+    // Reorder existing cards to match saved order; cards for widgets with
+    // no data today simply aren't in the DOM at all, so this only ever
+    // touches what's actually present.
+    layout.forEach(function(w) {
+      var card = grid.querySelector('[data-widget-key="' + w.key + '"]');
+      if (card) {
+        grid.appendChild(card);
+        card.hidden = !w.visible;
+      }
+    });
+  }
+
+  function renderToggleList() {
+    toggleList.innerHTML = '';
+    layout.forEach(function(w) {
+      var present = !!grid.querySelector('[data-widget-key="' + w.key + '"]');
+      var row = document.createElement('label');
+      row.className = 'widget-toggle-row';
+      row.innerHTML = '<input type="checkbox" ' + (w.visible ? 'checked' : '') + (present ? '' : ' disabled') + '> ' +
+        (WIDGET_LABELS[w.key] || w.key) + (present ? '' : ' <small>(nothing to show today)</small>');
+      row.querySelector('input').addEventListener('change', function(e) {
+        w.visible = e.target.checked;
+        applyLayout();
+        saveLayout();
+      });
+      toggleList.appendChild(row);
+    });
+  }
+
+  applyLayout();
+
+  if (customizeBtn) {
+    customizeBtn.addEventListener('click', function() {
+      customizePanel.hidden = !customizePanel.hidden;
+      if (!customizePanel.hidden) renderToggleList();
+    });
+  }
+
+  // Native HTML5 drag-and-drop reordering.
+  var dragged = null;
+  grid.addEventListener('dragstart', function(e) {
+    var card = e.target.closest('.today-card');
+    if (!card) return;
+    dragged = card;
+    card.classList.add('dragging');
+  });
+  grid.addEventListener('dragend', function(e) {
+    var card = e.target.closest('.today-card');
+    if (card) card.classList.remove('dragging');
+  });
+  grid.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    var over = e.target.closest('.today-card');
+    if (!over || over === dragged || !dragged) return;
+    var rect = over.getBoundingClientRect();
+    var before = (e.clientY - rect.top) < rect.height / 2;
+    grid.insertBefore(dragged, before ? over : over.nextSibling);
+  });
+  grid.addEventListener('drop', function(e) {
+    e.preventDefault();
+    if (!dragged) return;
+    var newOrder = Array.prototype.slice.call(grid.querySelectorAll('.today-card')).map(function(c) { return c.getAttribute('data-widget-key'); });
+    layout.sort(function(a, b) { return newOrder.indexOf(a.key) - newOrder.indexOf(b.key); });
+    dragged = null;
+    saveLayout();
   });
 })();
 </script>
