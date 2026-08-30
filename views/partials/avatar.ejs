@@ -1,5 +1,5 @@
 <%
-// Locals: gender ('male'|'female'), skin (hex), hair (hex), size (px, default 40), avClass (extra CSS class, optional)
+// Locals: gender ('male'|'female'), skin (hex), hair (hex), shirt (hex), size (px, default 40), avClass (extra CSS class, optional)
 // skin/hair are deliberately only written into this SVG's own inline style
 // when explicitly passed in. A descendant's own inline custom-property
 // declaration always wins over one set on an ancestor (e.g. a JS-driven
@@ -14,10 +14,13 @@ const avExtraClass = typeof avClass !== 'undefined' && avClass ? avClass : '';
 const avStyleParts = [];
 if (typeof skin !== 'undefined' && skin) avStyleParts.push('--av-skin:' + skin);
 if (typeof hair !== 'undefined' && hair) avStyleParts.push('--av-hair:' + hair);
+if (typeof shirt !== 'undefined' && shirt) avStyleParts.push('--av-shirt:' + shirt);
 %>
 <svg class="alms-avatar <%= avExtraClass %>" width="<%= avSize %>" height="<%= avSize %>" viewBox="0 0 100 100" style="<%= avStyleParts.join(';') %>" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
   <circle cx="50" cy="50" r="50" fill="var(--av-skin)" opacity="0.18"></circle>
-  <ellipse cx="50" cy="80" rx="30" ry="20" fill="var(--av-skin)"></ellipse>
+  <ellipse cx="50" cy="84" rx="32" ry="20" fill="var(--av-shirt)"></ellipse>
+  <path d="M40 66 Q50 76 60 66 L60 74 Q50 82 40 74 Z" fill="var(--av-skin)"></path>
+  <path d="M34 70 L50 80 L66 70" stroke="rgba(0,0,0,0.15)" stroke-width="2" fill="none" stroke-linecap="round"></path>
   <circle cx="50" cy="46" r="24" fill="var(--av-skin)"></circle>
   <% if (avGender === 'female') { %>
     <path d="M22 44 Q22 14 50 14 Q78 14 78 44 L78 58 Q70 46 70 34 Q60 44 50 44 Q40 44 30 34 Q30 46 22 58 Z" fill="var(--av-hair)"></path>

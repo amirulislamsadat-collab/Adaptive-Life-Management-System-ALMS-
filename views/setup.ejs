@@ -58,7 +58,7 @@
   <p class="setup-sub">Build your avatar and answer a couple quick questions — we'll use this to personalize your targets (sleep, water) and how much we recommend at once.</p>
 
   <form method="POST" action="/setup/you" id="youForm">
-    <div class="avatar-builder" id="avatarBuilder" style="--av-skin:#F0B594;--av-hair:#3B2314;">
+    <div class="avatar-builder" id="avatarBuilder" style="--av-skin:#F0B594;--av-hair:#3B2314;--av-shirt:#5B8DEF;">
       <div class="avatar-preview">
         <div id="avPreviewMale"><%- include('partials/avatar', { gender: 'male', size: 140 }) %></div>
         <div id="avPreviewFemale" hidden><%- include('partials/avatar', { gender: 'female', size: 140 }) %></div>
@@ -92,12 +92,38 @@
         </div>
         <input type="hidden" name="hair" id="hairInput" value="#3B2314">
       </div>
+
+      <div class="avatar-opt-group">
+        <label>Shirt color</label>
+        <div class="swatch-row" id="shirtSwatches">
+          <% ['#5B8DEF','#FF5A5F','#10B981','#8B5CF6','#64748B'].forEach(function(c, i){ %>
+            <button type="button" class="swatch <%= i===0?'active':'' %>" data-val="<%= c %>" style="background:<%= c %>" aria-label="Shirt color"></button>
+          <% }) %>
+        </div>
+        <input type="hidden" name="shirt" id="shirtInput" value="#5B8DEF">
+      </div>
     </div>
 
-    <div class="fg" style="max-width:200px;margin:0 auto 32px;">
-      <label for="ageInput">Your age (optional)</label>
-      <input type="number" id="ageInput" name="age" min="10" max="110" placeholder="e.g. 21" class="form-inp">
-      <p style="font-size:12px;color:var(--text-muted);margin-top:6px;">Used only to suggest a healthy sleep range — never shown to anyone else.</p>
+    <div class="form-row" style="max-width:420px;margin:0 auto 32px;">
+      <div class="fg">
+        <label for="ageInput">Your age (optional)</label>
+        <input type="number" id="ageInput" name="age" min="10" max="110" placeholder="e.g. 21" class="form-inp">
+      </div>
+      <div class="fg">
+        <label for="weightInput">Weight in kg (optional)</label>
+        <input type="number" id="weightInput" name="weight_kg" min="20" max="300" step="0.1" placeholder="e.g. 65" class="form-inp">
+      </div>
+    </div>
+    <p style="font-size:12px;color:var(--text-muted);text-align:center;margin-top:-24px;margin-bottom:32px;">Used only to suggest a healthy sleep range and daily water goal — never shown to anyone else.</p>
+
+    <div class="fg">
+      <label>How active are you day-to-day?</label>
+      <select name="activity_level" class="form-inp" style="max-width:320px;margin:0 auto 32px;display:block;">
+        <option value="sedentary">Mostly sedentary (desk job, little exercise)</option>
+        <option value="lightly_active" selected>Lightly active (some walking/light exercise)</option>
+        <option value="active">Active (regular exercise most weeks)</option>
+        <option value="very_active">Very active (intense exercise most days)</option>
+      </select>
     </div>
 
     <div class="fg">
@@ -163,6 +189,7 @@
     }
     wireSwatches('skinSwatches', 'skinInput', '--av-skin');
     wireSwatches('hairSwatches', 'hairInput', '--av-hair');
+    wireSwatches('shirtSwatches', 'shirtInput', '--av-shirt');
   })();
   </script>
 

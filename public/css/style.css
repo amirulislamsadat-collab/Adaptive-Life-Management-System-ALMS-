@@ -14,6 +14,14 @@
   --bg-color: #F7F9FC;
   --text-dark: #002B5B;
   --text-muted: #64748B;
+  /* Avatar fallback colors — only actually used if some future avatar
+     usage doesn't pass skin/hair/shirt explicitly and has no styled
+     ancestor either; every current usage sets a real value one way or
+     the other, but this keeps var(--av-skin) etc. from silently
+     resolving to nothing in that case. */
+  --av-skin: #F0B594;
+  --av-hair: #3B2314;
+  --av-shirt: #5B8DEF;
   --primary: #FF5A5F; /* Coral primary accent */
   --primary-hover: #E04B50;
   --secondary: #0ea5e9;

@@ -51,7 +51,7 @@ async function callAnthropic(systemPrompt, messages) {
 const MODULE_GUIDE = `
 - Tasks: create/edit/delete to-dos with priority, difficulty, and an optional due date. The "Today" dashboard's Quick-Add box also parses plain text like "submit report tomorrow high priority".
 - Study Planner: Assignments, Examinations (with a countdown), Study Sessions, Subjects.
-- Health & Wellness: Sleep, Water Intake (one-tap +250ml on the dashboard), Exercise, Mood, Medication reminders.
+- Health & Wellness: Sleep (target range personalized by age), Water Intake (goal personalized by weight/gender, one-tap +250ml on the dashboard), Exercise (weekly target personalized by activity level), Mood, Medication reminders, and a guided Breathing Exercise (box breathing or 4-7-8) at /breathe.
 - Habit Tracker: daily check-ins with current/longest streaks.
 - Focus Mode: schedule a daily/weekly distraction-free time block, then check in as "stayed focused" or "got distracted" — it's an honest accountability tool (like the app Opal), not literal app-blocking, since a website can't get OS permission to block other apps.
 - Digital Wellbeing: Screen Time and Social Media usage logs, plus a productive-vs-non-productive breakdown.

@@ -294,25 +294,16 @@
     })
       .then(function(r) { return r.json().then(function(data) { return { ok: r.ok, data: data }; }); })
       .then(function(res) {
-        if (!res.ok) { showCheckinToast(res.data.error || 'Something went wrong.', true); submitBtn.disabled = false; return; }
+        if (!res.ok) { window.almsToast(res.data.error || 'Something went wrong.', true); submitBtn.disabled = false; return; }
         modal.hidden = true;
         promptCard.hidden = true;
         var msg = res.data.note + ' (+' + res.data.xpAwarded + ' XP)';
         if (res.data.leveledUp) msg += ' — 🎉 Level up! You\'re now Level ' + res.data.newLevel + ': ' + res.data.newTitle;
-        showCheckinToast(msg, false);
+        window.almsToast(msg, false);
         setTimeout(function() { location.reload(); }, 2200);
       })
-      .catch(function() { showCheckinToast("Couldn't save your check-in — check your connection and try again.", true); submitBtn.disabled = false; });
+      .catch(function() { window.almsToast("Couldn't save your check-in — check your connection and try again.", true); submitBtn.disabled = false; });
   });
-
-  function showCheckinToast(text, isError) {
-    var toast = document.createElement('div');
-    toast.className = 'flash ' + (isError ? 'flash-error' : 'flash-success');
-    toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:600;max-width:90vw;';
-    toast.innerHTML = '<i class="fas fa-' + (isError ? 'exclamation-triangle' : 'check-circle') + '" aria-hidden="true"></i> ' + text;
-    document.body.appendChild(toast);
-    setTimeout(function() { toast.remove(); }, isError ? 4000 : 2200);
-  }
 })();
 </script>
 <script id="widgetLayoutData" type="application/json"><%- JSON.stringify(widgetLayout) %></script>

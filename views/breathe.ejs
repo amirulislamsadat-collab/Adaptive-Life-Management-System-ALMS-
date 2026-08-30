@@ -1,0 +1,127 @@
+<%- include('header', { currentPath: '/breathe' }) %>
+<div class="page page-center">
+  <a href="/modules/health" class="back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Health &amp; Wellness</a>
+  <div class="form-card card breathe-card">
+    <div class="form-header">
+      <i class="fas fa-wind" aria-hidden="true"></i>
+      <h1>Breathing Exercise</h1>
+    </div>
+    <p class="page-desc" style="text-align:center;margin-bottom:24px;">A couple of minutes of guided breathing — genuinely helps with stress, and a nice thing to reach for instead of your phone. <%= weeklyCount %> session<%= weeklyCount===1?'':'s' %> this week.</p>
+
+    <div class="breathe-pattern-picker" id="patternPicker">
+      <% Object.keys(patterns).forEach(function(key, i){ %>
+        <button type="button" class="breathe-pattern-btn <%= i===0?'active':'' %>" data-pattern="<%= key %>"><%= patterns[key].label %></button>
+      <% }) %>
+    </div>
+
+    <div class="breathe-stage">
+      <div class="breathe-circle" id="breatheCircle">
+        <span id="breathePhase">Ready</span>
+      </div>
+    </div>
+
+    <div class="breathe-stats">
+      <span>Cycle <span id="breatheCycleCount">0</span></span>
+    </div>
+
+    <div class="setup-actions" style="margin-top:24px;">
+      <button type="button" class="btn secondary" id="breatheStopBtn" hidden>Stop &amp; Log Session</button>
+      <button type="button" class="btn primary" id="breatheStartBtn"><i class="fas fa-play" aria-hidden="true"></i> Start</button>
+    </div>
+  </div>
+</div>
+<script id="breathePatternsData" type="application/json"><%- JSON.stringify(patterns) %></script>
+<script>
+(function() {
+  var patterns = JSON.parse(document.getElementById('breathePatternsData').textContent);
+  var currentPattern = 'box';
+  var circle = document.getElementById('breatheCircle');
+  var phaseEl = document.getElementById('breathePhase');
+  var cycleEl = document.getElementById('breatheCycleCount');
+  var startBtn = document.getElementById('breatheStartBtn');
+  var stopBtn = document.getElementById('breatheStopBtn');
+  var picker = document.getElementById('patternPicker');
+
+  var running = false;
+  var stepIndex = 0;
+  var cycles = 0;
+  var timer = null;
+  var lastScale = 0.7;
+
+  picker.querySelectorAll('.breathe-pattern-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (running) return;
+      currentPattern = btn.dataset.pattern;
+      picker.querySelectorAll('.breathe-pattern-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+    });
+  });
+
+  function runStep() {
+    var steps = patterns[currentPattern].steps;
+    var step = steps[stepIndex];
+    phaseEl.textContent = step.phase;
+
+    var targetScale = lastScale;
+    if (step.phase === 'Inhale') targetScale = 1.4;
+    if (step.phase === 'Exhale') targetScale = 0.7;
+    circle.style.transition = 'transform ' + step.seconds + 's ease-in-out';
+    circle.style.transform = 'scale(' + targetScale + ')';
+    lastScale = targetScale;
+
+    timer = setTimeout(function() {
+      stepIndex++;
+      if (stepIndex >= steps.length) {
+        stepIndex = 0;
+        cycles++;
+        cycleEl.textContent = cycles;
+      }
+      if (running) runStep();
+    }, step.seconds * 1000);
+  }
+
+  function start() {
+    running = true;
+    stepIndex = 0;
+    cycles = 0;
+    cycleEl.textContent = '0';
+    lastScale = 0.7;
+    startBtn.hidden = true;
+    stopBtn.hidden = false;
+    picker.querySelectorAll('.breathe-pattern-btn').forEach(function(b) { b.disabled = true; });
+    runStep();
+  }
+
+  function stop() {
+    running = false;
+    clearTimeout(timer);
+    circle.style.transition = 'transform 0.6s ease';
+    circle.style.transform = 'scale(0.9)';
+    phaseEl.textContent = 'Ready';
+    startBtn.hidden = false;
+    stopBtn.hidden = true;
+    picker.querySelectorAll('.breathe-pattern-btn').forEach(function(b) { b.disabled = false; });
+
+    if (cycles > 0) {
+      fetch('/breathe/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pattern: currentPattern, cycles: cycles })
+      })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.success) {
+            var msg = 'Nice work — ' + cycles + ' cycle' + (cycles === 1 ? '' : 's') + ' logged! +' + data.xpAwarded + ' XP';
+            if (data.leveledUp) { msg += ' — 🎉 Level up! Level ' + data.newLevel + ': ' + data.newTitle; window.almsCelebrate && window.almsCelebrate(); }
+            window.almsToast(msg, false);
+          }
+        })
+        .catch(function() {});
+    }
+  }
+
+  startBtn.addEventListener('click', start);
+  stopBtn.addEventListener('click', stop);
+})();
+</script>
+<%- include('footer') %>

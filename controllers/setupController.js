@@ -69,21 +69,28 @@ exports.postYou = async (req, res) => {
   const gender = ['male', 'female'].includes(req.body.gender) ? req.body.gender : 'male';
   const skin = req.body.skin || '#F0B594';
   const hair = req.body.hair || '#3B2314';
+  const shirt = req.body.shirt || '#5B8DEF';
   const age = parseInt(req.body.age, 10) || null;
+  const weight_kg = parseFloat(req.body.weight_kg) || null;
   const experience = ['beginner', 'intermediate', 'experienced'].includes(req.body.experience_level)
     ? req.body.experience_level : 'intermediate';
+  const activity_level = ['sedentary', 'lightly_active', 'active', 'very_active'].includes(req.body.activity_level)
+    ? req.body.activity_level : 'lightly_active';
 
   try {
-    await User.updateIdentity(userId, { gender, skin, hair, age, experience_level: experience });
-    // A sensible starting water goal based on gender, right away instead of
-    // everyone defaulting to the same flat 2000ml regardless of who they are.
-    await User.updateWaterGoal(userId, HealthGuidelines.waterGoalForGender(gender));
+    await User.updateIdentity(userId, { gender, skin, hair, shirt, age, experience_level: experience, weight_kg, activity_level });
+    // Sensible starting targets right away, based on who they actually are,
+    // instead of everyone defaulting to the same flat numbers.
+    await User.updateWaterGoal(userId, HealthGuidelines.waterGoal({ gender, weightKg: weight_kg }));
 
     req.session.user.avatar_gender = gender;
     req.session.user.avatar_skin = skin;
     req.session.user.avatar_hair = hair;
+    req.session.user.avatar_shirt = shirt;
     req.session.user.age = age;
     req.session.user.experience_level = experience;
+    req.session.user.weight_kg = weight_kg;
+    req.session.user.activity_level = activity_level;
 
     res.redirect('/setup?step=modules');
   } catch (err) {

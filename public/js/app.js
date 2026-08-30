@@ -4,6 +4,16 @@
 // instructions since Safari doesn't support beforeinstallprompt), and a
 // Ctrl+K / Cmd+K command palette for fast navigation.
 // ============================================================
+// --- Toast (replaces alert() for success/error feedback app-wide) ---
+window.almsToast = function (text, isError) {
+  var toast = document.createElement('div');
+  toast.className = 'flash ' + (isError ? 'flash-error' : 'flash-success');
+  toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:600;max-width:90vw;';
+  toast.innerHTML = '<i class="fas fa-' + (isError ? 'exclamation-triangle' : 'check-circle') + '" aria-hidden="true"></i> ' + text;
+  document.body.appendChild(toast);
+  setTimeout(function () { toast.remove(); }, isError ? 4000 : 2600);
+};
+
 // --- Confetti celebration (level-ups, streak milestones, setup complete) ---
 // Lightweight, self-contained — no external library, respects reduced-motion.
 window.almsCelebrate = function () {

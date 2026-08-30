@@ -9,9 +9,10 @@ const waterCtrl     = require('../controllers/waterController');
 const exerciseCtrl  = require('../controllers/exerciseController');
 const moodCtrl      = require('../controllers/moodController');
 const medicationCtrl = require('../controllers/medicationController');
+const breathingCtrl   = require('../controllers/breathingController');
 const requireModule   = require('../middleware/moduleAccessMiddleware');
 
-router.use(requireModule('health', ['/sleep', '/water', '/exercise', '/mood', '/medications']));
+router.use(requireModule('health', ['/sleep', '/water', '/exercise', '/mood', '/medications', '/breathe']));
 
 // --- Sleep Tracking (Feature 18) ---
 router.get('/sleep',             sleepCtrl.getSleepLogs);
@@ -52,5 +53,9 @@ router.get('/medications/edit/:id',       medicationCtrl.getEditMedication);
 router.post('/medications/edit/:id',      medicationCtrl.postEditMedication);
 router.post('/medications/toggle/:id',    medicationCtrl.toggleMedication);
 router.post('/medications/delete/:id',    medicationCtrl.deleteMedication);
+
+// --- Guided Breathing Exercise ---
+router.get('/breathe',          breathingCtrl.getBreathe);
+router.post('/breathe/complete', breathingCtrl.postComplete);
 
 module.exports = router;

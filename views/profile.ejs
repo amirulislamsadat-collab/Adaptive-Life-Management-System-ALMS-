@@ -7,7 +7,7 @@
 
   <div class="profile-hero">
     <div class="profile-hero-avatar">
-      <%- include('partials/avatar', { gender: user.avatar_gender, skin: user.avatar_skin, hair: user.avatar_hair, size: 100 }) %>
+      <%- include('partials/avatar', { gender: user.avatar_gender, skin: user.avatar_skin, hair: user.avatar_hair, shirt: user.avatar_shirt, size: 100 }) %>
     </div>
     <div class="profile-hero-info">
       <form method="POST" action="/profile/name" class="profile-name-form">
@@ -48,7 +48,7 @@
   </div>
   <div class="card" style="margin-bottom:40px;">
     <form method="POST" action="/profile/avatar">
-      <div class="avatar-builder" id="avatarBuilder" style="--av-skin:<%= user.avatar_skin %>;--av-hair:<%= user.avatar_hair %>;margin-bottom:24px;">
+      <div class="avatar-builder" id="avatarBuilder" style="--av-skin:<%= user.avatar_skin %>;--av-hair:<%= user.avatar_hair %>;--av-shirt:<%= user.avatar_shirt %>;margin-bottom:24px;">
         <div class="avatar-preview">
           <div id="avPreviewMale" <%= user.avatar_gender==='female' ? 'hidden' : '' %>><%- include('partials/avatar', { gender: 'male', size: 120 }) %></div>
           <div id="avPreviewFemale" <%= user.avatar_gender==='female' ? '' : 'hidden' %>><%- include('partials/avatar', { gender: 'female', size: 120 }) %></div>
@@ -82,6 +82,16 @@
           </div>
           <input type="hidden" name="hair" id="hairInput" value="<%= user.avatar_hair %>">
         </div>
+
+        <div class="avatar-opt-group">
+          <label>Shirt color</label>
+          <div class="swatch-row" id="shirtSwatches">
+            <% ['#5B8DEF','#FF5A5F','#10B981','#8B5CF6','#64748B'].forEach(function(c){ %>
+              <button type="button" class="swatch <%= user.avatar_shirt===c?'active':'' %>" data-val="<%= c %>" style="background:<%= c %>" aria-label="Shirt color"></button>
+            <% }) %>
+          </div>
+          <input type="hidden" name="shirt" id="shirtInput" value="<%= user.avatar_shirt %>">
+        </div>
       </div>
 
       <div class="form-row">
@@ -90,11 +100,27 @@
           <input type="number" id="ageInput" name="age" min="10" max="110" value="<%= user.age || '' %>" placeholder="e.g. 21">
         </div>
         <div class="fg">
+          <label for="weightInput">Weight (kg)</label>
+          <input type="number" id="weightInput" name="weight_kg" min="20" max="300" step="0.1" value="<%= user.weight_kg || '' %>" placeholder="e.g. 65">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="fg">
           <label for="expSelect">Experience level</label>
           <select id="expSelect" name="experience_level">
             <option value="beginner" <%= user.experience_level==='beginner'?'selected':'' %>>🌱 Just starting out</option>
             <option value="intermediate" <%= user.experience_level==='intermediate'?'selected':'' %>>🌿 Somewhere in between</option>
             <option value="experienced" <%= user.experience_level==='experienced'?'selected':'' %>>🌳 Pretty on top of it</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label for="activitySelect">Activity level</label>
+          <select id="activitySelect" name="activity_level">
+            <option value="sedentary" <%= user.activity_level==='sedentary'?'selected':'' %>>Mostly sedentary</option>
+            <option value="lightly_active" <%= user.activity_level==='lightly_active'?'selected':'' %>>Lightly active</option>
+            <option value="active" <%= user.activity_level==='active'?'selected':'' %>>Active</option>
+            <option value="very_active" <%= user.activity_level==='very_active'?'selected':'' %>>Very active</option>
           </select>
         </div>
       </div>
@@ -137,6 +163,7 @@
   }
   wireSwatches('skinSwatches', 'skinInput', '--av-skin');
   wireSwatches('hairSwatches', 'hairInput', '--av-hair');
+  wireSwatches('shirtSwatches', 'shirtInput', '--av-shirt');
 })();
 </script>
 <%- include('footer') %>

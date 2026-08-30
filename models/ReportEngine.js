@@ -24,8 +24,6 @@ const Expense                 = require('./Expense');
 const JournalEntry              = require('./JournalEntry');
 
 const WATER_DAILY_GOAL_ML = 2000;
-const SLEEP_TARGET_MINUTES = 480;      // 8 hours
-const EXERCISE_WEEKLY_TARGET_MIN = 150; // WHO guideline
 const MOOD_SCORES = { great: 100, good: 80, okay: 60, low: 40, bad: 20 };
 const STRESS_KEYWORDS = ['tired', 'stressed', 'anxious', 'overwhelmed'];
 
@@ -101,6 +99,7 @@ async function getLifeScore(userId) {
   const fullUser = await User.findById(userId);
   const waterGoal = (fullUser && fullUser.daily_water_goal_ml) || WATER_DAILY_GOAL_ML;
   const sleepTarget = HealthGuidelines.sleepRangeForAge(fullUser && fullUser.age).max;
+  const exerciseTarget = HealthGuidelines.exerciseWeeklyTarget(fullUser && fullUser.activity_level);
   const components = [];
 
   if (enabledSlugs.has('tasks')) {
@@ -128,7 +127,7 @@ async function getLifeScore(userId) {
     const healthScores = [];
     if (avgSleep > 0) healthScores.push(Math.min(100, (avgSleep / sleepTarget) * 100));
     if (todayWater > 0) healthScores.push(Math.min(100, (todayWater / waterGoal) * 100));
-    if (weeklyExercise > 0) healthScores.push(Math.min(100, (weeklyExercise / EXERCISE_WEEKLY_TARGET_MIN) * 100));
+    if (weeklyExercise > 0) healthScores.push(Math.min(100, (weeklyExercise / exerciseTarget) * 100));
     if (latestMood) healthScores.push(MOOD_SCORES[latestMood.mood] || 60);
     if (healthScores.length) components.push({ label: 'Health & Wellness', score: Math.round(healthScores.reduce((a, b) => a + b, 0) / healthScores.length) });
   }
@@ -171,6 +170,7 @@ async function getRecommendations(userId) {
   const fullUser = await User.findById(userId);
   const waterGoal = (fullUser && fullUser.daily_water_goal_ml) || WATER_DAILY_GOAL_ML;
   const sleepRange = HealthGuidelines.sleepRangeForAge(fullUser && fullUser.age);
+  const exerciseTarget = HealthGuidelines.exerciseWeeklyTarget(fullUser && fullUser.activity_level);
   const recommendations = [];
 
   if (enabledSlugs.has('health')) {
@@ -194,11 +194,11 @@ async function getRecommendations(userId) {
     }
 
     const weeklyExercise = await ExerciseLog.getWeeklyMinutes(userId);
-    if (weeklyExercise < EXERCISE_WEEKLY_TARGET_MIN) {
+    if (weeklyExercise < exerciseTarget) {
       recommendations.push({
         icon: 'fa-running',
         message: 'Fit in a bit more physical activity this week.',
-        reason: `You've logged ${weeklyExercise} minutes of exercise in the last 7 days, under the ${EXERCISE_WEEKLY_TARGET_MIN}-minute weekly guideline.`
+        reason: `You've logged ${weeklyExercise} minutes of exercise in the last 7 days, under your ${exerciseTarget}-minute weekly target.`
       });
     }
 
@@ -294,7 +294,7 @@ async function getRecommendations(userId) {
         icon: 'fa-mobile-alt',
         message: 'High screen time and lower mood have shown up together this week.',
         reason: `${Math.round(screenSummary.totalMinutes / 60)}h of screen time in 7 days alongside a below-average mood trend — worth a deliberate break.`,
-        actionLabel: 'Start a focus session', actionHref: '/focus'
+        actionLabel: 'Try a breathing exercise', actionHref: '/breathe'
       });
     }
   }
@@ -348,7 +348,8 @@ async function getRecommendations(userId) {
         icon: 'fa-heart',
         message: 'Your recent journal entries mention feeling stressed or overwhelmed.',
         reason: 'A few of your last entries used words like "tired," "stressed," or "overwhelmed" — might be worth a check-in with yourself, or someone you trust.',
-        actionLabel: 'Log mood', actionHref: enabledSlugs.has('health') ? '/mood/new' : '/journal/new'
+        actionLabel: enabledSlugs.has('health') ? 'Try a breathing exercise' : 'Log mood',
+        actionHref: enabledSlugs.has('health') ? '/breathe' : '/journal/new'
       });
     }
   }

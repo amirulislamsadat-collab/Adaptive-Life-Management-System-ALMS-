@@ -63,10 +63,11 @@ const User = {
     await db.query('UPDATE users SET widget_layout = ? WHERE id = ?', [layoutJson, userId]);
   },
 
-  updateIdentity: async (userId, { gender, skin, hair, age, experience_level }) => {
+  updateIdentity: async (userId, { gender, skin, hair, shirt, age, experience_level, weight_kg, activity_level }) => {
     await db.query(
-      'UPDATE users SET avatar_gender = ?, avatar_skin = ?, avatar_hair = ?, age = ?, experience_level = ? WHERE id = ?',
-      [gender, skin, hair, age, experience_level, userId]
+      `UPDATE users SET avatar_gender = ?, avatar_skin = ?, avatar_hair = ?, avatar_shirt = ?, age = ?,
+       experience_level = ?, weight_kg = ?, activity_level = ? WHERE id = ?`,
+      [gender, skin, hair, shirt, age, experience_level, weight_kg || null, activity_level, userId]
     );
   }
 };

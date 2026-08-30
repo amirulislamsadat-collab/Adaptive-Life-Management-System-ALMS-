@@ -127,8 +127,11 @@ app.use(async (req, res, next) => {
         req.session.user.avatar_gender = fresh.avatar_gender || 'male';
         req.session.user.avatar_skin = fresh.avatar_skin || '#F0B594';
         req.session.user.avatar_hair = fresh.avatar_hair || '#3B2314';
+        req.session.user.avatar_shirt = fresh.avatar_shirt || '#5B8DEF';
         req.session.user.age = fresh.age || null;
         req.session.user.experience_level = fresh.experience_level || null;
+        req.session.user.weight_kg = fresh.weight_kg || null;
+        req.session.user.activity_level = fresh.activity_level || 'lightly_active';
       }
       res.locals.levelInfo = Gamification.getLevelInfo(req.session.user.xp || 0);
       const lastActiveStr = req.session.user.last_active_date ? new Date(req.session.user.last_active_date).toDateString() : null;
@@ -300,6 +303,13 @@ async function initDB() {
       await db.query(`ALTER TABLE users ADD COLUMN avatar_hair VARCHAR(10) DEFAULT '#3B2314'`);
       await db.query(`ALTER TABLE users ADD COLUMN age INT DEFAULT NULL`);
       await db.query(`ALTER TABLE users ADD COLUMN experience_level VARCHAR(20) DEFAULT NULL`);
+    }
+    if (!userColNames.includes('avatar_shirt')) {
+      await db.query(`ALTER TABLE users ADD COLUMN avatar_shirt VARCHAR(10) DEFAULT '#5B8DEF'`);
+    }
+    if (!userColNames.includes('weight_kg')) {
+      await db.query(`ALTER TABLE users ADD COLUMN weight_kg DECIMAL(5,1) DEFAULT NULL`);
+      await db.query(`ALTER TABLE users ADD COLUMN activity_level VARCHAR(20) DEFAULT 'lightly_active'`);
     }
 
     // ---------- TABLE 3: modules ----------
@@ -812,7 +822,19 @@ async function initDB() {
       )
     `);
 
-    console.log('[DB] All 33 tables created and seeded successfully.');
+    // ---------- TABLE 34: breathing_sessions (guided breathing exercise log) ----------
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS breathing_sessions (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        pattern VARCHAR(20) NOT NULL,
+        cycles INT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    console.log('[DB] All 34 tables created and seeded successfully.');
   } catch (err) {
     console.error('[DB] Initialization error ->', err.message);
   }
