@@ -27,10 +27,13 @@ const digitalRoutes   = require('./routes/digitalRoutes');
 const financeRoutes   = require('./routes/financeRoutes');
 const goalRoutes      = require('./routes/goalRoutes');
 const journalRoutes   = require('./routes/journalRoutes');
+const focusRoutes     = require('./routes/focusRoutes');
 
 // --- Middleware Imports ---
 const notificationMiddleware = require('./middleware/notificationMiddleware');
 const Module = require('./models/Module');
+const User   = require('./models/User');
+const Gamification = require('./models/Gamification');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -40,8 +43,10 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // --- Body Parsers & Static Files ---
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+// Raised from Express's 100kb default so a base64-encoded profile picture
+// (submitted as a normal form field, not multipart) fits in one request.
+app.use(express.urlencoded({ extended: true, limit: '4mb' }));
+app.use(express.json({ limit: '4mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // --- Session ---
@@ -90,6 +95,29 @@ app.use(async (req, res, next) => {
   next();
 });
 
+// --- Refresh XP / Profile Picture (Gamification, Account) ---
+// Every controller renders with `user: req.session.user`, and that object is
+// only ever built once at login — so anything that changes afterward (XP
+// from completing things, a newly-uploaded profile picture) would otherwise
+// stay stuck at its login-time value everywhere. Refreshing it here, once
+// per request, means every existing render call picks it up for free.
+app.use(async (req, res, next) => {
+  res.locals.levelInfo = Gamification.getLevelInfo(0);
+  if (req.session.user && req.session.user.setup_completed == 1) {
+    try {
+      const fresh = await User.findById(req.session.user.id);
+      if (fresh) {
+        req.session.user.xp = fresh.xp || 0;
+        req.session.user.profile_picture = fresh.profile_picture || null;
+      }
+      res.locals.levelInfo = Gamification.getLevelInfo(req.session.user.xp || 0);
+    } catch (err) {
+      console.error('User refresh error:', err);
+    }
+  }
+  next();
+});
+
 // --- Notification Middleware (Feature 13) ---
 app.use(notificationMiddleware);
 
@@ -109,6 +137,7 @@ app.use('/', digitalRoutes);
 app.use('/', financeRoutes);
 app.use('/', goalRoutes);
 app.use('/', journalRoutes);
+app.use('/', focusRoutes);
 
 // --- Notifications API (for client-side polling without page refresh) ---
 const Reminder = require('./models/Reminder');
@@ -181,7 +210,12 @@ async function initDB() {
       INSERT IGNORE INTO roles (id, name, description) VALUES
       (1, 'Student', 'Academic learner managing coursework, study schedules, and campus life'),
       (2, 'Professional', 'Working professional balancing career tasks, meetings, and personal growth'),
-      (3, 'Freelancer', 'Independent worker managing clients, projects, deadlines, and invoicing')
+      (3, 'Freelancer', 'Independent worker managing clients, projects, deadlines, and invoicing'),
+      (4, 'Entrepreneur', 'Building a business and juggling finances, goals, and relentless to-dos'),
+      (5, 'Parent / Caregiver', 'Managing a household, family schedules, and a little time for yourself'),
+      (6, 'Fitness Enthusiast', 'Focused on training, recovery, sleep, and long-term health habits'),
+      (7, 'Creative / Content Creator', 'Managing projects, deadlines, and a healthy relationship with screens'),
+      (8, 'Remote Worker', 'Working from anywhere and protecting focus time from distractions')
     `);
 
     // ---------- TABLE 2: users ----------
@@ -193,11 +227,23 @@ async function initDB() {
         password VARCHAR(255) NOT NULL,
         role_id INT DEFAULT NULL,
         setup_completed TINYINT(1) DEFAULT 0,
+        profile_picture MEDIUMTEXT,
+        xp INT DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE SET NULL
       )
     `);
+    // Older databases created before profile pictures / XP existed won't have
+    // these columns yet — add them if missing so upgrading in place is safe.
+    const [userCols] = await db.query(`SHOW COLUMNS FROM users`);
+    const userColNames = userCols.map(c => c.Field);
+    if (!userColNames.includes('profile_picture')) {
+      await db.query(`ALTER TABLE users ADD COLUMN profile_picture MEDIUMTEXT`);
+    }
+    if (!userColNames.includes('xp')) {
+      await db.query(`ALTER TABLE users ADD COLUMN xp INT DEFAULT 0`);
+    }
 
     // ---------- TABLE 3: modules ----------
     await db.query(`
@@ -225,7 +271,8 @@ async function initDB() {
       (12, 'Habit Tracker',   'habits',     'Build consistent habits and track your daily completion streaks',            'habit'),
       (13, 'Digital Wellbeing','screentime','Track screen time and social media usage, and see how productive your time really is', 'mobile'),
       (14, 'Goals',           'goals',      'Set personal goals, track progress, and celebrate milestones',               'bullseye'),
-      (15, 'Reports & Insights','reports',  'Generate productivity and life balance reports with personalized recommendations', 'chart-line')
+      (15, 'Reports & Insights','reports',  'Generate productivity and life balance reports with personalized recommendations', 'chart-line'),
+      (16, 'Focus Mode',       'focus',    'Schedule distraction-free focus sessions and build accountability with check-ins', 'bullseye')
     `);
 
     // "Project Board" was seeded early on but never got a real feature built
@@ -280,12 +327,17 @@ async function initDB() {
         difficulty VARCHAR(20) DEFAULT 'normal',
         availability VARCHAR(20) DEFAULT 'flexible',
         status VARCHAR(10) DEFAULT 'pending',
+        due_date DATE DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
         FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
       )
     `);
+    const [taskCols] = await db.query(`SHOW COLUMNS FROM tasks`);
+    if (!taskCols.map(c => c.Field).includes('due_date')) {
+      await db.query(`ALTER TABLE tasks ADD COLUMN due_date DATE DEFAULT NULL`);
+    }
 
     // ---------- TABLE 7: notes (Feature 8) ----------
     await db.query(`
@@ -630,7 +682,39 @@ async function initDB() {
       )
     `);
 
-    console.log('[DB] All 28 tables created and seeded successfully.');
+    // ---------- TABLE 29: focus_sessions (Focus Mode) ----------
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS focus_sessions (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        days_of_week VARCHAR(64) NOT NULL,
+        start_time TIME NOT NULL,
+        end_time TIME NOT NULL,
+        blocklist TEXT,
+        is_active TINYINT(1) DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    // ---------- TABLE 30: focus_checkins (Focus Mode accountability log) ----------
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS focus_checkins (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        session_id INT NOT NULL,
+        user_id INT NOT NULL,
+        checkin_date DATE NOT NULL,
+        stayed_focused TINYINT(1) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY uq_session_date (session_id, checkin_date),
+        FOREIGN KEY (session_id) REFERENCES focus_sessions(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    console.log('[DB] All 30 tables created and seeded successfully.');
   } catch (err) {
     console.error('[DB] Initialization error ->', err.message);
   }

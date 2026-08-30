@@ -3,10 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="ALMS - Adaptive Life Management System. Manage tasks, notes, calendar, reminders, alarms, subjects, study planning and health & wellness in one place.">
+<meta name="description" content="ALMS - Adaptive Life Management System. Tasks, habits, health, finances, and focus — one adaptive workspace for your whole life.">
 <title>ALMS — Adaptive Life Management System</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#FF5A5F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ALMS">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="icon" href="/icons/icon-192.png">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -99,6 +106,9 @@ if (savedTheme === 'dark') {
       <% if(enabledSlugs.indexOf('habits') !== -1){ %>
       <li><a href="/habits" class="<%= cp.indexOf('/habits') === 0 ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-fire" aria-hidden="true"></i></span> Habits</a></li>
       <% } %>
+      <% if(enabledSlugs.indexOf('focus') !== -1){ %>
+      <li><a href="/focus" class="<%= cp.indexOf('/focus') === 0 ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-crosshairs" aria-hidden="true"></i></span> Focus Mode</a></li>
+      <% } %>
 
       <% if(enabledSlugs.indexOf('screentime') !== -1){ %>
       <li class="nav-group">
@@ -138,8 +148,22 @@ if (savedTheme === 'dark') {
       <li><a href="/modules/settings" class="<%= (cp.indexOf('/modules/settings') === 0 || (cp.indexOf('/modules') === 0 && !studyActive && !healthActive && !digitalActive && !financeActive && cp.indexOf('/modules/reports') !== 0)) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-cog" aria-hidden="true"></i></span> Settings</a></li>
     </nav>
     <div class="sidebar-foot">
+      <button type="button" class="install-app-btn js-install-app" hidden>
+        <i class="fas fa-arrow-down" aria-hidden="true"></i> Install App
+      </button>
+      <a href="/modules/settings" class="xp-chip" title="<%= levelInfo.xpIntoLevel %>/<%= levelInfo.xpForNextLevel %> XP to next level">
+        <div class="xp-level">Lv <%= levelInfo.level %></div>
+        <div class="xp-info">
+          <div class="xp-title"><%= levelInfo.title %></div>
+          <div class="xp-track"><div class="xp-fill" style="width:<%= levelInfo.progressPercent %>%"></div></div>
+        </div>
+      </a>
       <div class="user-chip">
-        <div class="user-avatar" aria-hidden="true"><%= user.name.charAt(0).toUpperCase() %></div>
+        <% if(user.profile_picture){ %>
+          <img src="<%= user.profile_picture %>" class="user-avatar" alt="" />
+        <% } else { %>
+          <div class="user-avatar" aria-hidden="true"><%= user.name.charAt(0).toUpperCase() %></div>
+        <% } %>
         <span class="user-name"><%= user.name %></span>
       </div>
       <a href="/logout" style="text-decoration:none">
@@ -153,7 +177,13 @@ if (savedTheme === 'dark') {
       <button type="button" class="topbar-menu-btn" id="topbarMenuBtn" aria-label="Open navigation">
         <i class="fas fa-bars" aria-hidden="true"></i>
       </button>
+      <button type="button" class="topbar-search-btn" id="commandPaletteTrigger" title="Search (Ctrl+K)">
+        <i class="fas fa-search" aria-hidden="true"></i> <span class="topbar-search-label">Search</span> <kbd>Ctrl K</kbd>
+      </button>
       <div class="topbar-spacer"></div>
+      <button type="button" class="install-app-btn install-app-btn-top js-install-app" hidden>
+        <i class="fas fa-arrow-down" aria-hidden="true"></i> Install App
+      </button>
       <% if(dueNotifications && dueNotifications.length){ %>
         <span class="notif-chip" id="notifChip" title="<%= dueNotifications.length %> due notification(s)">
           <i class="fas fa-bell" aria-hidden="true"></i> <%= dueNotifications.length %> due
@@ -163,6 +193,63 @@ if (savedTheme === 'dark') {
           <i class="fas fa-bell" aria-hidden="true"></i> <span id="notifCount">0</span> due
         </span>
       <% } %>
+    </div>
+
+    <div class="command-palette" id="commandPalette" hidden>
+      <div class="command-palette-box">
+        <div class="command-palette-input-wrap">
+          <i class="fas fa-search" aria-hidden="true"></i>
+          <input type="text" id="commandPaletteInput" placeholder="Jump to..." autocomplete="off">
+        </div>
+        <div class="command-palette-list" id="commandPaletteList">
+          <a href="/dashboard"><i class="fas fa-th-large" aria-hidden="true"></i> Dashboard</a>
+          <% if(enabledSlugs.indexOf('tasks') !== -1){ %><a href="/tasks/hub"><i class="fas fa-tasks" aria-hidden="true"></i> Tasks</a><% } %>
+          <% if(enabledSlugs.indexOf('notes') !== -1){ %><a href="/notes"><i class="fas fa-sticky-note" aria-hidden="true"></i> Notes</a><% } %>
+          <% if(enabledSlugs.indexOf('calendar') !== -1){ %><a href="/calendar"><i class="fas fa-calendar-alt" aria-hidden="true"></i> Calendar</a><% } %>
+          <% if(enabledSlugs.indexOf('reminders') !== -1){ %><a href="/reminders"><i class="fas fa-clock" aria-hidden="true"></i> Reminders</a><% } %>
+          <% if(enabledSlugs.indexOf('alarms') !== -1){ %><a href="/alarms"><i class="fas fa-bell" aria-hidden="true"></i> Alarms</a><% } %>
+          <% if(enabledSlugs.indexOf('subjects') !== -1){ %><a href="/subjects"><i class="fas fa-book" aria-hidden="true"></i> Subjects</a><% } %>
+          <% if(enabledSlugs.indexOf('study') !== -1){ %>
+          <a href="/assignments"><i class="fas fa-file-signature" aria-hidden="true"></i> Assignments</a>
+          <a href="/exams"><i class="fas fa-graduation-cap" aria-hidden="true"></i> Examinations</a>
+          <a href="/study-sessions"><i class="fas fa-stopwatch" aria-hidden="true"></i> Study Sessions</a>
+          <% } %>
+          <% if(enabledSlugs.indexOf('health') !== -1){ %>
+          <a href="/sleep"><i class="fas fa-bed" aria-hidden="true"></i> Sleep</a>
+          <a href="/water"><i class="fas fa-tint" aria-hidden="true"></i> Water Intake</a>
+          <a href="/exercise"><i class="fas fa-running" aria-hidden="true"></i> Exercise</a>
+          <a href="/mood"><i class="fas fa-smile" aria-hidden="true"></i> Mood</a>
+          <a href="/medications"><i class="fas fa-pills" aria-hidden="true"></i> Medications</a>
+          <% } %>
+          <% if(enabledSlugs.indexOf('habits') !== -1){ %><a href="/habits"><i class="fas fa-fire" aria-hidden="true"></i> Habits</a><% } %>
+          <% if(enabledSlugs.indexOf('focus') !== -1){ %><a href="/focus"><i class="fas fa-crosshairs" aria-hidden="true"></i> Focus Mode</a><% } %>
+          <% if(enabledSlugs.indexOf('screentime') !== -1){ %>
+          <a href="/screen-time"><i class="fas fa-hourglass-half" aria-hidden="true"></i> Screen Time</a>
+          <a href="/social-media"><i class="fas fa-hashtag" aria-hidden="true"></i> Social Media</a>
+          <% } %>
+          <% if(enabledSlugs.indexOf('finance') !== -1){ %>
+          <a href="/expenses"><i class="fas fa-money-bill-wave" aria-hidden="true"></i> Expenses</a>
+          <a href="/savings-goals"><i class="fas fa-piggy-bank" aria-hidden="true"></i> Savings Goals</a>
+          <% } %>
+          <% if(enabledSlugs.indexOf('goals') !== -1){ %><a href="/goals"><i class="fas fa-bullseye" aria-hidden="true"></i> Goals</a><% } %>
+          <% if(enabledSlugs.indexOf('journal') !== -1){ %><a href="/journal"><i class="fas fa-pen" aria-hidden="true"></i> Journal</a><% } %>
+          <% if(enabledSlugs.indexOf('reports') !== -1){ %><a href="/modules/reports"><i class="fas fa-chart-line" aria-hidden="true"></i> Reports</a><% } %>
+          <a href="/modules/settings"><i class="fas fa-cog" aria-hidden="true"></i> Settings</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="ios-install-modal" id="iosInstallModal" hidden>
+      <div class="ios-install-box">
+        <button type="button" class="ios-install-close" id="iosInstallModalClose" aria-label="Close">&times;</button>
+        <div class="ios-install-icon"><i class="fas fa-mobile-alt" aria-hidden="true"></i></div>
+        <h3>Install ALMS on iPhone/iPad</h3>
+        <ol>
+          <li>Tap the <strong>Share</strong> button <i class="fas fa-arrow-up-from-bracket" aria-hidden="true"></i> in Safari's toolbar</li>
+          <li>Scroll down and tap <strong>Add to Home Screen</strong></li>
+          <li>Tap <strong>Add</strong> — ALMS now opens like a native app</li>
+        </ol>
+      </div>
     </div>
 <% } %>
 
@@ -273,4 +360,5 @@ if (savedTheme === 'dark') {
   setInterval(pollNotifications, 60000);
 })();
 </script>
+<script src="/js/app.js" defer></script>
 <% } %>

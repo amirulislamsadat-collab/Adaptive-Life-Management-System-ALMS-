@@ -2,6 +2,7 @@
 // Controller: Habit — handles habit CRUD, check-ins & streaks (Features 23-24)
 // ============================================================
 const Habit = require('../models/Habit');
+const Gamification = require('../models/Gamification');
 
 exports.getHabits = async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
@@ -77,7 +78,8 @@ exports.checkinHabit = async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
   try {
     const nowChecked = await Habit.toggleToday(req.params.id, req.session.user.id);
-    req.session.success = nowChecked ? "Nice work — marked done for today!" : 'Check-in removed for today.';
+    if (nowChecked) await Gamification.awardXp(req.session.user.id, 15);
+    req.session.success = nowChecked ? "Nice work — marked done for today! +15 XP" : 'Check-in removed for today.';
   } catch (err) {
     console.error('Habit check-in error:', err);
     req.session.error = 'Failed to update check-in.';

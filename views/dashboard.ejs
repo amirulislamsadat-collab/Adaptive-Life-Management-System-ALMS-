@@ -2,8 +2,8 @@
 <div class="page">
   <div class="greeting-card">
     <div class="greeting-left">
-      <h1>Good <%= (new Date().getHours()<12?'Morning':new Date().getHours()<18?'Afternoon':'Evening') %>, <%= user.name %>!</h1>
-      <p>Here's your workspace overview. Stay productive and organized.</p>
+      <h1>Good <%= (new Date().getHours()<12?'Morning':new Date().getHours()<18?'Afternoon':'Evening') %>, <%= user.name.split(' ')[0] %>!</h1>
+      <p>Here's everything that needs you today — nothing more.</p>
       <div class="role-badge"><i class="fas fa-user-circle" aria-hidden="true"></i> <%= user.role %></div>
     </div>
     <div class="date-display">
@@ -12,7 +12,106 @@
     </div>
   </div>
 
-  <div class="stats-grid">
+  <% if(today.activeFocus){ %>
+  <div class="focus-banner">
+    <div class="focus-banner-icon"><i class="fas fa-crosshairs" aria-hidden="true"></i></div>
+    <div class="focus-banner-body">
+      <div class="focus-banner-title">Focus session active — "<%= today.activeFocus.name %>"</div>
+      <% if(today.activeFocus.blocklist){ %><div class="focus-banner-sub">Staying off: <%= today.activeFocus.blocklist %></div><% } %>
+    </div>
+    <a href="/focus" class="btn secondary btn-sm">Check in</a>
+  </div>
+  <% } %>
+
+  <form class="quick-add-bar" method="POST" action="/tasks/quick-add" id="quickAddForm">
+    <i class="fas fa-plus quick-add-icon" aria-hidden="true"></i>
+    <input type="text" name="text" placeholder='Quick-add a task — try "buy groceries tomorrow high priority"' autocomplete="off">
+    <button type="submit" class="btn primary btn-sm">Add</button>
+  </form>
+
+  <div class="section-header" style="margin-top:36px;">
+    <div class="section-title"><i class="fas fa-sun" aria-hidden="true"></i> Today</div>
+  </div>
+  <div class="today-grid">
+
+    <% if(today.tasksDue.length){ %>
+    <div class="today-card">
+      <div class="today-card-head"><i class="fas fa-tasks" aria-hidden="true"></i> Tasks due today</div>
+      <% today.tasksDue.forEach(t => { %>
+      <div class="today-row">
+        <span><%= t.title %></span>
+        <form method="POST" action="/tasks/done/<%= t.id %>"><button class="today-check-btn" title="Mark done"><i class="fas fa-check" aria-hidden="true"></i></button></form>
+      </div>
+      <% }) %>
+    </div>
+    <% } %>
+
+    <% if(today.habitsToCheckIn.length){ %>
+    <div class="today-card">
+      <div class="today-card-head"><i class="fas fa-fire" aria-hidden="true"></i> Habits to check in</div>
+      <% today.habitsToCheckIn.forEach(h => { %>
+      <div class="today-row">
+        <span><%= h.name %> <span class="streak-badge <%= h.currentStreak === 0 ? 'zero' : '' %>" style="margin-left:6px;"><%= h.currentStreak %>🔥</span></span>
+        <form method="POST" action="/habits/checkin/<%= h.id %>"><button class="today-check-btn" title="Check in"><i class="fas fa-check" aria-hidden="true"></i></button></form>
+      </div>
+      <% }) %>
+    </div>
+    <% } %>
+
+    <% if(today.medsDueToday.length){ %>
+    <div class="today-card">
+      <div class="today-card-head"><i class="fas fa-pills" aria-hidden="true"></i> Medications today</div>
+      <% today.medsDueToday.forEach(m => { %>
+      <div class="today-row">
+        <span><%= m.medication_name %></span>
+        <span class="meta"><%= m.time_of_day.slice(0,5) %></span>
+      </div>
+      <% }) %>
+    </div>
+    <% } %>
+
+    <% if(today.remindersDue.length){ %>
+    <div class="today-card">
+      <div class="today-card-head"><i class="fas fa-clock" aria-hidden="true"></i> Reminders due</div>
+      <% today.remindersDue.forEach(r => { %>
+      <div class="today-row"><span><%= r.title %></span></div>
+      <% }) %>
+    </div>
+    <% } %>
+
+    <% if(today.todaysEvents.length){ %>
+    <div class="today-card">
+      <div class="today-card-head"><i class="fas fa-calendar-alt" aria-hidden="true"></i> Today's events</div>
+      <% today.todaysEvents.forEach(e => { %>
+      <div class="today-row">
+        <span><%= e.title %></span>
+        <span class="meta"><%= new Date(e.start_time).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}) %></span>
+      </div>
+      <% }) %>
+    </div>
+    <% } %>
+
+    <% if(enabledSlugs.indexOf('health') !== -1){ %>
+    <div class="today-card">
+      <div class="today-card-head"><i class="fas fa-tint" aria-hidden="true"></i> Water intake</div>
+      <div class="progress-track" style="margin:8px 0;"><div class="progress-fill" style="width:<%= Math.min(100, Math.round(today.waterTotal/today.waterGoal*100)) %>%"></div></div>
+      <div class="today-row">
+        <span class="meta"><%= today.waterTotal %> / <%= today.waterGoal %> ml</span>
+        <form method="POST" action="/water/create">
+          <input type="hidden" name="log_date" value="<%= new Date().toISOString().slice(0,10) %>">
+          <input type="hidden" name="amount_ml" value="250">
+          <button class="today-check-btn" title="+250ml"><i class="fas fa-plus" aria-hidden="true"></i></button>
+        </form>
+      </div>
+    </div>
+    <% } %>
+
+  </div>
+  <% if(!today.tasksDue.length && !today.habitsToCheckIn.length && !today.medsDueToday.length && !today.remindersDue.length && !today.todaysEvents.length){ %>
+  <p class="empty-msg">Nothing urgent today — you're all caught up. 🎉</p>
+  <% } %>
+
+  <div class="stats-grid" style="margin-top:40px;">
     <div class="stat-card">
       <div class="stat-icon total">
         <i class="fas fa-layer-group" aria-hidden="true"></i>
@@ -51,7 +150,7 @@
     </div>
   </div>
 
-  <div class="section-header">
+  <div class="section-header" style="margin-top:40px;">
     <div class="section-title">
       <i class="fas fa-th-large" aria-hidden="true"></i>
       Active Modules <span class="section-badge"><%= modules.length %></span>
@@ -62,8 +161,8 @@
   <% if(modules && modules.length){ %>
   <div class="modules-grid">
     <% modules.forEach(function(mod){ %>
-    <% const linkMap = { tasks:'/tasks/hub', notes:'/notes', calendar:'/calendar', reminders:'/reminders', alarms:'/alarms', subjects:'/subjects', study:'/modules/study', finance:'/modules/finance', health:'/modules/health', journal:'/journal', habits:'/habits', screentime:'/modules/screentime', goals:'/goals', reports:'/modules/reports' }; %>
-    <% const iconMap = { tasks:'fas fa-tasks', study:'fas fa-book-open', finance:'fas fa-wallet', health:'fas fa-heartbeat', journal:'fas fa-pen', notes:'fas fa-sticky-note', calendar:'fas fa-calendar-alt', reminders:'fas fa-clock', alarms:'fas fa-bell', subjects:'fas fa-book', habits:'fas fa-fire', screentime:'fas fa-mobile-alt', goals:'fas fa-bullseye', reports:'fas fa-chart-line' }; %>
+    <% const linkMap = { tasks:'/tasks/hub', notes:'/notes', calendar:'/calendar', reminders:'/reminders', alarms:'/alarms', subjects:'/subjects', study:'/modules/study', finance:'/modules/finance', health:'/modules/health', journal:'/journal', habits:'/habits', screentime:'/modules/screentime', goals:'/goals', reports:'/modules/reports', focus:'/focus' }; %>
+    <% const iconMap = { tasks:'fas fa-tasks', study:'fas fa-book-open', finance:'fas fa-wallet', health:'fas fa-heartbeat', journal:'fas fa-pen', notes:'fas fa-sticky-note', calendar:'fas fa-calendar-alt', reminders:'fas fa-clock', alarms:'fas fa-bell', subjects:'fas fa-book', habits:'fas fa-fire', screentime:'fas fa-mobile-alt', goals:'fas fa-bullseye', reports:'fas fa-chart-line', focus:'fas fa-crosshairs' }; %>
     <% const link = linkMap[mod.slug] || '/modules/settings'; %>
     <% const icon = iconMap[mod.slug] || 'fas fa-cube'; %>
     <a href="<%= link %>" class="module-card" aria-label="<%= mod.name %> module">

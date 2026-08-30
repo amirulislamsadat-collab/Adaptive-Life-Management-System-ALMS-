@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>You're offline — ALMS</title>
+<style>
+  body { font-family: 'Poppins', system-ui, sans-serif; background: #F7F9FC; color: #002B5B; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; padding: 24px; text-align: center; }
+  .box { max-width: 400px; }
+  .icon { width: 72px; height: 72px; border-radius: 20px; background: #FF5A5F; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 24px; font-weight: 900; }
+  h1 { font-size: 22px; margin-bottom: 12px; }
+  p { color: #64748B; line-height: 1.6; margin-bottom: 24px; }
+  button { background: #FF5A5F; color: #fff; border: none; padding: 12px 28px; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  button:hover { background: #E04B50; }
+</style>
+</head>
+<body>
+  <div class="box">
+    <div class="icon">A</div>
+    <h1>You're offline</h1>
+    <p>ALMS needs a connection to load your latest tasks, habits, and everything else. Reconnect and try again.</p>
+    <button onclick="location.reload()">Retry</button>
+  </div>
+</body>
+</html>

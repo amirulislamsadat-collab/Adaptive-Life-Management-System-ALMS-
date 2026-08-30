@@ -46,6 +46,21 @@ Built with plain **MVC**: `models/` (MySQL data access), `views/` (EJS templates
 
 Features 32-35 are read-only: `models/ReportEngine.js` computes them fresh on every visit from the other feature tables (tasks, study, health, habits, screen time, finance) instead of storing generated reports.
 
+## The 2026 upgrade (this deploy only)
+
+This `alms-vercel-deploy` folder has been upgraded well past the original 35-feature scope for the Vercel-hosted version, while the main project folder was left untouched. What's new:
+
+- **Installable app (PWA)** — a Web App Manifest and Service Worker make the site installable on Android, desktop Chrome/Edge, and iOS. An "Install App" button appears both in the top bar and the sidebar: on Android/desktop it triggers the browser's native install prompt; on iOS (which has no install-prompt API) it shows step-by-step "Add to Home Screen" instructions instead. Static assets are cached for offline use, with a branded offline fallback page for navigation when there's no connection.
+- **Focus Mode** (`/focus`) — schedule daily/weekly distraction-free time blocks. Being honest about what a website can and can't do: a browser tab cannot get OS-level permission to block other apps, so this is deliberately built as an accountability tool in the spirit of apps like Opal, not a fake app-blocker. During an active session the dashboard shows a banner to check in as "Stayed focused" or "Got distracted," and streak/success-rate stats are tracked per session.
+- **Gamification (XP & levels)** — completing tasks, checking in on habits, finishing assignments/exams/study sessions, hitting 100% on a goal, and staying focused during a Focus Mode session all award XP. Level and progress-to-next-level are shown as a badge in the sidebar and as a progress ring on the Settings page.
+- **Quick-Add** — a natural-language task box on the Today dashboard (e.g. "Submit report tomorrow high priority") parses a due date and priority from plain text instead of requiring the full task form.
+- **Redesigned "Today" dashboard** (`/dashboard`) — instead of just module tiles, the dashboard now leads with what's actually due today: tasks, habit check-ins, medications, upcoming reminders, today's calendar events, and a one-tap "+250ml" water log — each card only appears if its module is enabled, and the whole thing collapses to a friendly empty state when nothing's due.
+- **Profile pictures & expanded Account settings** — upload a photo (client-side resized/compressed to keep the database payload small) or remove it, and rename your display name, from the "Account" section of Settings.
+- **5 new roles at setup** — Entrepreneur, Parent/Caregiver, Fitness Enthusiast, Creative/Content Creator, and Remote Worker join the original Student/Professional/Freelancer, each with its own recommended-module set (Focus Mode included where it fits).
+- **Modern visual redesign + Ctrl+K command palette** — a refreshed look with hover/lift micro-interactions on cards, and a searchable command palette (Ctrl+K / Cmd+K, or the topbar search button) that jumps straight to any enabled module.
+
+All 35 original features remain fully functional and were regression-tested end-to-end after these changes (all routes return 200, module enable/disable still gates every new and old feature correctly, no server errors).
+
 ## Local development (XAMPP)
 
 1. Install [XAMPP](https://www.apachefriends.org/) and start **MySQL** from the XAMPP Control Panel (Apache is not required — this app runs its own Node server).
@@ -100,6 +115,8 @@ controllers/  Request handlers (one per feature area)
 middleware/   Due-notification check, runs on every request
 models/       Parameterized MySQL queries, one per entity
 public/css/   Stylesheet
+public/js/    Client-side scripts (PWA install prompt, service worker registration, command palette)
+public/icons/ PWA app icons; public/manifest.json and public/service-worker.js are the PWA config
 routes/       Express routers, mounted in server.js
 views/        EJS templates (header/footer shared shell + one list/form pair per feature)
 server.js     App entry point — view engine, sessions, routes, table creation, server start

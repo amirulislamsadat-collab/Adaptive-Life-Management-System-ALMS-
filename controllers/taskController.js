@@ -3,6 +3,7 @@
 // ============================================================
 const Task     = require('../models/Task');
 const Category = require('../models/Category');
+const Gamification = require('../models/Gamification');
 
 exports.getTaskHub = async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
@@ -62,11 +63,11 @@ exports.getEditTask = async (req, res) => {
 
 exports.postCreateTask = async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
-  const { title, description, category_id, priority, difficulty, availability } = req.body;
+  const { title, description, category_id, priority, difficulty, availability, due_date } = req.body;
   if (!title || !title.trim()) { req.session.error = 'Task title is required.'; return res.redirect('/tasks/new'); }
   try {
     await Task.create(req.session.user.id, {
-      category_id, title: title.trim(), description, priority, difficulty, availability
+      category_id, title: title.trim(), description, priority, difficulty, availability, due_date
     });
     req.session.success = 'Task created successfully!';
     res.redirect('/tasks/view');
@@ -74,6 +75,63 @@ exports.postCreateTask = async (req, res) => {
     console.error('Create error:', err);
     req.session.error = 'Failed to create task.';
     res.redirect('/tasks/new');
+  }
+};
+
+// --- Quick-Add: natural-language task entry ("buy milk tomorrow high priority") ---
+// Deliberately simple keyword matching rather than a full NLP library — good
+// enough to strip a handful of common phrases while leaving everything else
+// as the task title, and fast/dependency-free for a serverless deploy.
+function parseQuickAdd(text) {
+  let remaining = text;
+  let priority = 'medium';
+  let due_date = null;
+
+  if (/\b(urgent|asap|high priority|!!!)\b/i.test(remaining)) priority = 'high';
+  else if (/\blow priority\b/i.test(remaining)) priority = 'low';
+  remaining = remaining.replace(/\b(urgent|asap|high priority|low priority|!!!)\b/gi, '');
+
+  const today = new Date();
+  const WEEKDAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const toDateStr = (d) => d.toISOString().slice(0, 10);
+
+  if (/\btoday\b/i.test(remaining)) {
+    due_date = toDateStr(today);
+    remaining = remaining.replace(/\btoday\b/gi, '');
+  } else if (/\btomorrow\b/i.test(remaining)) {
+    const d = new Date(today); d.setDate(d.getDate() + 1);
+    due_date = toDateStr(d);
+    remaining = remaining.replace(/\btomorrow\b/gi, '');
+  } else {
+    const match = remaining.match(/\b(next\s+)?(sunday|monday|tuesday|wednesday|thursday|friday|saturday)\b/i);
+    if (match) {
+      const targetDay = WEEKDAYS.indexOf(match[2].toLowerCase());
+      const d = new Date(today);
+      let diff = (targetDay - d.getDay() + 7) % 7;
+      if (diff === 0 || match[1]) diff += 7;
+      d.setDate(d.getDate() + diff);
+      due_date = toDateStr(d);
+      remaining = remaining.replace(match[0], '');
+    }
+  }
+
+  const title = remaining.replace(/\s{2,}/g, ' ').trim();
+  return { title: title || text.trim(), priority, due_date };
+}
+
+exports.postQuickAddTask = async (req, res) => {
+  if (!req.session.user) return res.redirect('/login');
+  const text = (req.body.text || '').trim();
+  if (!text) { req.session.error = 'Type something to add.'; return res.redirect('/tasks/view'); }
+  try {
+    const parsed = parseQuickAdd(text);
+    await Task.create(req.session.user.id, { title: parsed.title, priority: parsed.priority, due_date: parsed.due_date });
+    req.session.success = `Added "${parsed.title}"${parsed.due_date ? ' — due ' + parsed.due_date : ''}.`;
+    res.redirect(req.get('Referrer') || req.get('Referer') || '/tasks/view');
+  } catch (err) {
+    console.error('Quick-add error:', err);
+    req.session.error = 'Failed to add task.';
+    res.redirect('/tasks/view');
   }
 };
 
@@ -93,7 +151,8 @@ exports.markDone = async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
   try {
     await Task.markDone(req.params.id, req.session.user.id);
-    req.session.success = 'Task marked as done!';
+    await Gamification.awardXp(req.session.user.id, 10);
+    req.session.success = 'Task marked as done! +10 XP';
   } catch (err) { req.session.error = 'Failed to complete task.'; }
   res.redirect('/tasks/view');
 };
@@ -109,7 +168,7 @@ exports.deleteTask = async (req, res) => {
 
 exports.postEditTask = async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
-  const { title, description, category_id, priority, difficulty, availability, status } = req.body;
+  const { title, description, category_id, priority, difficulty, availability, status, due_date } = req.body;
   if (!title || !title.trim()) {
     req.session.error = 'Task title is required.';
     return res.redirect(`/tasks/edit/${req.params.id}`);
@@ -117,7 +176,7 @@ exports.postEditTask = async (req, res) => {
 
   try {
     const result = await Task.update(req.params.id, req.session.user.id, {
-      category_id, title: title.trim(), description, priority, difficulty, availability, status
+      category_id, title: title.trim(), description, priority, difficulty, availability, status, due_date
     });
 
     if (!result.affectedRows) {

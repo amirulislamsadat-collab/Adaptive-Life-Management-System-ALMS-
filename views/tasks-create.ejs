@@ -71,6 +71,11 @@
       </div>
 
       <div class="fg">
+        <label for="taskDueDate">Due Date (optional)</label>
+        <input id="taskDueDate" type="date" name="due_date" value="<%= currentTask && currentTask.due_date ? new Date(currentTask.due_date).toISOString().slice(0,10) : '' %>">
+      </div>
+
+      <div class="fg">
         <label for="taskDesc">Description (Optional)</label>
         <textarea id="taskDesc" name="description" placeholder="Add details, links, or notes here..." rows="4"><%= descriptionValue %></textarea>
       </div>

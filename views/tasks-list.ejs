@@ -37,6 +37,9 @@
                   <span class="badge-cat"><i class="fas fa-tag" aria-hidden="true"></i> <%= task.category_name %></span>
                 <% } %>
                 <span><i class="fas fa-flag" aria-hidden="true"></i> Priority: <%= task.priority %></span>
+                <% if(task.due_date){ %>
+                <span><i class="fas fa-calendar-day" aria-hidden="true"></i> Due <%= new Date(task.due_date).toLocaleDateString('en-US',{month:'short',day:'numeric'}) %></span>
+                <% } %>
               </div>
             </div>
           </div>

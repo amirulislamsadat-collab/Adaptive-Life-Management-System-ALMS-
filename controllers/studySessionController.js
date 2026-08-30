@@ -3,6 +3,7 @@
 // ============================================================
 const StudySession = require('../models/StudySession');
 const Subject      = require('../models/Subject');
+const Gamification = require('../models/Gamification');
 
 exports.getSessions = async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
@@ -102,7 +103,8 @@ exports.markStatus = async (req, res) => {
   const status = ['planned', 'completed', 'missed'].includes(req.body.status) ? req.body.status : 'completed';
   try {
     await StudySession.markStatus(req.params.id, req.session.user.id, status);
-    req.session.success = status === 'completed' ? 'Study session marked as completed!' : 'Study session updated.';
+    if (status === 'completed') await Gamification.awardXp(req.session.user.id, 15);
+    req.session.success = status === 'completed' ? 'Study session marked as completed! +15 XP' : 'Study session updated.';
   } catch (err) {
     console.error('Study session status error:', err);
     req.session.error = 'Failed to update study session.';

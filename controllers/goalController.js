@@ -2,6 +2,7 @@
 // Controller: Goal — handles personal goal CRUD & progress (Feature 30)
 // ============================================================
 const Goal = require('../models/Goal');
+const Gamification = require('../models/Gamification');
 
 exports.getGoals = async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
@@ -79,8 +80,11 @@ exports.postEditGoal = async (req, res) => {
 exports.updateProgress = async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
   try {
-    await Goal.updateProgress(req.params.id, req.session.user.id, req.body.progress_percent);
-    req.session.success = 'Progress updated!';
+    const before = await Goal.findById(req.params.id, req.session.user.id);
+    const clamped = await Goal.updateProgress(req.params.id, req.session.user.id, req.body.progress_percent);
+    const justCompleted = clamped >= 100 && before && before.progress_percent < 100;
+    if (justCompleted) await Gamification.awardXp(req.session.user.id, 25);
+    req.session.success = justCompleted ? 'Goal completed! +25 XP' : 'Progress updated!';
   } catch (err) {
     console.error('Goal progress error:', err);
     req.session.error = 'Failed to update progress.';

@@ -28,6 +28,14 @@ const User = {
 
   completeSetup: async (userId) => {
     await db.query('UPDATE users SET setup_completed = 1 WHERE id = ?', [userId]);
+  },
+
+  updateProfilePicture: async (userId, dataUrl) => {
+    await db.query('UPDATE users SET profile_picture = ? WHERE id = ?', [dataUrl, userId]);
+  },
+
+  updateName: async (userId, name) => {
+    await db.query('UPDATE users SET name = ? WHERE id = ?', [name, userId]);
   }
 };
 

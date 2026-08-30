@@ -13,6 +13,7 @@ router.post('/tasks/edit/:id', ctrl.postEditTask);
 router.get('/tasks/view',      ctrl.getTaskList);
 router.post('/tasks/done/:id', ctrl.markDone);
 router.post('/tasks/delete/:id', ctrl.deleteTask);
+router.post('/tasks/quick-add', ctrl.postQuickAddTask);
 
 // Redirect base to hub
 router.get('/tasks', (req, res) => res.redirect('/tasks/hub'));

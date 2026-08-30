@@ -26,10 +26,10 @@ const Task = {
 
   create: async (userId, data) => {
     const [result] = await db.query(
-      `INSERT INTO tasks (user_id, category_id, title, description, priority, difficulty, availability, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')`,
+      `INSERT INTO tasks (user_id, category_id, title, description, priority, difficulty, availability, status, due_date)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?)`,
       [userId, data.category_id || null, data.title, data.description || '',
-       data.priority || 'medium', data.difficulty || 'normal', data.availability || 'flexible']
+       data.priority || 'medium', data.difficulty || 'normal', data.availability || 'flexible', data.due_date || null]
     );
     return result;
   },
@@ -37,11 +37,11 @@ const Task = {
   update: async (id, userId, data) => {
     const [result] = await db.query(
       `UPDATE tasks
-       SET category_id = ?, title = ?, description = ?, priority = ?, difficulty = ?, availability = ?, status = ?
+       SET category_id = ?, title = ?, description = ?, priority = ?, difficulty = ?, availability = ?, status = ?, due_date = ?
        WHERE id = ? AND user_id = ?`,
       [data.category_id || null, data.title, data.description || '',
        data.priority || 'medium', data.difficulty || 'normal',
-       data.availability || 'flexible', data.status || 'pending', id, userId]
+       data.availability || 'flexible', data.status || 'pending', data.due_date || null, id, userId]
     );
     return result;
   },
@@ -52,6 +52,14 @@ const Task = {
 
   delete: async (id, userId) => {
     await db.query('DELETE FROM tasks WHERE id = ? AND user_id = ?', [id, userId]);
+  },
+
+  findDueToday: async (userId) => {
+    const [rows] = await db.query(
+      `SELECT * FROM tasks WHERE user_id = ? AND status = 'pending' AND due_date = CURDATE()`,
+      [userId]
+    );
+    return rows;
   },
 
   getStats: async (userId) => {

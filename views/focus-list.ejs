@@ -1,0 +1,83 @@
+<%- include('header', { currentPath: '/focus' }) %>
+<div class="page">
+  <div class="top">
+    <div>
+      <a href="/dashboard" class="back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Dashboard</a>
+      <h1><i class="fas fa-crosshairs" aria-hidden="true"></i> Focus Mode</h1>
+      <div class="page-desc">Schedule distraction-free windows and build accountability with daily check-ins.</div>
+    </div>
+    <a class="btn primary" href="/focus/new" id="newFocusBtn"><i class="fas fa-plus" aria-hidden="true"></i> New Focus Session</a>
+  </div>
+
+  <div class="info-box">
+    <div class="info-box-head"><i class="fas fa-circle-info" aria-hidden="true"></i> How this works</div>
+    <p>A website can't reach into your phone and disable other apps — no PWA has that permission, only the OS itself does. So Focus Mode works the way the best web-based focus tools do: you schedule the window, ALMS reminds you when it starts, and you check in honestly afterward. Every honest "I stayed focused" check-in earns XP and feeds your Productive Time Analysis.</p>
+  </div>
+
+  <% if(activeNow){ %>
+  <div class="focus-banner" style="margin-bottom:32px;">
+    <div class="focus-banner-icon"><i class="fas fa-crosshairs" aria-hidden="true"></i></div>
+    <div class="focus-banner-body">
+      <div class="focus-banner-title">"<%= activeNow.name %>" is active right now</div>
+      <% if(activeNow.blocklist){ %><div class="focus-banner-sub">Staying off: <%= activeNow.blocklist %></div><% } %>
+    </div>
+    <% if(!activeCheckedIn){ %>
+    <div style="display:flex;gap:8px;">
+      <form method="POST" action="/focus/checkin/<%= activeNow.id %>">
+        <input type="hidden" name="stayed_focused" value="1">
+        <button class="btn primary btn-sm">Stayed focused</button>
+      </form>
+      <form method="POST" action="/focus/checkin/<%= activeNow.id %>">
+        <input type="hidden" name="stayed_focused" value="0">
+        <button class="btn secondary btn-sm">Got distracted</button>
+      </form>
+    </div>
+    <% } else { %>
+    <span class="badge-progress completed">Checked in</span>
+    <% } %>
+  </div>
+  <% } %>
+
+  <% if(stats.total > 0){ %>
+  <div class="summary-strip" style="margin-bottom:32px;">
+    <div class="summary-tile"><div class="val"><%= stats.total %></div><div class="lbl">Total Check-ins</div></div>
+    <div class="summary-tile"><div class="val"><%= stats.stayed %></div><div class="lbl">Stayed Focused</div></div>
+    <div class="summary-tile"><div class="val"><%= stats.rate %>%</div><div class="lbl">Success Rate</div></div>
+  </div>
+  <% } %>
+
+  <% if(sessions.length){ %>
+  <div class="list">
+    <% sessions.forEach(s => { %>
+    <div class="item">
+      <div class="item-body">
+        <div class="item-title"><%= s.name %></div>
+        <div class="meta">
+          <span class="badge-progress <%= s.is_active ? 'completed' : 'pending' %>"><%= s.is_active ? 'Active' : 'Paused' %></span>
+          <span><i class="fas fa-calendar-week" aria-hidden="true"></i> <%= s.days_of_week.split(',').join(', ') %></span>
+          <span><i class="fas fa-clock" aria-hidden="true"></i> <%= s.start_time.slice(0,5) %> – <%= s.end_time.slice(0,5) %></span>
+        </div>
+        <% if(s.blocklist){ %><div class="meta item-desc"><i class="fas fa-ban" aria-hidden="true"></i> Avoiding: <%= s.blocklist %></div><% } %>
+      </div>
+      <div class="actions">
+        <form method="POST" action="/focus/toggle/<%= s.id %>" style="display:inline">
+          <button type="submit" class="btn secondary btn-sm"><i class="fas fa-<%= s.is_active ? 'pause' : 'play' %>" aria-hidden="true"></i> <%= s.is_active ? 'Pause' : 'Resume' %></button>
+        </form>
+        <a href="/focus/edit/<%= s.id %>" class="btn secondary btn-sm"><i class="fas fa-edit" aria-hidden="true"></i> Edit</a>
+        <form method="POST" action="/focus/delete/<%= s.id %>" style="display:inline" onsubmit="return confirm('Delete this focus session?');">
+          <button type="submit" class="btn danger btn-sm"><i class="fas fa-trash-alt" aria-hidden="true"></i> Delete</button>
+        </form>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+  <% } else { %>
+  <div class="empty-state">
+    <div class="empty-icon"><i class="fas fa-crosshairs" aria-hidden="true"></i></div>
+    <h3>No focus sessions scheduled</h3>
+    <p>Set up a recurring window — like "Deep Work, 9-11am, weekdays" — to protect your focus time.</p>
+    <a href="/focus/new" class="btn primary"><i class="fas fa-plus" aria-hidden="true"></i> Create Focus Session</a>
+  </div>
+  <% } %>
+</div>
+<%- include('footer') %>
