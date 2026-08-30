@@ -15,7 +15,7 @@
         <div class="fg">
           <label for="eSubject">Subject</label>
           <select id="eSubject" name="subject_id">
-            <option value="">— No subject —</option>
+            <option value="">No subject</option>
             <% subjects.forEach(s => { %>
             <option value="<%= s.id %>" <%= exam && exam.subject_id == s.id ? 'selected' : '' %>><%= s.name %></option>
             <% }) %>

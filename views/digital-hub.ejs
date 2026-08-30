@@ -15,8 +15,8 @@
         <div class="non-productive" style="width:<%= summary.nonProductivePct %>%"></div>
       </div>
       <div class="split-legend">
-        <span><span class="legend-dot productive"></span> Productive — <%= summary.productiveMinutes %> min (<%= summary.productivePct %>%)</span>
-        <span><span class="legend-dot non-productive"></span> Non-Productive — <%= summary.nonProductiveMinutes %> min (<%= summary.nonProductivePct %>%)</span>
+        <span><span class="legend-dot productive"></span> Productive: <%= summary.productiveMinutes %> min (<%= summary.productivePct %>%)</span>
+        <span><span class="legend-dot non-productive"></span> Non-Productive: <%= summary.nonProductiveMinutes %> min (<%= summary.nonProductivePct %>%)</span>
       </div>
     <% } else { %>
       <p class="empty-msg">No screen time recorded in the last 7 days yet. Log some activity to see your breakdown.</p>

@@ -34,7 +34,7 @@ exports.postCreateWaterLog = async (req, res) => {
     const logged_at = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:00`;
     await WaterLog.create(req.session.user.id, { log_date, amount_ml: amount, logged_at });
     const result = await Gamification.awardXp(req.session.user.id, 5);
-    req.session.success = `Logged ${amount} ml of water! +5 XP` + (result.leveledUp ? ` — 🎉 Level up! You're now Level ${result.newLevel}: ${result.newTitle}` : '');
+    req.session.success = `${amount} ml logged, nice! +5 XP` + Gamification.bonusSuffix(result);
     res.redirect(req.get('Referrer') || req.get('Referer') || '/water');
   } catch (err) {
     console.error('Create water log error:', err);

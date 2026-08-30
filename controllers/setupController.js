@@ -112,7 +112,7 @@ exports.postModules = async (req, res) => {
     }
     await User.completeSetup(userId);
     req.session.user.setup_completed = 1;
-    req.session.success = "You're all set! Welcome to ALMS — let's build some great habits. 🎉";
+    req.session.success = "You're all set! Welcome to ALMS, let's build some great habits. 🎉";
     res.redirect('/dashboard?justSetup=1');
   } catch (err) {
     console.error('Setup modules error:', err);

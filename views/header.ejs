@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="ALMS - Adaptive Life Management System. Tasks, habits, health, finances, and focus — one adaptive workspace for your whole life.">
-<title>ALMS — Adaptive Life Management System</title>
+<meta name="description" content="ALMS: Adaptive Life Management System. Tasks, habits, health, finances, and focus, all in one adaptive workspace for your whole life.">
+<title>ALMS: Adaptive Life Management System</title>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#FF5A5F">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -154,7 +154,7 @@ if (savedTheme === 'dark') {
         <i class="fas fa-arrow-down" aria-hidden="true"></i> Install App
       </button>
       <% if(streakInfo.currentStreak > 0){ %>
-      <div class="streak-chip <%= streakInfo.activeToday ? '' : 'streak-chip-cold' %>" title="<%= streakInfo.activeToday ? 'Active today — streak safe' : 'Not active yet today — do something to keep your streak!' %>">
+      <div class="streak-chip <%= streakInfo.activeToday ? '' : 'streak-chip-cold' %>" title="<%= streakInfo.activeToday ? "You're good for today, streak safe!" : "Do something today to keep your streak going!" %>">
         <i class="fas fa-fire" aria-hidden="true"></i>
         <span><%= streakInfo.currentStreak %> day<%= streakInfo.currentStreak === 1 ? '' : 's' %></span>
       </div>
@@ -253,23 +253,23 @@ if (savedTheme === 'dark') {
         <button type="button" class="ios-install-close" id="installPickerClose" aria-label="Close">&times;</button>
         <div class="ios-install-icon"><i class="fas fa-download" aria-hidden="true"></i></div>
         <h3>Get ALMS as an app</h3>
-        <p class="install-picker-sub">Pick what fits how you use ALMS — the browser install auto-updates itself; the downloads below are standalone installers.</p>
+        <p class="install-picker-sub">Pick whatever fits you best. The browser install keeps itself updated automatically; the downloads below are regular standalone installers.</p>
         <div class="install-picker-options">
           <button type="button" class="install-picker-opt" id="installPickerBrowser" hidden>
             <i class="fas fa-globe" aria-hidden="true"></i>
-            <span><strong>Install in this browser</strong><small>One click, updates automatically</small></span>
+            <span><strong>Install in this browser</strong><small>One click and you're done, updates itself</small></span>
           </button>
           <button type="button" class="install-picker-opt" id="installPickerIOS" hidden>
             <i class="fas fa-mobile-alt" aria-hidden="true"></i>
-            <span><strong>Add to Home Screen</strong><small>Instructions for iPhone/iPad</small></span>
+            <span><strong>Add to Home Screen</strong><small>Quick steps for iPhone/iPad</small></span>
           </button>
           <a class="install-picker-opt" href="https://github.com/amirulislamsadat-collab/Adaptive-Life-Management-System-ALMS-/releases/latest/download/ALMS-Setup.exe">
             <i class="fab fa-windows" aria-hidden="true"></i>
-            <span><strong>Download for Windows</strong><small>.exe installer — unsigned, SmartScreen will warn once</small></span>
+            <span><strong>Download for Windows</strong><small>Windows might flag it as unrecognized since it's not code-signed, that's normal, just click "Run anyway"</small></span>
           </a>
           <a class="install-picker-opt" href="https://github.com/amirulislamsadat-collab/Adaptive-Life-Management-System-ALMS-/releases/latest/download/ALMS.apk">
             <i class="fab fa-android" aria-hidden="true"></i>
-            <span><strong>Download for Android</strong><small>.apk — enable "install unknown apps" for your browser</small></span>
+            <span><strong>Download for Android</strong><small>You'll need to allow "install unknown apps" for your browser first</small></span>
           </a>
         </div>
       </div>
@@ -283,7 +283,7 @@ if (savedTheme === 'dark') {
         <ol>
           <li>Tap the <strong>Share</strong> button <i class="fas fa-arrow-up-from-bracket" aria-hidden="true"></i> in Safari's toolbar</li>
           <li>Scroll down and tap <strong>Add to Home Screen</strong></li>
-          <li>Tap <strong>Add</strong> — ALMS now opens like a native app</li>
+          <li>Tap <strong>Add</strong> and you're set, ALMS now opens just like any other app</li>
         </ol>
       </div>
     </div>
@@ -301,7 +301,7 @@ if (savedTheme === 'dark') {
         </div>
       </div>
       <div class="assistant-messages" id="assistantMessages">
-        <div class="assistant-msg assistant-msg-bot">Hi! I can help you find or understand any feature in ALMS — ask me anything about how the app works.</div>
+        <div class="assistant-msg assistant-msg-bot">Hey! Ask me anything about ALMS, how a feature works, where to find something, whatever you need.</div>
       </div>
       <form class="assistant-input-row" id="assistantForm">
         <input type="text" id="assistantInput" placeholder="Ask about ALMS..." autocomplete="off" maxlength="2000">
@@ -368,7 +368,7 @@ if (savedTheme === 'dark') {
     if ("Notification" in window && Notification.permission === "granted") {
       <% dueNotifications.forEach(function(item){ %>
         new Notification("ALMS <%= item.type === 'alarm' ? 'Alarm' : 'Reminder' %>", {
-          body: "<%= item.title %> — due at <%= item.time %>",
+          body: "<%= item.title %> is due at <%= item.time %>",
           icon: "/favicon.ico"
         });
       <% }) %>
@@ -404,7 +404,7 @@ if (savedTheme === 'dark') {
           if ("Notification" in window && Notification.permission === "granted") {
             data.items.forEach(function(item) {
               new Notification("ALMS " + (item.type === 'alarm' ? 'Alarm' : 'Reminder'), {
-                body: item.title + " — due at " + item.time,
+                body: item.title + " is due at " + item.time,
                 icon: "/favicon.ico"
               });
             });

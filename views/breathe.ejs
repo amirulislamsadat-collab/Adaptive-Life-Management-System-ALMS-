@@ -6,7 +6,7 @@
       <i class="fas fa-wind" aria-hidden="true"></i>
       <h1>Breathing Exercise</h1>
     </div>
-    <p class="page-desc" style="text-align:center;margin-bottom:24px;">A couple of minutes of guided breathing — genuinely helps with stress, and a nice thing to reach for instead of your phone. <%= weeklyCount %> session<%= weeklyCount===1?'':'s' %> this week.</p>
+    <p class="page-desc" style="text-align:center;margin-bottom:24px;">Just a couple minutes of guided breathing. It genuinely helps with stress, and it's a nice thing to reach for instead of your phone. <%= weeklyCount %> session<%= weeklyCount===1?'':'s' %> this week.</p>
 
     <div class="breathe-pattern-picker" id="patternPicker">
       <% Object.keys(patterns).forEach(function(key, i){ %>
@@ -111,8 +111,8 @@
         .then(function(r) { return r.json(); })
         .then(function(data) {
           if (data.success) {
-            var msg = 'Nice work — ' + cycles + ' cycle' + (cycles === 1 ? '' : 's') + ' logged! +' + data.xpAwarded + ' XP';
-            if (data.leveledUp) { msg += ' — 🎉 Level up! Level ' + data.newLevel + ': ' + data.newTitle; window.almsCelebrate && window.almsCelebrate(); }
+            var msg = 'Nice, ' + cycles + ' cycle' + (cycles === 1 ? '' : 's') + ' logged! +' + data.xpAwarded + ' XP';
+            if (data.leveledUp) { msg += ' 🎉 Level up! Level ' + data.newLevel + ': ' + data.newTitle + '!'; window.almsCelebrate && window.almsCelebrate(); }
             window.almsToast(msg, false);
           }
         })

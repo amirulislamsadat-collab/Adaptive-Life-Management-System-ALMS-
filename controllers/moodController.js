@@ -31,7 +31,7 @@ exports.postCreateMoodLog = async (req, res) => {
   try {
     await MoodLog.create(req.session.user.id, { log_date, mood, notes });
     const result = await Gamification.awardXp(req.session.user.id, 5);
-    req.session.success = 'Mood logged successfully! +5 XP' + (result.leveledUp ? ` — 🎉 Level up! You're now Level ${result.newLevel}: ${result.newTitle}` : '');
+    req.session.success = 'Got it, mood logged! +5 XP' + Gamification.bonusSuffix(result);
     res.redirect('/mood');
   } catch (err) {
     console.error('Create mood log error:', err);

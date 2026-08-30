@@ -55,7 +55,7 @@
   <% } else if(step === 'you') { %>
   <div class="setup-mascot">🦉</div>
   <h1 class="setup-title">Tell us about you, <%= user.name.split(' ')[0] %>!</h1>
-  <p class="setup-sub">Build your avatar and answer a couple quick questions — we'll use this to personalize your targets (sleep, water) and how much we recommend at once.</p>
+  <p class="setup-sub">Build your avatar and answer a couple quick questions. We'll use this to personalize your targets (sleep, water) and how much we throw at you at once.</p>
 
   <form method="POST" action="/setup/you" id="youForm">
     <div class="avatar-builder" id="avatarBuilder" style="--av-skin:#F0B594;--av-hair:#3B2314;--av-shirt:#5B8DEF;">
@@ -114,7 +114,7 @@
         <input type="number" id="weightInput" name="weight_kg" min="20" max="300" step="0.1" placeholder="e.g. 65" class="form-inp">
       </div>
     </div>
-    <p style="font-size:12px;color:var(--text-muted);text-align:center;margin-top:-24px;margin-bottom:32px;">Used only to suggest a healthy sleep range and daily water goal — never shown to anyone else.</p>
+    <p style="font-size:12px;color:var(--text-muted);text-align:center;margin-top:-24px;margin-bottom:32px;">We only use this to suggest a healthy sleep range and daily water goal. Never shown to anyone else.</p>
 
     <div class="fg">
       <label>How active are you day-to-day?</label>
@@ -133,7 +133,7 @@
           <input type="radio" name="experience_level" value="beginner">
           <span class="experience-emoji">🌱</span>
           <span class="experience-title">Just starting out</span>
-          <span class="experience-desc">New to tracking things — start me simple</span>
+          <span class="experience-desc">New to tracking things, keep it simple</span>
         </label>
         <label class="experience-card">
           <input type="radio" name="experience_level" value="intermediate" checked>
@@ -200,7 +200,7 @@
   <h1 class="setup-title"><i class="fas fa-puzzle-piece"></i> Customize Your Workspace</h1>
   <p class="setup-sub">
     <% if(user.experience_level === 'beginner') { %>
-      We kept this short since you're just starting out — you can always turn more on later from Settings.
+      We kept this short since you're just starting out. You can always turn more on later from Settings.
     <% } else { %>
       We've recommended modules based on your role. Toggle them to fit your needs.
     <% } %>

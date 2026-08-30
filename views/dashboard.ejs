@@ -3,7 +3,7 @@
   <div class="greeting-card">
     <div class="greeting-left">
       <h1>Good <%= (new Date().getHours()<12?'Morning':new Date().getHours()<18?'Afternoon':'Evening') %>, <%= user.name.split(' ')[0] %>!</h1>
-      <p>Here's everything that needs you today — nothing more.</p>
+      <p>Here's what actually needs you today, nothing more.</p>
       <div class="role-badge"><i class="fas fa-user-circle" aria-hidden="true"></i> <%= user.role %></div>
     </div>
     <div class="date-display">
@@ -26,7 +26,7 @@
   <div class="focus-banner">
     <div class="focus-banner-icon"><i class="fas fa-crosshairs" aria-hidden="true"></i></div>
     <div class="focus-banner-body">
-      <div class="focus-banner-title">Focus session active — "<%= today.activeFocus.name %>"</div>
+      <div class="focus-banner-title">Focus session active: "<%= today.activeFocus.name %>"</div>
       <% if(today.activeFocus.blocklist){ %><div class="focus-banner-sub">Staying off: <%= today.activeFocus.blocklist %></div><% } %>
     </div>
     <a href="/focus" class="btn secondary btn-sm">Check in</a>
@@ -77,7 +77,7 @@
 
   <form class="quick-add-bar" method="POST" action="/tasks/quick-add" id="quickAddForm">
     <i class="fas fa-plus quick-add-icon" aria-hidden="true"></i>
-    <input type="text" name="text" placeholder='Quick-add a task — try "buy groceries tomorrow high priority"' autocomplete="off">
+    <input type="text" name="text" placeholder='Quick-add a task, try "buy groceries tomorrow high priority"' autocomplete="off">
     <button type="submit" class="btn primary btn-sm">Add</button>
   </form>
 
@@ -167,7 +167,7 @@
 
   </div>
   <% if(!today.tasksDue.length && !today.habitsToCheckIn.length && !today.medsDueToday.length && !today.remindersDue.length && !today.todaysEvents.length){ %>
-  <p class="empty-msg">Nothing urgent today — you're all caught up. 🎉</p>
+  <p class="empty-msg">Nothing urgent today, you're all caught up! 🎉</p>
   <% } %>
 
   <div class="stats-grid" style="margin-top:40px;">
@@ -298,11 +298,11 @@
         modal.hidden = true;
         promptCard.hidden = true;
         var msg = res.data.note + ' (+' + res.data.xpAwarded + ' XP)';
-        if (res.data.leveledUp) msg += ' — 🎉 Level up! You\'re now Level ' + res.data.newLevel + ': ' + res.data.newTitle;
+        if (res.data.leveledUp) msg += ' 🎉 Level up! You just hit Level ' + res.data.newLevel + ': ' + res.data.newTitle + '!';
         window.almsToast(msg, false);
         setTimeout(function() { location.reload(); }, 2200);
       })
-      .catch(function() { window.almsToast("Couldn't save your check-in — check your connection and try again.", true); submitBtn.disabled = false; });
+      .catch(function() { window.almsToast("Couldn't save your check-in, check your connection and try again.", true); submitBtn.disabled = false; });
   });
 })();
 </script>

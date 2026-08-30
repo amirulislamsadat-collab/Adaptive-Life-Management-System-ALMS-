@@ -82,12 +82,10 @@ exports.checkinHabit = async (req, res) => {
       const { current } = await Habit.getStreaks(req.params.id, req.session.user.id);
       let xp = 15;
       let bonusNote = '';
-      if (current === 7) { xp += 50; bonusNote = ' — 🔥 7-day streak bonus!'; }
-      else if (current === 30) { xp += 200; bonusNote = ' — 🔥 30-day streak bonus!'; }
+      if (current === 7) { xp += 50; bonusNote = ' Plus a 50 XP bonus for a 7-day streak on this one!'; }
+      else if (current === 30) { xp += 200; bonusNote = ' Plus a 200 XP bonus for 30 days straight!'; }
       const result = await Gamification.awardXp(req.session.user.id, xp);
-      req.session.success = `Nice work — marked done for today! +${xp} XP${bonusNote}`
-        + (result.streakMilestone ? ` — 🔥 ${result.currentStreak}-day ALMS streak!` : '')
-        + (result.leveledUp ? ` — 🎉 Level up! You're now Level ${result.newLevel}: ${result.newTitle}` : '');
+      req.session.success = `Nice work, marked done for today! +${xp} XP${bonusNote}` + Gamification.bonusSuffix(result);
     } else {
       req.session.success = 'Check-in removed for today.';
     }

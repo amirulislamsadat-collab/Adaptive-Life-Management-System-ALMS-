@@ -105,7 +105,7 @@ exports.markStatus = async (req, res) => {
     await StudySession.markStatus(req.params.id, req.session.user.id, status);
     if (status === 'completed') {
       const result = await Gamification.awardXp(req.session.user.id, 20);
-      req.session.success = 'Study session marked as completed! +20 XP' + (result.leveledUp ? ` — 🎉 Level up! You're now Level ${result.newLevel}: ${result.newTitle}` : '');
+      req.session.success = 'Study session complete! +20 XP' + Gamification.bonusSuffix(result);
     } else {
       req.session.success = 'Study session updated.';
     }

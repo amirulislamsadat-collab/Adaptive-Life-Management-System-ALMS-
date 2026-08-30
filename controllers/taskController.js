@@ -126,7 +126,7 @@ exports.postQuickAddTask = async (req, res) => {
   try {
     const parsed = parseQuickAdd(text);
     await Task.create(req.session.user.id, { title: parsed.title, priority: parsed.priority, due_date: parsed.due_date });
-    req.session.success = `Added "${parsed.title}"${parsed.due_date ? ' — due ' + parsed.due_date : ''}.`;
+    req.session.success = `Added "${parsed.title}"${parsed.due_date ? ' (due ' + parsed.due_date + ')' : ''}!`;
     res.redirect(req.get('Referrer') || req.get('Referer') || '/tasks/view');
   } catch (err) {
     console.error('Quick-add error:', err);
@@ -155,9 +155,7 @@ exports.markDone = async (req, res) => {
     const multiplier = Gamification.PRIORITY_MULTIPLIER[task && task.priority] || 1;
     const xp = Math.round(10 * multiplier);
     const result = await Gamification.awardXp(req.session.user.id, xp);
-    req.session.success = `Task marked as done! +${xp} XP`
-      + (result.streakMilestone ? ` — 🔥 ${result.currentStreak}-day streak!` : '')
-      + (result.leveledUp ? ` — 🎉 Level up! You're now Level ${result.newLevel}: ${result.newTitle}` : '');
+    req.session.success = `Nice, one done! +${xp} XP` + Gamification.bonusSuffix(result);
   } catch (err) { req.session.error = 'Failed to complete task.'; }
   res.redirect('/tasks/view');
 };

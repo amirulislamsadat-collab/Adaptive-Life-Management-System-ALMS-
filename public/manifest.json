@@ -1,7 +1,7 @@
 {
-  "name": "ALMS — Adaptive Life Management System",
+  "name": "ALMS: Adaptive Life Management System",
   "short_name": "ALMS",
-  "description": "Tasks, habits, health, finances, and focus — one adaptive workspace for your whole life.",
+  "description": "Tasks, habits, health, finances, and focus, all in one adaptive workspace for your whole life.",
   "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",

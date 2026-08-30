@@ -57,6 +57,17 @@ const Gamification = {
   PRIORITY_MULTIPLIER,
   STREAK_MILESTONES,
 
+  // A ready-to-append suffix for level-ups and streak milestones, so
+  // every controller doesn't hand-write its own copy of this sentence.
+  // Empty string when neither happened, so callers can always just do
+  // `baseMessage + Gamification.bonusSuffix(result)`.
+  bonusSuffix: (result) => {
+    var parts = [];
+    if (result.streakMilestone) parts.push(`🔥 ${result.currentStreak} days in a row now!`);
+    if (result.leveledUp) parts.push(`🎉 Level up! You just hit Level ${result.newLevel}: ${result.newTitle}!`);
+    return parts.length ? ' ' + parts.join(' ') : '';
+  },
+
   // Any XP-earning action counts as "active today" for the daily streak
   // (Duolingo-style: do *something* meaningful once a day to keep it
   // alive), so streak bookkeeping lives here rather than being called

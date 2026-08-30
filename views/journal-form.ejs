@@ -15,7 +15,7 @@
         <div class="fg">
           <label for="jMood">Mood (optional)</label>
           <select id="jMood" name="mood_tag">
-            <option value="">— None —</option>
+            <option value="">Skip this</option>
             <option value="great" <%= entry && entry.mood_tag==='great' ? 'selected' : '' %>>😄 Great</option>
             <option value="good" <%= entry && entry.mood_tag==='good' ? 'selected' : '' %>>🙂 Good</option>
             <option value="okay" <%= entry && entry.mood_tag==='okay' ? 'selected' : '' %>>😐 Okay</option>

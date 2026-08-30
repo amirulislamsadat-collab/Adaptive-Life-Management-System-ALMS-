@@ -215,7 +215,7 @@ window.almsCelebrate = function () {
     var sendBtn = form.querySelector('.assistant-send');
     var clearBtn = document.getElementById('assistantClear');
     var historyLoaded = false;
-    var WELCOME_TEXT = 'Hi! I can help you find or understand any feature in ALMS — ask me anything about how the app works.';
+    var WELCOME_TEXT = 'Hey! Ask me anything about ALMS, how a feature works, where to find something, whatever you need.';
 
     function addMessage(text, cls) {
       var div = document.createElement('div');
@@ -287,7 +287,7 @@ window.almsCelebrate = function () {
         })
         .catch(function () {
           thinking.remove();
-          addMessage("Couldn't reach the assistant — check your connection and try again.", 'assistant-msg-error');
+          addMessage("Couldn't reach the assistant, check your connection and try again.", 'assistant-msg-error');
         })
         .finally(function () {
           input.disabled = false;

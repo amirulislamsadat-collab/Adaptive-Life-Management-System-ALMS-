@@ -119,7 +119,7 @@ exports.checkIn = async (req, res) => {
     await FocusSession.checkIn(req.params.id, req.session.user.id, stayedFocused);
     if (stayedFocused) {
       const result = await Gamification.awardXp(req.session.user.id, 20);
-      req.session.success = 'Nice — you stayed focused! +20 XP' + (result.leveledUp ? ` — 🎉 Level up! You're now Level ${result.newLevel}: ${result.newTitle}` : '');
+      req.session.success = 'Nice, you stayed focused! +20 XP' + Gamification.bonusSuffix(result);
     } else {
       req.session.success = 'Check-in logged. There\'s always the next session.';
     }

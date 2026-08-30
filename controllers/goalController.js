@@ -85,7 +85,7 @@ exports.updateProgress = async (req, res) => {
     const justCompleted = clamped >= 100 && before && before.progress_percent < 100;
     if (justCompleted) {
       const result = await Gamification.awardXp(req.session.user.id, 25);
-      req.session.success = 'Goal completed! +25 XP' + (result.leveledUp ? ` — 🎉 Level up! You're now Level ${result.newLevel}: ${result.newTitle}` : '');
+      req.session.success = 'Goal completed! 🎯 +25 XP' + Gamification.bonusSuffix(result);
     } else {
       req.session.success = 'Progress updated!';
     }

@@ -31,7 +31,7 @@ exports.runNotificationSweep = async (req, res) => {
   }
 
   if (!PushService.isConfigured) {
-    return res.json({ sent: 0, note: 'Push not configured (VAPID keys unset) — nothing to do.' });
+    return res.json({ sent: 0, note: 'Push notifications are not set up yet (no VAPID keys), so there is nothing to send.' });
   }
 
   let sent = 0;

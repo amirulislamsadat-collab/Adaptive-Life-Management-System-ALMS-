@@ -38,7 +38,7 @@ exports.postCreateEntry = async (req, res) => {
     const wordCount = (content || '').trim().split(/\s+/).filter(Boolean).length;
     if (wordCount >= 50) {
       const result = await Gamification.awardXp(req.session.user.id, 25);
-      msg += ' +25 XP for a reflective entry' + (result.leveledUp ? ` — 🎉 Level up! You're now Level ${result.newLevel}: ${result.newTitle}` : '');
+      msg += ' Nice reflective entry, +25 XP.' + Gamification.bonusSuffix(result);
     }
     req.session.success = msg;
     res.redirect('/journal');

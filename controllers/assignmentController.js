@@ -102,7 +102,7 @@ exports.markStatus = async (req, res) => {
     await Assignment.updateStatus(req.params.id, req.session.user.id, status);
     if (status === 'completed') {
       const result = await Gamification.awardXp(req.session.user.id, 15);
-      req.session.success = 'Assignment status updated. +15 XP' + (result.leveledUp ? ` — 🎉 Level up! You're now Level ${result.newLevel}: ${result.newTitle}` : '');
+      req.session.success = 'Nice, assignment done! +15 XP' + Gamification.bonusSuffix(result);
     } else {
       req.session.success = 'Assignment status updated.';
     }
