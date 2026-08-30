@@ -62,8 +62,8 @@
   <% if(modules && modules.length){ %>
   <div class="modules-grid">
     <% modules.forEach(function(mod){ %>
-    <% const linkMap = { tasks:'/tasks/hub', notes:'/notes', calendar:'/calendar', reminders:'/reminders', alarms:'/alarms', subjects:'/subjects', study:'/modules/study', finance:'/modules/finance', health:'/modules/health', projects:'/modules/projects', journal:'/journal', habits:'/habits', screentime:'/modules/screentime', goals:'/goals', reports:'/modules/reports' }; %>
-    <% const iconMap = { tasks:'fas fa-tasks', study:'fas fa-book-open', finance:'fas fa-wallet', health:'fas fa-heartbeat', projects:'fas fa-chart-bar', journal:'fas fa-pen', notes:'fas fa-sticky-note', calendar:'fas fa-calendar-alt', reminders:'fas fa-clock', alarms:'fas fa-bell', subjects:'fas fa-book', habits:'fas fa-fire', screentime:'fas fa-mobile-alt', goals:'fas fa-bullseye', reports:'fas fa-chart-line' }; %>
+    <% const linkMap = { tasks:'/tasks/hub', notes:'/notes', calendar:'/calendar', reminders:'/reminders', alarms:'/alarms', subjects:'/subjects', study:'/modules/study', finance:'/modules/finance', health:'/modules/health', journal:'/journal', habits:'/habits', screentime:'/modules/screentime', goals:'/goals', reports:'/modules/reports' }; %>
+    <% const iconMap = { tasks:'fas fa-tasks', study:'fas fa-book-open', finance:'fas fa-wallet', health:'fas fa-heartbeat', journal:'fas fa-pen', notes:'fas fa-sticky-note', calendar:'fas fa-calendar-alt', reminders:'fas fa-clock', alarms:'fas fa-bell', subjects:'fas fa-book', habits:'fas fa-fire', screentime:'fas fa-mobile-alt', goals:'fas fa-bullseye', reports:'fas fa-chart-line' }; %>
     <% const link = linkMap[mod.slug] || '/modules/settings'; %>
     <% const icon = iconMap[mod.slug] || 'fas fa-cube'; %>
     <a href="<%= link %>" class="module-card" aria-label="<%= mod.name %> module">

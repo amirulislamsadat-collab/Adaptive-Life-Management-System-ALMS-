@@ -8,7 +8,7 @@ const examCtrl       = require('../controllers/examController');
 const sessionCtrl    = require('../controllers/studySessionController');
 const requireModule   = require('../middleware/moduleAccessMiddleware');
 
-router.use(requireModule('study'));
+router.use(requireModule('study', ['/assignments', '/exams', '/study-sessions']));
 
 // --- Assignments (Feature 15) ---
 router.get('/assignments',              assignCtrl.getAssignments);

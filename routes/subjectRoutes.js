@@ -3,7 +3,7 @@ const router = express.Router();
 const ctrl = require('../controllers/subjectController');
 const requireModule = require('../middleware/moduleAccessMiddleware');
 
-router.use(requireModule('subjects'));
+router.use(requireModule('subjects', ['/subjects']));
 
 router.get('/subjects', ctrl.getSubjects);
 router.get('/subjects/new', ctrl.getCreateSubject);

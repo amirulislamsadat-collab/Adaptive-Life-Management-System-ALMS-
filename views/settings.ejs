@@ -1,0 +1,104 @@
+<%- include('header', { currentPath: '/modules/settings' }) %>
+<div class="page">
+  <div class="top-header">
+    <h1 class="page-title">
+      <i class="fas fa-cog" aria-hidden="true"></i> Settings
+    </h1>
+    <p class="page-desc">Manage your modules, appearance, and account.</p>
+  </div>
+
+  <div class="section-header">
+    <div class="section-title"><i class="fas fa-puzzle-piece" aria-hidden="true"></i> Modules</div>
+  </div>
+
+  <div class="info-box">
+    <div class="info-box-head">
+      <i class="fas fa-shield-alt" aria-hidden="true"></i> Safe Data Preservation
+    </div>
+    <p>Don't worry about losing your work! Disabling a module only hides it from your workspace. All your underlying data is safely preserved in the database and will be exactly as you left it when you re-enable the module.</p>
+  </div>
+
+  <div class="mods-grid" style="margin-bottom:40px;">
+    <% modules.forEach(function(mod){ %>
+    <div class="mc <%= mod.is_enabled ? 'on' : '' %>">
+      <div class="mc-top">
+        <div class="mc-icon">
+          <%- mod.slug==='tasks'?'<i class="fas fa-tasks"></i>':mod.slug==='study'?'<i class="fas fa-book-open"></i>':mod.slug==='finance'?'<i class="fas fa-money-bill-wave"></i>':mod.slug==='health'?'<i class="fas fa-heart"></i>':mod.slug==='notes'?'<i class="fas fa-sticky-note"></i>':mod.slug==='calendar'?'<i class="fas fa-calendar-alt"></i>':mod.slug==='reminders'?'<i class="fas fa-clock"></i>':mod.slug==='alarms'?'<i class="fas fa-bell"></i>':mod.slug==='subjects'?'<i class="fas fa-book"></i>':mod.slug==='habits'?'<i class="fas fa-fire"></i>':mod.slug==='screentime'?'<i class="fas fa-mobile-alt"></i>':mod.slug==='journal'?'<i class="fas fa-pen"></i>':mod.slug==='goals'?'<i class="fas fa-bullseye"></i>':mod.slug==='reports'?'<i class="fas fa-chart-line"></i>':'<i class="fas fa-pencil-alt"></i>' %>
+        </div>
+        <div class="mc-info">
+          <h4><%= mod.name %></h4>
+          <p><%= mod.description %></p>
+        </div>
+      </div>
+      <div class="mc-foot">
+        <% if(mod.is_enabled){ %>
+          <div class="status-on">
+            <div class="sdot green"><i class="fas fa-check" aria-hidden="true" style="font-size:10px;color:white;"></i></div>
+            Enabled
+          </div>
+          <form method="POST" action="/modules/settings/toggle/<%= mod.id %>">
+            <button type="submit" class="btn-disable">Disable</button>
+          </form>
+        <% } else { %>
+          <div class="status-off">
+            <div class="sdot gray"><i class="fas fa-times" aria-hidden="true" style="font-size:10px;color:white;"></i></div>
+            Disabled
+          </div>
+          <form method="POST" action="/modules/settings/toggle/<%= mod.id %>">
+            <button type="submit" class="btn-enable">Enable</button>
+          </form>
+        <% } %>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+
+  <div class="section-header">
+    <div class="section-title"><i class="fas fa-palette" aria-hidden="true"></i> Appearance</div>
+  </div>
+  <div class="card" style="margin-bottom:40px;">
+    <div class="fg" style="margin-bottom:0;">
+      <label>Theme</label>
+      <div class="category-toggle" id="themeToggle">
+        <input type="radio" id="themeLight" name="theme" value="light">
+        <label for="themeLight" class="productive-label"><i class="fas fa-sun" aria-hidden="true"></i> Light</label>
+        <input type="radio" id="themeDark" name="theme" value="dark">
+        <label for="themeDark" class="non-productive-label"><i class="fas fa-moon" aria-hidden="true"></i> Dark</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <div class="section-title"><i class="fas fa-user-circle" aria-hidden="true"></i> Account</div>
+  </div>
+  <div class="card">
+    <div class="fg">
+      <label>Name</label>
+      <div><%= user.name %></div>
+    </div>
+    <div class="fg">
+      <label>Email</label>
+      <div><%= user.email %></div>
+    </div>
+    <div class="fg" style="margin-bottom:0;">
+      <label>Role</label>
+      <div><%= user.role %></div>
+    </div>
+  </div>
+</div>
+<script>
+(function() {
+  var light = document.getElementById('themeLight');
+  var dark = document.getElementById('themeDark');
+  var current = document.documentElement.getAttribute('data-theme') || 'light';
+  (current === 'dark' ? dark : light).checked = true;
+
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    try { localStorage.setItem('alms_theme', theme); } catch (e) {}
+  }
+  light.addEventListener('change', function() { if (light.checked) setTheme('light'); });
+  dark.addEventListener('change', function() { if (dark.checked) setTheme('dark'); });
+})();
+</script>
+<%- include('footer') %>

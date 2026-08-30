@@ -3,7 +3,7 @@ const router = express.Router();
 const ctrl = require('../controllers/alarmController');
 const requireModule = require('../middleware/moduleAccessMiddleware');
 
-router.use(requireModule('alarms'));
+router.use(requireModule('alarms', ['/alarms']));
 
 router.get('/alarms', ctrl.getAlarms);
 router.get('/alarms/new', ctrl.getCreateAlarm);

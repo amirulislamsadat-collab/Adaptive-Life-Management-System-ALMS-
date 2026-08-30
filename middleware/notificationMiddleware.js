@@ -7,6 +7,17 @@ const Alarm    = require('../models/Alarm');
 
 const DAY_CODES = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
 
+// MySQL DATETIME columns come back from mysql2 as JS Date objects. Interpolating
+// one directly into a string (as the notification banner and native
+// Notification popups do) calls its default toString(), which prints the full
+// "Sat Aug 29 2026 22:41:00 GMT+0600 (Bangladesh Standard Time)" — so it needs
+// to be turned into a short, readable time first.
+function formatDueTime(dueAt) {
+  return new Date(dueAt).toLocaleString('en-US', {
+    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+  });
+}
+
 function alarmMatchesToday(alarm, dayCode) {
   if (alarm.frequency === 'daily') return true;
   if (alarm.frequency === 'weekdays') return ['MO', 'TU', 'WE', 'TH', 'FR'].includes(dayCode);
@@ -51,8 +62,8 @@ module.exports = async (req, res, next) => {
     }
 
     res.locals.dueNotifications = [
-      ...dueReminders.map(rem => ({ type: 'reminder', title: rem.title, time: rem.due_at })),
-      ...dueAlarms.map(alarm => ({ type: 'alarm', title: alarm.title, time: alarm.time_of_day }))
+      ...dueReminders.map(rem => ({ type: 'reminder', title: rem.title, time: formatDueTime(rem.due_at) })),
+      ...dueAlarms.map(alarm => ({ type: 'alarm', title: alarm.title, time: String(alarm.time_of_day || '').slice(0, 5) }))
     ];
 
     if (dueReminders.length) {

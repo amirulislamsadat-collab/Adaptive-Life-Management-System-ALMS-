@@ -7,7 +7,7 @@ const expenseCtrl = require('../controllers/expenseController');
 const savingsCtrl  = require('../controllers/savingsGoalController');
 const requireModule = require('../middleware/moduleAccessMiddleware');
 
-router.use(requireModule('finance'));
+router.use(requireModule('finance', ['/expenses', '/savings-goals']));
 
 router.get('/expenses',             expenseCtrl.getExpenses);
 router.get('/expenses/new',         expenseCtrl.getCreateExpense);

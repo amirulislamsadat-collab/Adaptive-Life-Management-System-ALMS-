@@ -20,10 +20,10 @@ exports.getSettings = async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
   try {
     const modules = await Module.findAllWithUserStatus(req.session.user.id);
-    res.render('module-settings', { user: req.session.user, modules });
+    res.render('settings', { user: req.session.user, modules });
   } catch (err) {
     console.error('Settings error:', err);
-    res.status(500).send('An error occurred while loading the module settings. Please try again.');
+    res.status(500).send('An error occurred while loading settings. Please try again.');
   }
 };
 
@@ -32,12 +32,16 @@ exports.toggleModule = async (req, res) => {
   const userId = req.session.user.id;
   const moduleId = req.params.id;
   try {
+    const mod = await Module.findById(moduleId);
     const existing = await Module.findUserModule(userId, moduleId);
+    const wasEnabled = existing ? !!existing.is_enabled : false;
     if (existing) {
       await Module.toggleUserModule(userId, moduleId, existing.is_enabled);
     } else {
       await Module.enableForUser(userId, moduleId);
     }
+    const name = mod ? mod.name : 'Module';
+    req.session.success = wasEnabled ? `${name} disabled.` : `${name} enabled!`;
     res.redirect('/modules/settings');
   } catch (err) {
     console.error('Toggle module error:', err);
@@ -59,7 +63,7 @@ exports.getModulePage = async (req, res) => {
     const enabledModules = await Module.findEnabledForUser(userId);
     const isEnabled = enabledModules.some(m => m.slug === mod.slug);
     if (!isEnabled) {
-      req.session.error = 'That module is currently disabled. Enable it in Module Settings to use this feature.';
+      req.session.error = 'That module is currently disabled. Enable it in Settings to use this feature.';
       return res.redirect('/modules/settings');
     }
 
@@ -108,7 +112,8 @@ exports.getModulePage = async (req, res) => {
       return res.render('reports-hub', { user: req.session.user, module: mod, productivity, lifeScore, recommendations });
     }
 
-    res.render('module-page', { user: req.session.user, module: mod });
+    req.session.error = 'That module does not have a page yet.';
+    res.redirect('/dashboard');
   } catch (err) {
     console.error('Module page error:', err);
     req.session.error = 'Failed to load module.';

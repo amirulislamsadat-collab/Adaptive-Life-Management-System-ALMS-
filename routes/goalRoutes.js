@@ -6,7 +6,7 @@ const router  = express.Router();
 const ctrl    = require('../controllers/goalController');
 const requireModule = require('../middleware/moduleAccessMiddleware');
 
-router.use(requireModule('goals'));
+router.use(requireModule('goals', ['/goals']));
 
 router.get('/goals',              ctrl.getGoals);
 router.get('/goals/new',          ctrl.getCreateGoal);

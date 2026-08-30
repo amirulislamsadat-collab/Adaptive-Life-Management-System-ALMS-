@@ -7,8 +7,8 @@ const User   = require('../models/User');
 
 const roleRecommendations = {
   'Student':      [1, 2, 4, 6, 12, 13, 15],
-  'Professional': [1, 3, 5, 13, 14, 15],
-  'Freelancer':   [1, 3, 5, 6, 12, 13, 14, 15]
+  'Professional': [1, 3, 13, 14, 15],
+  'Freelancer':   [1, 3, 6, 12, 13, 14, 15]
 };
 
 exports.getSetup = async (req, res) => {

@@ -140,9 +140,12 @@ app.get('/api/notifications', async (req, res) => {
     if (dueReminders.length) {
       await Reminder.markNotified(userId, dueReminders.map(r => r.id));
     }
+    // r.due_at is a JS Date object (from a MySQL DATETIME column) — format it
+    // to a short readable string instead of letting the client stringify the
+    // raw Date/ISO value into the notification popup.
     const items = [
-      ...dueReminders.map(r => ({ type:'reminder', title: r.title, time: r.due_at })),
-      ...dueAlarms.map(a => ({ type:'alarm', title: a.title, time: a.time_of_day }))
+      ...dueReminders.map(r => ({ type:'reminder', title: r.title, time: new Date(r.due_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) })),
+      ...dueAlarms.map(a => ({ type:'alarm', title: a.title, time: String(a.time_of_day || '').slice(0, 5) }))
     ];
     res.json({ count: items.length, items });
   } catch (err) {
@@ -213,7 +216,6 @@ async function initDB() {
       (2, 'Study Planner',    'study',    'Plan study sessions, track coursework, and manage academic deadlines','book'),
       (3, 'Finance Tracker',  'finance',  'Monitor expenses, income, and maintain a personal budget',            'wallet'),
       (4, 'Health & Wellness','health',   'Track fitness goals, water intake, and wellness habits',              'heart'),
-      (5, 'Project Board',    'projects', 'Manage projects with kanban boards and milestone tracking',           'project'),
       (6, 'Personal Journal', 'journal',  'Write daily reflections, mood tracking, and personal notes',         'pen'),
       (7, 'Notes',            'notes',    'Capture, pin, and search your notes quickly',                         'note'),
       (8, 'Calendar',         'calendar', 'Manage calendar events and detect scheduling conflicts',              'calendar'),
@@ -225,6 +227,12 @@ async function initDB() {
       (14, 'Goals',           'goals',      'Set personal goals, track progress, and celebrate milestones',               'bullseye'),
       (15, 'Reports & Insights','reports',  'Generate productivity and life balance reports with personalized recommendations', 'chart-line')
     `);
+
+    // "Project Board" was seeded early on but never got a real feature built
+    // behind it. Removing it here (not just from the INSERT list above) so it
+    // also disappears from databases that already seeded it; the FK cascade
+    // on user_modules cleans up any per-user enable/disable rows for it too.
+    await db.query(`DELETE FROM modules WHERE slug = 'projects'`);
 
     // ---------- TABLE 4: user_modules ----------
     await db.query(`

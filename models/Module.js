@@ -9,6 +9,11 @@ const Module = {
     return rows;
   },
 
+  findById: async (id) => {
+    const [rows] = await db.query('SELECT * FROM modules WHERE id = ?', [id]);
+    return rows[0] || null;
+  },
+
   findBySlug: async (slug) => {
     const [rows] = await db.query(
       'SELECT slug, name, description FROM modules WHERE slug = ?',

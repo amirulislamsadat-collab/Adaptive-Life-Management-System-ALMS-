@@ -8,7 +8,7 @@ const screenTimeCtrl  = require('../controllers/screenTimeController');
 const socialMediaCtrl = require('../controllers/socialMediaController');
 const requireModule    = require('../middleware/moduleAccessMiddleware');
 
-router.use(requireModule('screentime'));
+router.use(requireModule('screentime', ['/screen-time', '/social-media']));
 
 // --- Screen Time Recording (Feature 25) ---
 router.get('/screen-time',             screenTimeCtrl.getScreenTime);

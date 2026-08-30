@@ -3,7 +3,7 @@ const router  = express.Router();
 const ctrl    = require('../controllers/taskController');
 const requireModule = require('../middleware/moduleAccessMiddleware');
 
-router.use(requireModule('tasks'));
+router.use(requireModule('tasks', ['/tasks']));
 
 router.get('/tasks/hub',       ctrl.getTaskHub);
 router.get('/tasks/new',       ctrl.getCreateTask);

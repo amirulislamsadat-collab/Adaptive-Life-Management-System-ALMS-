@@ -11,10 +11,15 @@
 </head>
 <body>
 <script>
-// Applied immediately (before the sidebar renders) so a hidden sidebar
-// doesn't flash on screen for a moment on every page load.
+// Applied immediately (before the rest of the page renders) so neither the
+// sidebar's hidden state nor the dark theme flash visible-then-changed on
+// every page load.
 if (localStorage.getItem('alms_sidebar_hidden') === '1') {
   document.body.classList.add('sidebar-hidden');
+}
+var savedTheme = localStorage.getItem('alms_theme');
+if (savedTheme === 'dark') {
+  document.documentElement.setAttribute('data-theme', 'dark');
 }
 </script>
 <% var setupDone = user && user.setup_completed == 1; %>
@@ -130,7 +135,7 @@ if (localStorage.getItem('alms_sidebar_hidden') === '1') {
       <% if(enabledSlugs.indexOf('reports') !== -1){ %>
       <li><a href="/modules/reports" class="<%= cp.indexOf('/modules/reports') === 0 ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></span> Reports</a></li>
       <% } %>
-      <li><a href="/modules/settings" class="<%= (cp.indexOf('/modules/settings') === 0 || (cp.indexOf('/modules') === 0 && !studyActive && !healthActive && !digitalActive && !financeActive && cp.indexOf('/modules/reports') !== 0)) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-cog" aria-hidden="true"></i></span> Modules</a></li>
+      <li><a href="/modules/settings" class="<%= (cp.indexOf('/modules/settings') === 0 || (cp.indexOf('/modules') === 0 && !studyActive && !healthActive && !digitalActive && !financeActive && cp.indexOf('/modules/reports') !== 0)) ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-cog" aria-hidden="true"></i></span> Settings</a></li>
     </nav>
     <div class="sidebar-foot">
       <div class="user-chip">

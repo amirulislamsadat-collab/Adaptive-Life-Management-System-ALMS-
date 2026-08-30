@@ -3,7 +3,7 @@ const router = express.Router();
 const ctrl = require('../controllers/calendarController');
 const requireModule = require('../middleware/moduleAccessMiddleware');
 
-router.use(requireModule('calendar'));
+router.use(requireModule('calendar', ['/calendar']));
 
 router.get('/calendar', ctrl.getEvents);
 router.get('/calendar/new', ctrl.getCreateEvent);
