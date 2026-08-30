@@ -63,6 +63,33 @@ window.almsCelebrate = function () {
     });
   }
 
+  // --- Android app: Google Sign-In handoff ---
+  // Google refuses to complete OAuth inside this app's embedded WebView, so
+  // the Google button has to open in a real Chrome Custom Tab instead (the
+  // Capacitor bridge is available even though this page is loaded from the
+  // live URL, not a bundled local file). The browser hands a finished
+  // sign-in back to the app via an alms:// deep link, caught below.
+  if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
+    var googleBtn = document.querySelector('.btn-google');
+    if (googleBtn && window.Capacitor.Plugins && window.Capacitor.Plugins.Browser) {
+      googleBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        window.Capacitor.Plugins.Browser.open({ url: location.origin + '/auth/google?client=mobile' });
+      });
+    }
+    if (window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+      window.Capacitor.Plugins.App.addListener('appUrlOpen', function (data) {
+        try {
+          var code = new URL(data.url).searchParams.get('code');
+          if (code) {
+            if (window.Capacitor.Plugins.Browser.close) window.Capacitor.Plugins.Browser.close().catch(function () {});
+            window.location.href = location.origin + '/auth/complete-handoff?code=' + encodeURIComponent(code);
+          }
+        } catch (err) {}
+      });
+    }
+  }
+
   // --- Install App button: opens a picker (browser install / iOS steps /
   // Windows & Android downloads) rather than guessing a single action,
   // since a native download is always an option even when this browser

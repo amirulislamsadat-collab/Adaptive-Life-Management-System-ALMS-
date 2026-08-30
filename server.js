@@ -863,7 +863,22 @@ async function initDB() {
       )
     `);
 
-    console.log('[DB] All 35 tables created and seeded successfully.');
+    // ---------- TABLE 36: auth_handoff_codes (native app Google sign-in) ----------
+    // Google requires OAuth to finish in a real system browser, not the
+    // embedded WebView the desktop/mobile apps show — so the browser
+    // session and the app's own webview session are two separate cookie
+    // jars. These short-lived, single-use codes are how the browser hands
+    // a completed sign-in back to the app via a custom URL (alms://...).
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS auth_handoff_codes (
+        code VARCHAR(64) PRIMARY KEY,
+        user_id INT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    console.log('[DB] All 36 tables created and seeded successfully.');
   } catch (err) {
     console.error('[DB] Initialization error ->', err.message);
   }

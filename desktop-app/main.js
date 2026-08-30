@@ -15,6 +15,47 @@ const fs = require('fs');
 
 const config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf-8'));
 const APP_URL = process.env.ALMS_APP_URL || config.appUrl;
+const PROTOCOL = 'alms';
+
+// Google requires OAuth to complete in a real browser, not this embedded
+// window, so it won't sign in here at all. The custom alms:// protocol is
+// how the system browser hands a completed sign-in back to this app —
+// see the auth-handoff flow in controllers/authController.js.
+app.setAsDefaultProtocolClient(PROTOCOL);
+
+function handleDeepLink(win, url) {
+  if (!url || !url.startsWith(PROTOCOL + '://')) return;
+  try {
+    const parsed = new URL(url);
+    const code = parsed.searchParams.get('code');
+    if (code && win) {
+      win.loadURL(APP_URL + '/auth/complete-handoff?code=' + encodeURIComponent(code));
+      if (win.isMinimized()) win.restore();
+      win.focus();
+    }
+  } catch (e) {}
+}
+
+// Only one window should ever exist. If the OS launches the protocol
+// handler while the app is already running, forward the URL to the
+// existing window instead of starting a second instance.
+const gotLock = app.requestSingleInstanceLock();
+if (!gotLock) {
+  app.quit();
+} else {
+  app.on('second-instance', (event, argv) => {
+    const win = BrowserWindow.getAllWindows()[0];
+    const url = argv.find(arg => arg.startsWith(PROTOCOL + '://'));
+    if (url) handleDeepLink(win, url);
+    else if (win) { if (win.isMinimized()) win.restore(); win.focus(); }
+  });
+}
+
+// macOS delivers the protocol URL through this event instead of argv.
+app.on('open-url', (event, url) => {
+  event.preventDefault();
+  handleDeepLink(BrowserWindow.getAllWindows()[0], url);
+});
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -43,6 +84,21 @@ function createWindow() {
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
     return { action: 'deny' };
+  });
+
+  // Google Sign-In refuses to complete inside an embedded webview like this
+  // one, so send that specific navigation out to the system browser instead
+  // of letting it happen here. The browser hands the finished sign-in back
+  // via the alms:// deep link (see handleDeepLink above).
+  win.webContents.on('will-navigate', (event, navUrl) => {
+    try {
+      const parsed = new URL(navUrl);
+      if (parsed.pathname === '/auth/google') {
+        event.preventDefault();
+        parsed.searchParams.set('client', 'desktop');
+        shell.openExternal(parsed.toString());
+      }
+    } catch (e) {}
   });
 
   // If the app can't be reached (offline, DNS failure, etc.), show a
@@ -93,6 +149,12 @@ function buildMenu(win) {
 app.whenReady().then(() => {
   const win = createWindow();
   buildMenu(win);
+
+  // Windows/Linux: if the app wasn't already running, the OS launches it
+  // fresh with the alms:// URL as a command-line argument instead of firing
+  // second-instance.
+  const launchUrl = process.argv.find(arg => arg.startsWith(PROTOCOL + '://'));
+  if (launchUrl) handleDeepLink(win, launchUrl);
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

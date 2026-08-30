@@ -18,6 +18,17 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- Deep link handoff for Google sign-in: Google requires OAuth to
+                 complete in the system browser, not this embedded WebView, so
+                 after sign-in the browser hands control back to the app via
+                 alms://auth-callback?code=... -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="alms" />
+            </intent-filter>
         </activity>
 
         <provider

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signed in — ALMS</title>
+<link rel="icon" href="/icons/icon-192.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="auth-page">
+  <div class="auth-card" style="text-align:center;">
+    <div class="auth-icon-wrap">
+      <div class="auth-icon"><i class="fas fa-check-circle" aria-hidden="true"></i></div>
+      <div class="auth-title">You're signed in!</div>
+      <div class="auth-sub">Taking you back to the app now.</div>
+    </div>
+    <a href="alms://auth-callback?code=<%= code %>" class="btn-auth" id="returnToAppBtn" style="text-decoration:none;display:block;box-sizing:border-box;">
+      <i class="fas fa-arrow-left" aria-hidden="true"></i> Open ALMS App
+    </a>
+    <p style="font-size:13px;color:var(--text-muted,#64748B);margin-top:16px;">Nothing happening? Tap the button above. You can close this tab once the app opens.</p>
+  </div>
+</div>
+<script>
+  window.addEventListener('load', function() {
+    window.location.href = document.getElementById('returnToAppBtn').getAttribute('href');
+  });
+</script>
+</body>
+</html>

@@ -4,6 +4,18 @@
 const bcrypt   = require('bcryptjs');
 const User     = require('../models/User');
 const Role     = require('../models/Role');
+const AuthHandoff = require('../models/AuthHandoff');
+
+// Builds the { id, name, email, role, role_id, setup_completed } shape the
+// rest of the app expects on req.session.user, from a full user row.
+async function buildSessionUser(user) {
+  let roleName = 'Member';
+  if (user.role_id) {
+    const role = await Role.findById(user.role_id);
+    if (role) roleName = role.name;
+  }
+  return { id: user.id, name: user.name, email: user.email, role: roleName, role_id: user.role_id, setup_completed: user.setup_completed };
+}
 
 exports.getLogin = (req, res) => res.render('login');
 
@@ -54,16 +66,40 @@ exports.googleCallback = async (req, res) => {
   const user = req.user;
   if (!user) { req.session.error = 'Google sign-in failed. Please try again.'; return res.redirect('/login'); }
   try {
-    let roleName = 'Member';
-    if (user.role_id) {
-      const role = await Role.findById(user.role_id);
-      if (role) roleName = role.name;
+    // Log the browser itself in too — a safe fallback in case the deep-link
+    // handoff below doesn't fire, so the user isn't stuck with nothing.
+    req.session.user = await buildSessionUser(user);
+
+    const client = ['desktop', 'mobile'].includes(req.query.state) ? req.query.state : 'web';
+    if (client !== 'web') {
+      const code = await AuthHandoff.create(user.id);
+      return res.render('auth-handoff', { code });
     }
-    req.session.user = { id: user.id, name: user.name, email: user.email, role: roleName, role_id: user.role_id, setup_completed: user.setup_completed };
     res.redirect(user.setup_completed ? '/dashboard' : '/setup');
   } catch (err) {
     console.error('!!! GOOGLE LOGIN CRASH !!!! ->', err);
     req.session.error = 'Google sign-in failed. Please try again.';
+    res.redirect('/login');
+  }
+};
+
+// Reached by the desktop/mobile app's own embedded webview after it
+// receives the alms://auth-callback?code=... deep link — establishes the
+// session there too, since that webview has a separate cookie jar from
+// whatever system browser Google sign-in actually happened in.
+exports.completeHandoff = async (req, res) => {
+  const code = req.query.code;
+  if (!code) { req.session.error = 'That sign-in link is invalid.'; return res.redirect('/login'); }
+  try {
+    const userId = await AuthHandoff.consume(code);
+    if (!userId) { req.session.error = 'That sign-in link expired. Please try signing in again.'; return res.redirect('/login'); }
+    const user = await User.findById(userId);
+    if (!user) { req.session.error = 'Account not found.'; return res.redirect('/login'); }
+    req.session.user = await buildSessionUser(user);
+    res.redirect(user.setup_completed ? '/dashboard' : '/setup');
+  } catch (err) {
+    console.error('Auth handoff error:', err);
+    req.session.error = 'Sign-in failed. Please try again.';
     res.redirect('/login');
   }
 };

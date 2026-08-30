@@ -27,6 +27,10 @@
       "config.json",
       "build/icon.png"
     ],
+    "protocols": {
+      "name": "ALMS Auth Handoff",
+      "schemes": ["alms"]
+    },
     "win": {
       "target": [
         {
