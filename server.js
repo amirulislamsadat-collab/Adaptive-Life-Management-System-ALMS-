@@ -43,6 +43,7 @@ const Gamification = require('./models/Gamification');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
+let dbReady; // assigned once initDB() is kicked off, below — see the gating middleware
 
 // --- View Engine ---
 app.set('view engine', 'ejs');
@@ -54,6 +55,19 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true, limit: '4mb' }));
 app.use(express.json({ limit: '4mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// --- DB Ready Gate ---
+// On Vercel, a cold start can freeze the serverless container right after it
+// sends its first response — including in the middle of an unawaited background
+// task. initDB() runs its migrations sequentially and used to be fire-and-forget,
+// so a fast first request could get served while later ALTER/CREATE statements
+// were still pending, freezing them mid-run and silently leaving new columns/
+// tables missing (this is exactly how avatar_shirt/weight_kg/activity_level and
+// the breathing_sessions table went missing on the live DB). Holding every
+// non-static request here until dbReady resolves makes migrations reliable.
+app.use((req, res, next) => {
+  dbReady.then(() => next()).catch(next);
+});
 
 // --- Session ---
 app.use(session({
@@ -848,8 +862,9 @@ async function initDB() {
 // ============================================================
 // initDB() is idempotent (CREATE TABLE IF NOT EXISTS / INSERT IGNORE), so it is
 // safe to run once per process — both for a long-running local/XAMPP server and
-// for a Vercel serverless cold start.
-initDB().catch(err => console.error('[DB] Startup init failed ->', err.message));
+// for a Vercel serverless cold start. Requests are held at the DB Ready Gate
+// above until this resolves, so migrations always finish before any route runs.
+dbReady = initDB().catch(err => console.error('[DB] Startup init failed ->', err.message));
 
 // Only bind to a port when run directly (`node server.js` / XAMPP + local dev).
 // On Vercel the exported `app` is wrapped as a serverless function instead —
