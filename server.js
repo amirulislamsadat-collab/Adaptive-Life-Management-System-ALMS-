@@ -29,6 +29,8 @@ const financeRoutes   = require('./routes/financeRoutes');
 const goalRoutes      = require('./routes/goalRoutes');
 const journalRoutes   = require('./routes/journalRoutes');
 const focusRoutes     = require('./routes/focusRoutes');
+const assistantRoutes = require('./routes/assistantRoutes');
+const assistantCtrl   = require('./controllers/assistantController');
 
 // --- Middleware Imports ---
 const notificationMiddleware = require('./middleware/notificationMiddleware');
@@ -59,6 +61,7 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.locals.googleAuthConfigured = googleAuthConfigured;
+app.locals.assistantConfigured = assistantCtrl.isConfigured;
 
 // --- Flash Messages Middleware ---
 app.use((req, res, next) => {
@@ -141,6 +144,7 @@ app.use('/', financeRoutes);
 app.use('/', goalRoutes);
 app.use('/', journalRoutes);
 app.use('/', focusRoutes);
+app.use('/', assistantRoutes);
 
 // --- Notifications API (for client-side polling without page refresh) ---
 const Reminder = require('./models/Reminder');

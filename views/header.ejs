@@ -251,6 +251,25 @@ if (savedTheme === 'dark') {
         </ol>
       </div>
     </div>
+
+    <% if(assistantConfigured){ %>
+    <button type="button" class="assistant-fab" id="assistantFab" aria-label="Open AI assistant">
+      <i class="fas fa-robot" aria-hidden="true"></i>
+    </button>
+    <div class="assistant-panel" id="assistantPanel" hidden>
+      <div class="assistant-head">
+        <div class="assistant-head-title"><i class="fas fa-robot" aria-hidden="true"></i> ALMS Assistant</div>
+        <button type="button" class="assistant-close" id="assistantClose" aria-label="Close">&times;</button>
+      </div>
+      <div class="assistant-messages" id="assistantMessages">
+        <div class="assistant-msg assistant-msg-bot">Hi! I can help you find or understand any feature in ALMS — ask me anything about how the app works.</div>
+      </div>
+      <form class="assistant-input-row" id="assistantForm">
+        <input type="text" id="assistantInput" placeholder="Ask about ALMS..." autocomplete="off" maxlength="2000">
+        <button type="submit" class="assistant-send" aria-label="Send"><i class="fas fa-paper-plane" aria-hidden="true"></i></button>
+      </form>
+    </div>
+    <% } %>
 <% } %>
 
 <% if(setupDone && dueNotifications && dueNotifications.length){ %>
