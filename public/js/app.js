@@ -114,7 +114,7 @@
     if (paletteTrigger) paletteTrigger.addEventListener('click', openPalette);
   }
 
-  // --- AI Assistant widget ---
+  // --- AI Assistant widget (history persists server-side per user) ---
   var fab = document.getElementById('assistantFab');
   var panel = document.getElementById('assistantPanel');
   if (fab && panel) {
@@ -122,7 +122,9 @@
     var form = document.getElementById('assistantForm');
     var input = document.getElementById('assistantInput');
     var sendBtn = form.querySelector('.assistant-send');
-    var history = [];
+    var clearBtn = document.getElementById('assistantClear');
+    var historyLoaded = false;
+    var WELCOME_TEXT = 'Hi! I can help you find or understand any feature in ALMS — ask me anything about how the app works.';
 
     function addMessage(text, cls) {
       var div = document.createElement('div');
@@ -133,20 +135,46 @@
       return div;
     }
 
+    function loadHistory() {
+      if (historyLoaded) return;
+      historyLoaded = true;
+      fetch('/assistant/history')
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.history && data.history.length) {
+            messagesEl.innerHTML = '';
+            data.history.forEach(function (m) {
+              addMessage(m.content, m.role === 'user' ? 'assistant-msg-user' : 'assistant-msg-bot');
+            });
+          }
+        })
+        .catch(function () {});
+    }
+
     fab.addEventListener('click', function () {
       panel.hidden = false;
+      loadHistory();
       input.focus();
     });
     document.getElementById('assistantClose').addEventListener('click', function () {
       panel.hidden = true;
     });
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function () {
+        fetch('/assistant/history', { method: 'DELETE' })
+          .then(function () {
+            messagesEl.innerHTML = '';
+            addMessage(WELCOME_TEXT, 'assistant-msg-bot');
+          })
+          .catch(function () {});
+      });
+    }
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       var text = input.value.trim();
       if (!text) return;
       addMessage(text, 'assistant-msg-user');
-      history.push({ role: 'user', content: text });
       input.value = '';
       input.disabled = true;
       sendBtn.disabled = true;
@@ -155,14 +183,13 @@
       fetch('/assistant/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, history: history.slice(0, -1) })
+        body: JSON.stringify({ message: text })
       })
         .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
         .then(function (res) {
           thinking.remove();
           if (res.ok) {
             addMessage(res.data.reply, 'assistant-msg-bot');
-            history.push({ role: 'assistant', content: res.data.reply });
           } else {
             addMessage(res.data.error || 'Something went wrong.', 'assistant-msg-error');
           }

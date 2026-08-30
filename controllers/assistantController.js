@@ -4,6 +4,7 @@
 // talks about the app; it doesn't read or write the user's actual data.
 // ============================================================
 const Anthropic = require('@anthropic-ai/sdk');
+const AssistantMessage = require('../models/AssistantMessage');
 
 const isConfigured = !!process.env.ANTHROPIC_API_KEY;
 const client = isConfigured ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }) : null;
@@ -55,11 +56,33 @@ function isRateLimited(userId) {
 
 exports.isConfigured = isConfigured;
 
+exports.getHistory = async (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Please log in.' });
+  try {
+    const history = await AssistantMessage.findRecentByUser(req.session.user.id);
+    res.json({ history });
+  } catch (err) {
+    console.error('Assistant history error:', err);
+    res.status(500).json({ error: 'Failed to load chat history.' });
+  }
+};
+
+exports.clearHistory = async (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Please log in.' });
+  try {
+    await AssistantMessage.clearForUser(req.session.user.id);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Assistant clear history error:', err);
+    res.status(500).json({ error: 'Failed to clear chat history.' });
+  }
+};
+
 exports.postChat = async (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: 'Please log in.' });
   if (!isConfigured) return res.status(503).json({ error: 'The AI assistant is not configured on this server.' });
 
-  const { message, history } = req.body;
+  const { message } = req.body;
   if (!message || typeof message !== 'string' || !message.trim()) {
     return res.status(400).json({ error: 'Message is required.' });
   }
@@ -69,16 +92,22 @@ exports.postChat = async (req, res) => {
     return res.status(429).json({ error: "You've hit the hourly limit for the assistant — try again shortly." });
   }
 
+  const trimmedMessage = message.trim();
+
   try {
     const Module = require('../models/Module');
-    const enabled = await Module.findEnabledForUser(req.session.user.id);
+    const [enabled, priorTurns] = await Promise.all([
+      Module.findEnabledForUser(req.session.user.id),
+      AssistantMessage.findRecentByUser(req.session.user.id)
+    ]);
     const enabledNames = enabled.map(m => m.name);
 
-    const priorTurns = Array.isArray(history) ? history.slice(-10) : [];
+    // Conversation context is read back from the DB (not trusted from the
+    // client) so it can't be spoofed and stays consistent across devices.
     const messages = priorTurns
-      .filter(m => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
-      .map(m => ({ role: m.role, content: m.content.slice(0, 2000) }));
-    messages.push({ role: 'user', content: message.trim() });
+      .slice(-10)
+      .map(m => ({ role: m.role, content: m.content }));
+    messages.push({ role: 'user', content: trimmedMessage });
 
     const response = await client.messages.create({
       model: MODEL,
@@ -91,9 +120,12 @@ exports.postChat = async (req, res) => {
       .filter(block => block.type === 'text')
       .map(block => block.text)
       .join('\n')
-      .trim();
+      .trim() || "Sorry, I didn't catch that — could you rephrase?";
 
-    res.json({ reply: reply || "Sorry, I didn't catch that — could you rephrase?" });
+    await AssistantMessage.create(req.session.user.id, 'user', trimmedMessage);
+    await AssistantMessage.create(req.session.user.id, 'assistant', reply);
+
+    res.json({ reply });
   } catch (err) {
     console.error('!!! ASSISTANT CHAT ERROR !!! ->', err);
     res.status(500).json({ error: 'The assistant is having trouble right now. Please try again in a moment.' });

@@ -749,7 +749,19 @@ async function initDB() {
       )
     `);
 
-    console.log('[DB] All 31 tables created and seeded successfully.');
+    // ---------- TABLE 32: assistant_messages (persisted AI chat history) ----------
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS assistant_messages (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        role ENUM('user','assistant') NOT NULL,
+        content TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    console.log('[DB] All 32 tables created and seeded successfully.');
   } catch (err) {
     console.error('[DB] Initialization error ->', err.message);
   }
