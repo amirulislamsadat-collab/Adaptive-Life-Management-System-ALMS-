@@ -155,7 +155,9 @@ exports.markDone = async (req, res) => {
     const multiplier = Gamification.PRIORITY_MULTIPLIER[task && task.priority] || 1;
     const xp = Math.round(10 * multiplier);
     const result = await Gamification.awardXp(req.session.user.id, xp);
-    req.session.success = `Task marked as done! +${xp} XP` + (result.leveledUp ? ` — 🎉 Level up! You're now Level ${result.newLevel}: ${result.newTitle}` : '');
+    req.session.success = `Task marked as done! +${xp} XP`
+      + (result.streakMilestone ? ` — 🔥 ${result.currentStreak}-day streak!` : '')
+      + (result.leveledUp ? ` — 🎉 Level up! You're now Level ${result.newLevel}: ${result.newTitle}` : '');
   } catch (err) { req.session.error = 'Failed to complete task.'; }
   res.redirect('/tasks/view');
 };

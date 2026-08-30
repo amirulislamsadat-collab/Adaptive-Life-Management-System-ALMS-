@@ -12,6 +12,16 @@
     </div>
   </div>
 
+  <% if(streakInfo.currentStreak > 0 && !streakInfo.activeToday){ %>
+  <div class="streak-risk-banner">
+    <div class="streak-risk-icon"><i class="fas fa-fire" aria-hidden="true"></i></div>
+    <div class="focus-banner-body">
+      <div class="focus-banner-title">Your <%= streakInfo.currentStreak %>-day streak is at risk!</div>
+      <div class="focus-banner-sub">Complete a task, check in a habit, or log anything to keep it alive today.</div>
+    </div>
+  </div>
+  <% } %>
+
   <% if(today.activeFocus){ %>
   <div class="focus-banner">
     <div class="focus-banner-icon"><i class="fas fa-crosshairs" aria-hidden="true"></i></div>

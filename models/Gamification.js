@@ -46,20 +46,67 @@ function levelForXp(totalXp) {
 }
 
 const PRIORITY_MULTIPLIER = { low: 1, medium: 1.5, high: 2 };
+const STREAK_MILESTONES = [3, 7, 14, 30, 50, 100, 200, 365];
+
+function toDateOnly(d) {
+  const dt = new Date(d);
+  return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
+}
 
 const Gamification = {
   PRIORITY_MULTIPLIER,
+  STREAK_MILESTONES,
 
-  // Returns { newXp, leveledUp, newLevel } so a caller can flash a
-  // level-up message when a single award crosses a threshold.
+  // Any XP-earning action counts as "active today" for the daily streak
+  // (Duolingo-style: do *something* meaningful once a day to keep it
+  // alive), so streak bookkeeping lives here rather than being called
+  // separately from every controller.
+  //
+  // Returns { newXp, leveledUp, newLevel, newTitle, currentStreak,
+  // longestStreak, streakExtended, streakMilestone } so a caller can flash
+  // a level-up and/or streak message inline with the action's own message.
   awardXp: async (userId, amount) => {
-    const [[before]] = await db.query('SELECT xp FROM users WHERE id = ?', [userId]);
+    const [[before]] = await db.query(
+      'SELECT xp, current_streak, longest_streak, last_active_date FROM users WHERE id = ?',
+      [userId]
+    );
     const beforeXp = (before && before.xp) || 0;
     const afterXp = beforeXp + Math.round(amount);
-    await db.query('UPDATE users SET xp = ? WHERE id = ?', [afterXp, userId]);
+
+    const today = toDateOnly(new Date());
+    const lastActive = before && before.last_active_date ? toDateOnly(before.last_active_date) : null;
+    const gapDays = lastActive ? Math.round((today - lastActive) / 86400000) : null;
+
+    let currentStreak = (before && before.current_streak) || 0;
+    let streakExtended = false;
+    if (gapDays === 0) {
+      // Already counted today — no change.
+    } else if (gapDays === 1) {
+      currentStreak += 1;
+      streakExtended = true;
+    } else {
+      currentStreak = 1;
+      streakExtended = true;
+    }
+    const longestStreak = Math.max((before && before.longest_streak) || 0, currentStreak);
+
+    await db.query(
+      'UPDATE users SET xp = ?, current_streak = ?, longest_streak = ?, last_active_date = CURDATE() WHERE id = ?',
+      [afterXp, currentStreak, longestStreak, userId]
+    );
+
     const beforeLevel = levelForXp(beforeXp).level;
     const afterInfo = levelForXp(afterXp);
-    return { newXp: afterXp, leveledUp: afterInfo.level > beforeLevel, newLevel: afterInfo.level, newTitle: afterInfo.title };
+    return {
+      newXp: afterXp,
+      leveledUp: afterInfo.level > beforeLevel,
+      newLevel: afterInfo.level,
+      newTitle: afterInfo.title,
+      currentStreak,
+      longestStreak,
+      streakExtended,
+      streakMilestone: streakExtended && STREAK_MILESTONES.includes(currentStreak)
+    };
   },
 
   getLevelInfo: (xp) => {

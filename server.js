@@ -110,6 +110,7 @@ app.use(async (req, res, next) => {
 // per request, means every existing render call picks it up for free.
 app.use(async (req, res, next) => {
   res.locals.levelInfo = Gamification.getLevelInfo(0);
+  res.locals.streakInfo = { currentStreak: 0, longestStreak: 0, activeToday: true };
   if (req.session.user && req.session.user.setup_completed == 1) {
     try {
       const fresh = await User.findById(req.session.user.id);
@@ -117,8 +118,17 @@ app.use(async (req, res, next) => {
         req.session.user.xp = fresh.xp || 0;
         req.session.user.profile_picture = fresh.profile_picture || null;
         req.session.user.daily_water_goal_ml = fresh.daily_water_goal_ml || 2000;
+        req.session.user.current_streak = fresh.current_streak || 0;
+        req.session.user.longest_streak = fresh.longest_streak || 0;
+        req.session.user.last_active_date = fresh.last_active_date || null;
       }
       res.locals.levelInfo = Gamification.getLevelInfo(req.session.user.xp || 0);
+      const lastActiveStr = req.session.user.last_active_date ? new Date(req.session.user.last_active_date).toDateString() : null;
+      res.locals.streakInfo = {
+        currentStreak: req.session.user.current_streak || 0,
+        longestStreak: req.session.user.longest_streak || 0,
+        activeToday: lastActiveStr === new Date().toDateString()
+      };
     } catch (err) {
       console.error('User refresh error:', err);
     }
@@ -266,6 +276,11 @@ async function initDB() {
     }
     if (!userColNames.includes('widget_layout')) {
       await db.query(`ALTER TABLE users ADD COLUMN widget_layout TEXT DEFAULT NULL`);
+    }
+    if (!userColNames.includes('current_streak')) {
+      await db.query(`ALTER TABLE users ADD COLUMN current_streak INT DEFAULT 0`);
+      await db.query(`ALTER TABLE users ADD COLUMN longest_streak INT DEFAULT 0`);
+      await db.query(`ALTER TABLE users ADD COLUMN last_active_date DATE DEFAULT NULL`);
     }
 
     // ---------- TABLE 3: modules ----------
