@@ -19,11 +19,21 @@ const MoodLog             = require('./MoodLog');
 const Habit                = require('./Habit');
 const ScreenTimeLog          = require('./ScreenTimeLog');
 const Expense                 = require('./Expense');
+const JournalEntry              = require('./JournalEntry');
 
 const WATER_DAILY_GOAL_ML = 2000;
 const SLEEP_TARGET_MINUTES = 480;      // 8 hours
 const EXERCISE_WEEKLY_TARGET_MIN = 150; // WHO guideline
 const MOOD_SCORES = { great: 100, good: 80, okay: 60, low: 40, bad: 20 };
+const STRESS_KEYWORDS = ['tired', 'stressed', 'anxious', 'overwhelmed'];
+
+function daysSince(dateStr) {
+  const then = new Date(dateStr);
+  const now = new Date();
+  const a = new Date(then.getFullYear(), then.getMonth(), then.getDate());
+  const b = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((b - a) / 86400000);
+}
 
 async function enabledSlugSet(userId) {
   const enabled = await Module.findEnabledForUser(userId);
@@ -246,12 +256,96 @@ async function getRecommendations(userId) {
       recommendations.push({
         icon: 'fa-exclamation-circle',
         message: 'Clear your high-priority tasks first.',
-        reason: `You have ${stats.high_priority} pending high-priority task${stats.high_priority === 1 ? '' : 's'}.`
+        reason: `You have ${stats.high_priority} pending high-priority task${stats.high_priority === 1 ? '' : 's'}.`,
+        actionLabel: 'View tasks', actionHref: '/tasks/view'
       });
     }
   }
 
-  return recommendations.slice(0, 6);
+  // ---- Cross-module insights: rules that combine two unrelated modules ----
+
+  if (enabledSlugs.has('health') && enabledSlugs.has('tasks')) {
+    const [avgSleep, taskStats] = await Promise.all([SleepLog.getAverageMinutes(userId, 7), Task.getStats(userId)]);
+    const completionRate = taskStats.total ? (taskStats.completed / taskStats.total) * 100 : null;
+    if (avgSleep > 0 && avgSleep < 360 && completionRate !== null && completionRate < 60) {
+      recommendations.push({
+        icon: 'fa-bed',
+        message: 'Short sleep may be dragging down your task completion.',
+        reason: `Your 7-day average sleep is ${(avgSleep / 60).toFixed(1)}h and only ${Math.round(completionRate)}% of tasks are complete — these two often move together.`,
+        actionLabel: 'Log sleep', actionHref: '/sleep/new'
+      });
+    }
+  }
+
+  if (enabledSlugs.has('screentime') && enabledSlugs.has('health')) {
+    const [screenSummary, recentMoods] = await Promise.all([ScreenTimeLog.getSummary(userId, 7), MoodLog.findAllByUser(userId)]);
+    const recentMoodScores = recentMoods.slice(0, 5).map(m => MOOD_SCORES[m.mood] || 60);
+    const avgMoodScore = recentMoodScores.length ? recentMoodScores.reduce((a, b) => a + b, 0) / recentMoodScores.length : null;
+    if (screenSummary.totalMinutes > 300 && avgMoodScore !== null && avgMoodScore < 60) {
+      recommendations.push({
+        icon: 'fa-mobile-alt',
+        message: 'High screen time and lower mood have shown up together this week.',
+        reason: `${Math.round(screenSummary.totalMinutes / 60)}h of screen time in 7 days alongside a below-average mood trend — worth a deliberate break.`,
+        actionLabel: 'Start a focus session', actionHref: '/focus'
+      });
+    }
+  }
+
+  if (enabledSlugs.has('habits')) {
+    const habits = await Habit.findAllByUserWithStats(userId);
+    const strong = habits.filter(h => h.currentStreak > 7).sort((a, b) => b.currentStreak - a.currentStreak)[0];
+    if (strong) {
+      recommendations.push({
+        icon: 'fa-trophy',
+        message: `🎉 ${strong.currentStreak}-day streak on "${strong.name}" — great consistency!`,
+        reason: `Keep it going — you're well past the first-week mark, which is usually the hardest part.`
+      });
+    }
+  }
+
+  if (enabledSlugs.has('health')) {
+    const exerciseLogs = await ExerciseLog.findAllByUser(userId);
+    const daysSinceLastExercise = exerciseLogs.length ? daysSince(exerciseLogs[0].log_date) : null;
+    if (daysSinceLastExercise === null || daysSinceLastExercise >= 3) {
+      recommendations.push({
+        icon: 'fa-running',
+        message: "It's been a few days since you moved — a short walk counts.",
+        reason: daysSinceLastExercise === null ? "No exercise logged yet." : `Last exercise logged ${daysSinceLastExercise} days ago.`,
+        actionLabel: 'Log exercise', actionHref: '/exercise/new'
+      });
+    }
+
+    const recentWaterLogs = await WaterLog.findAllByUser(userId);
+    const last5Dates = [...new Set(recentWaterLogs.map(w => new Date(w.log_date).toDateString()))].slice(0, 5);
+    if (last5Dates.length >= 3) {
+      const totalsByDay = last5Dates.map(d => recentWaterLogs.filter(w => new Date(w.log_date).toDateString() === d).reduce((s, w) => s + w.amount_ml, 0));
+      const avgDaily = totalsByDay.reduce((a, b) => a + b, 0) / totalsByDay.length;
+      if (avgDaily < WATER_DAILY_GOAL_ML * 0.7) {
+        recommendations.push({
+          icon: 'fa-tint',
+          message: "You've been consistently under your water goal.",
+          reason: `Averaging ${Math.round(avgDaily)} ml/day over your last ${totalsByDay.length} logged days, below your ${WATER_DAILY_GOAL_ML} ml goal.`,
+          actionLabel: 'Log water', actionHref: '/water/new'
+        });
+      }
+    }
+  }
+
+  if (enabledSlugs.has('journal')) {
+    const entries = await JournalEntry.findAllByUser(userId);
+    const last5 = entries.slice(0, 5);
+    const hasStressSignal = last5.some(e => STRESS_KEYWORDS.some(k => (e.content || '').toLowerCase().includes(k)));
+    if (hasStressSignal) {
+      recommendations.push({
+        icon: 'fa-heart',
+        message: 'Your recent journal entries mention feeling stressed or overwhelmed.',
+        reason: 'A few of your last entries used words like "tired," "stressed," or "overwhelmed" — might be worth a check-in with yourself, or someone you trust.',
+        actionLabel: 'Log mood', actionHref: enabledSlugs.has('health') ? '/mood/new' : '/journal/new'
+      });
+    }
+  }
+
+  return recommendations.slice(0, 8);
 }
 
 module.exports = { getProductivityReport, getLifeScore, getRecommendations };

@@ -71,10 +71,13 @@
     <% recommendations.forEach(rec => { %>
     <div class="rec-card">
       <div class="rec-card-icon"><i class="fas <%= rec.icon %>" aria-hidden="true"></i></div>
-      <div>
+      <div style="flex:1;">
         <div class="rec-card-msg"><%= rec.message %></div>
         <div class="rec-card-reason"><%= rec.reason %></div>
       </div>
+      <% if(rec.actionLabel && rec.actionHref){ %>
+        <a href="<%= rec.actionHref %>" class="btn secondary btn-sm" style="flex-shrink:0;align-self:center;"><%= rec.actionLabel %></a>
+      <% } %>
     </div>
     <% }) %>
   </div>
