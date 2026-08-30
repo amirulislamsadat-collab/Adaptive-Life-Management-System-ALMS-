@@ -3,7 +3,7 @@
   "appName": "ALMS",
   "webDir": "www",
   "server": {
-    "url": "https://your-app.vercel.app",
+    "url": "https://alms-one.vercel.app",
     "cleartext": false
   },
   "android": {
