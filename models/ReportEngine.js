@@ -9,6 +9,8 @@
 // so they always reflect the latest data.
 // ============================================================
 const Module         = require('./Module');
+const User            = require('./User');
+const HealthGuidelines = require('./HealthGuidelines');
 const Task            = require('./Task');
 const Assignment       = require('./Assignment');
 const StudySession     = require('./StudySession');
@@ -96,6 +98,9 @@ async function getProductivityReport(userId) {
 // ------------------------------------------------------------
 async function getLifeScore(userId) {
   const enabledSlugs = await enabledSlugSet(userId);
+  const fullUser = await User.findById(userId);
+  const waterGoal = (fullUser && fullUser.daily_water_goal_ml) || WATER_DAILY_GOAL_ML;
+  const sleepTarget = HealthGuidelines.sleepRangeForAge(fullUser && fullUser.age).max;
   const components = [];
 
   if (enabledSlugs.has('tasks')) {
@@ -121,8 +126,8 @@ async function getLifeScore(userId) {
       MoodLog.findLatest(userId)
     ]);
     const healthScores = [];
-    if (avgSleep > 0) healthScores.push(Math.min(100, (avgSleep / SLEEP_TARGET_MINUTES) * 100));
-    if (todayWater > 0) healthScores.push(Math.min(100, (todayWater / WATER_DAILY_GOAL_ML) * 100));
+    if (avgSleep > 0) healthScores.push(Math.min(100, (avgSleep / sleepTarget) * 100));
+    if (todayWater > 0) healthScores.push(Math.min(100, (todayWater / waterGoal) * 100));
     if (weeklyExercise > 0) healthScores.push(Math.min(100, (weeklyExercise / EXERCISE_WEEKLY_TARGET_MIN) * 100));
     if (latestMood) healthScores.push(MOOD_SCORES[latestMood.mood] || 60);
     if (healthScores.length) components.push({ label: 'Health & Wellness', score: Math.round(healthScores.reduce((a, b) => a + b, 0) / healthScores.length) });
@@ -163,25 +168,28 @@ async function getLifeScore(userId) {
 // ------------------------------------------------------------
 async function getRecommendations(userId) {
   const enabledSlugs = await enabledSlugSet(userId);
+  const fullUser = await User.findById(userId);
+  const waterGoal = (fullUser && fullUser.daily_water_goal_ml) || WATER_DAILY_GOAL_ML;
+  const sleepRange = HealthGuidelines.sleepRangeForAge(fullUser && fullUser.age);
   const recommendations = [];
 
   if (enabledSlugs.has('health')) {
     const avgSleep = await SleepLog.getAverageMinutes(userId, 7);
-    if (avgSleep > 0 && avgSleep < 420) {
+    if (avgSleep > 0 && avgSleep < sleepRange.min) {
       recommendations.push({
         icon: 'fa-bed',
         message: 'Try to get a bit more sleep.',
-        reason: `Your 7-day average is ${(avgSleep / 60).toFixed(1)}h, below the recommended 7-8 hours.`
+        reason: `Your 7-day average is ${(avgSleep / 60).toFixed(1)}h, below your recommended ${Math.round(sleepRange.min/60)}-${Math.round(sleepRange.max/60)} hours.`
       });
     }
 
     const todayWater = await WaterLog.getTodayTotal(userId);
     const hour = new Date().getHours();
-    if (hour >= 15 && todayWater < WATER_DAILY_GOAL_ML * 0.5) {
+    if (hour >= 15 && todayWater < waterGoal * 0.5) {
       recommendations.push({
         icon: 'fa-tint',
         message: 'Drink more water today.',
-        reason: `You've had ${todayWater} ml so far — less than half of your ${WATER_DAILY_GOAL_ML} ml goal, and it's already afternoon.`
+        reason: `You've had ${todayWater} ml so far — less than half of your ${waterGoal} ml goal, and it's already afternoon.`
       });
     }
 
@@ -267,7 +275,7 @@ async function getRecommendations(userId) {
   if (enabledSlugs.has('health') && enabledSlugs.has('tasks')) {
     const [avgSleep, taskStats] = await Promise.all([SleepLog.getAverageMinutes(userId, 7), Task.getStats(userId)]);
     const completionRate = taskStats.total ? (taskStats.completed / taskStats.total) * 100 : null;
-    if (avgSleep > 0 && avgSleep < 360 && completionRate !== null && completionRate < 60) {
+    if (avgSleep > 0 && avgSleep < sleepRange.min && completionRate !== null && completionRate < 60) {
       recommendations.push({
         icon: 'fa-bed',
         message: 'Short sleep may be dragging down your task completion.',
@@ -320,11 +328,11 @@ async function getRecommendations(userId) {
     if (last5Dates.length >= 3) {
       const totalsByDay = last5Dates.map(d => recentWaterLogs.filter(w => new Date(w.log_date).toDateString() === d).reduce((s, w) => s + w.amount_ml, 0));
       const avgDaily = totalsByDay.reduce((a, b) => a + b, 0) / totalsByDay.length;
-      if (avgDaily < WATER_DAILY_GOAL_ML * 0.7) {
+      if (avgDaily < waterGoal * 0.7) {
         recommendations.push({
           icon: 'fa-tint',
           message: "You've been consistently under your water goal.",
-          reason: `Averaging ${Math.round(avgDaily)} ml/day over your last ${totalsByDay.length} logged days, below your ${WATER_DAILY_GOAL_ML} ml goal.`,
+          reason: `Averaging ${Math.round(avgDaily)} ml/day over your last ${totalsByDay.length} logged days, below your ${waterGoal} ml goal.`,
           actionLabel: 'Log water', actionHref: '/water/new'
         });
       }

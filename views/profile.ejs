@@ -1,0 +1,142 @@
+<%- include('header', { currentPath: '/profile' }) %>
+<div class="page">
+  <div class="top-header">
+    <h1 class="page-title"><i class="fas fa-user" aria-hidden="true"></i> Your Profile</h1>
+    <p class="page-desc">Your avatar, stats, and a couple of things we use to personalize your targets.</p>
+  </div>
+
+  <div class="profile-hero">
+    <div class="profile-hero-avatar">
+      <%- include('partials/avatar', { gender: user.avatar_gender, skin: user.avatar_skin, hair: user.avatar_hair, size: 100 }) %>
+    </div>
+    <div class="profile-hero-info">
+      <form method="POST" action="/profile/name" class="profile-name-form">
+        <input type="text" name="name" value="<%= user.name %>" required>
+        <button type="submit" class="btn secondary btn-sm">Save</button>
+      </form>
+      <div class="profile-hero-meta">
+        <span><i class="fas fa-envelope" aria-hidden="true"></i> <%= user.email %></span>
+        <span><i class="fas fa-user-tag" aria-hidden="true"></i> <%= user.role %></span>
+        <span><i class="fas fa-calendar" aria-hidden="true"></i> Since <%= new Date(fullUser.created_at).toLocaleDateString('en-US',{month:'short',year:'numeric'}) %></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="profile-stats-row">
+    <div class="profile-stat-card">
+      <div class="score-ring" style="--score: <%= levelInfo.progressPercent %>; --score-color: var(--primary); width:80px;height:80px;">
+        <div class="score-ring-inner" style="width:62px;height:62px;">
+          <div class="score-ring-value" style="font-size:18px;">Lv<%= levelInfo.level %></div>
+        </div>
+      </div>
+      <div>
+        <div class="profile-stat-title"><%= levelInfo.title %></div>
+        <div class="profile-stat-sub"><%= levelInfo.xpIntoLevel %> / <%= levelInfo.xpForNextLevel %> XP &middot; <%= levelInfo.xp %> total</div>
+      </div>
+    </div>
+    <div class="profile-stat-card">
+      <div class="profile-stat-icon streak"><i class="fas fa-fire" aria-hidden="true"></i></div>
+      <div>
+        <div class="profile-stat-title"><%= fullUser.current_streak || 0 %> day streak</div>
+        <div class="profile-stat-sub">Longest: <%= fullUser.longest_streak || 0 %> days</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <div class="section-title"><i class="fas fa-palette" aria-hidden="true"></i> Customize Avatar</div>
+  </div>
+  <div class="card" style="margin-bottom:40px;">
+    <form method="POST" action="/profile/avatar">
+      <div class="avatar-builder" id="avatarBuilder" style="--av-skin:<%= user.avatar_skin %>;--av-hair:<%= user.avatar_hair %>;margin-bottom:24px;">
+        <div class="avatar-preview">
+          <div id="avPreviewMale" <%= user.avatar_gender==='female' ? 'hidden' : '' %>><%- include('partials/avatar', { gender: 'male', size: 120 }) %></div>
+          <div id="avPreviewFemale" <%= user.avatar_gender==='female' ? '' : 'hidden' %>><%- include('partials/avatar', { gender: 'female', size: 120 }) %></div>
+        </div>
+
+        <div class="avatar-opt-group">
+          <label>I am...</label>
+          <div class="avatar-gender-toggle">
+            <button type="button" class="avatar-gender-btn <%= user.avatar_gender!=='female'?'active':'' %>" data-gender="male" id="genderMaleBtn">🙋‍♂️ A guy</button>
+            <button type="button" class="avatar-gender-btn <%= user.avatar_gender==='female'?'active':'' %>" data-gender="female" id="genderFemaleBtn">🙋‍♀️ A girl</button>
+          </div>
+          <input type="hidden" name="gender" id="genderInput" value="<%= user.avatar_gender || 'male' %>">
+        </div>
+
+        <div class="avatar-opt-group">
+          <label>Skin tone</label>
+          <div class="swatch-row" id="skinSwatches">
+            <% ['#FDE0C4','#F0B594','#C88A5E','#8D5A3C','#5C3A24'].forEach(function(c){ %>
+              <button type="button" class="swatch <%= user.avatar_skin===c?'active':'' %>" data-val="<%= c %>" style="background:<%= c %>" aria-label="Skin tone"></button>
+            <% }) %>
+          </div>
+          <input type="hidden" name="skin" id="skinInput" value="<%= user.avatar_skin %>">
+        </div>
+
+        <div class="avatar-opt-group">
+          <label>Hair color</label>
+          <div class="swatch-row" id="hairSwatches">
+            <% ['#0F0A08','#3B2314','#8B5A2B','#C99A3D','#B0B0B0'].forEach(function(c){ %>
+              <button type="button" class="swatch <%= user.avatar_hair===c?'active':'' %>" data-val="<%= c %>" style="background:<%= c %>" aria-label="Hair color"></button>
+            <% }) %>
+          </div>
+          <input type="hidden" name="hair" id="hairInput" value="<%= user.avatar_hair %>">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="fg">
+          <label for="ageInput">Age</label>
+          <input type="number" id="ageInput" name="age" min="10" max="110" value="<%= user.age || '' %>" placeholder="e.g. 21">
+        </div>
+        <div class="fg">
+          <label for="expSelect">Experience level</label>
+          <select id="expSelect" name="experience_level">
+            <option value="beginner" <%= user.experience_level==='beginner'?'selected':'' %>>🌱 Just starting out</option>
+            <option value="intermediate" <%= user.experience_level==='intermediate'?'selected':'' %>>🌿 Somewhere in between</option>
+            <option value="experienced" <%= user.experience_level==='experienced'?'selected':'' %>>🌳 Pretty on top of it</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" class="btn primary">Save changes</button>
+    </form>
+  </div>
+</div>
+<script>
+(function() {
+  var builder = document.getElementById('avatarBuilder');
+  var maleBtn = document.getElementById('genderMaleBtn');
+  var femaleBtn = document.getElementById('genderFemaleBtn');
+  var maleAv = document.getElementById('avPreviewMale');
+  var femaleAv = document.getElementById('avPreviewFemale');
+  var genderInput = document.getElementById('genderInput');
+
+  function setGender(g) {
+    genderInput.value = g;
+    maleBtn.classList.toggle('active', g === 'male');
+    femaleBtn.classList.toggle('active', g === 'female');
+    maleAv.hidden = g !== 'male';
+    femaleAv.hidden = g !== 'female';
+  }
+  maleBtn.addEventListener('click', function() { setGender('male'); });
+  femaleBtn.addEventListener('click', function() { setGender('female'); });
+
+  function wireSwatches(containerId, inputId, cssVar) {
+    var container = document.getElementById(containerId);
+    var input = document.getElementById(inputId);
+    container.querySelectorAll('.swatch').forEach(function(sw) {
+      sw.addEventListener('click', function() {
+        container.querySelectorAll('.swatch').forEach(function(s) { s.classList.remove('active'); });
+        sw.classList.add('active');
+        var val = sw.dataset.val;
+        input.value = val;
+        builder.style.setProperty(cssVar, val);
+      });
+    });
+  }
+  wireSwatches('skinSwatches', 'skinInput', '--av-skin');
+  wireSwatches('hairSwatches', 'hairInput', '--av-hair');
+})();
+</script>
+<%- include('footer') %>

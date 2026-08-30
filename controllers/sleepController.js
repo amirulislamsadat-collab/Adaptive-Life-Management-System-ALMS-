@@ -3,6 +3,7 @@
 // ============================================================
 const SleepLog = require('../models/SleepLog');
 const Gamification = require('../models/Gamification');
+const HealthGuidelines = require('../models/HealthGuidelines');
 
 function computeDurationMinutes(bedtime, wakeTime) {
   const [bh, bm] = bedtime.split(':').map(Number);
@@ -43,9 +44,10 @@ exports.postCreateSleepLog = async (req, res) => {
     const duration_minutes = computeDurationMinutes(bedtime, wake_time);
     await SleepLog.create(req.session.user.id, { sleep_date, bedtime, wake_time, duration_minutes, quality, notes });
     let msg = 'Sleep logged successfully!';
-    if (duration_minutes >= 7 * 60 && duration_minutes <= 9 * 60) {
+    const range = HealthGuidelines.sleepRangeForAge(req.session.user.age);
+    if (duration_minutes >= range.min && duration_minutes <= range.max) {
       const result = await Gamification.awardXp(req.session.user.id, 15);
-      msg += ' +15 XP for a healthy 7-9h night' + (result.leveledUp ? ` — 🎉 Level up! You're now Level ${result.newLevel}: ${result.newTitle}` : '');
+      msg += ` +15 XP for a healthy ${Math.round(range.min/60)}-${Math.round(range.max/60)}h night` + (result.leveledUp ? ` — 🎉 Level up! You're now Level ${result.newLevel}: ${result.newTitle}` : '');
     }
     req.session.success = msg;
     res.redirect('/sleep');

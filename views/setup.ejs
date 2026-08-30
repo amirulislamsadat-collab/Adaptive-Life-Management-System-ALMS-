@@ -1,7 +1,7 @@
 <%- include('header') %>
 <div class="setup-page">
   <!-- Stepper -->
-  <% const stepOrder = ['role','modules','profile']; const stepIdx = stepOrder.indexOf(step); %>
+  <% const stepOrder = ['role','you','modules']; const stepIdx = stepOrder.indexOf(step); %>
   <div class="stepper">
     <div class="step-item">
       <div class="step-circle <%= stepIdx===0 ? 'active' : 'done' %>">
@@ -14,12 +14,12 @@
       <div class="step-circle <%= stepIdx===1 ? 'active' : (stepIdx>1 ? 'done' : 'inactive') %>">
         <%- stepIdx>1 ? '<i class="fas fa-check"></i>' : '2' %>
       </div>
-      <span class="step-label <%= stepIdx===1 ? 'active' : (stepIdx>1 ? 'done' : '') %>">Modules</span>
+      <span class="step-label <%= stepIdx===1 ? 'active' : (stepIdx>1 ? 'done' : '') %>">You</span>
     </div>
     <div class="step-connector <%= stepIdx>=2 ? 'done' : '' %>"></div>
     <div class="step-item">
       <div class="step-circle <%= stepIdx===2 ? 'active' : 'inactive' %>">3</div>
-      <span class="step-label <%= stepIdx===2 ? 'active' : '' %>">You</span>
+      <span class="step-label <%= stepIdx===2 ? 'active' : '' %>">Modules</span>
     </div>
   </div>
 
@@ -52,12 +52,132 @@
     }
   </script>
 
+  <% } else if(step === 'you') { %>
+  <div class="setup-mascot">🦉</div>
+  <h1 class="setup-title">Tell us about you, <%= user.name.split(' ')[0] %>!</h1>
+  <p class="setup-sub">Build your avatar and answer a couple quick questions — we'll use this to personalize your targets (sleep, water) and how much we recommend at once.</p>
+
+  <form method="POST" action="/setup/you" id="youForm">
+    <div class="avatar-builder" id="avatarBuilder" style="--av-skin:#F0B594;--av-hair:#3B2314;">
+      <div class="avatar-preview">
+        <div id="avPreviewMale"><%- include('partials/avatar', { gender: 'male', size: 140 }) %></div>
+        <div id="avPreviewFemale" hidden><%- include('partials/avatar', { gender: 'female', size: 140 }) %></div>
+      </div>
+
+      <div class="avatar-opt-group">
+        <label>I am...</label>
+        <div class="avatar-gender-toggle">
+          <button type="button" class="avatar-gender-btn active" data-gender="male" id="genderMaleBtn">🙋‍♂️ A guy</button>
+          <button type="button" class="avatar-gender-btn" data-gender="female" id="genderFemaleBtn">🙋‍♀️ A girl</button>
+        </div>
+        <input type="hidden" name="gender" id="genderInput" value="male">
+      </div>
+
+      <div class="avatar-opt-group">
+        <label>Skin tone</label>
+        <div class="swatch-row" id="skinSwatches">
+          <% ['#FDE0C4','#F0B594','#C88A5E','#8D5A3C','#5C3A24'].forEach(function(c, i){ %>
+            <button type="button" class="swatch <%= i===1?'active':'' %>" data-val="<%= c %>" style="background:<%= c %>" aria-label="Skin tone"></button>
+          <% }) %>
+        </div>
+        <input type="hidden" name="skin" id="skinInput" value="#F0B594">
+      </div>
+
+      <div class="avatar-opt-group">
+        <label>Hair color</label>
+        <div class="swatch-row" id="hairSwatches">
+          <% ['#0F0A08','#3B2314','#8B5A2B','#C99A3D','#B0B0B0'].forEach(function(c, i){ %>
+            <button type="button" class="swatch <%= i===1?'active':'' %>" data-val="<%= c %>" style="background:<%= c %>" aria-label="Hair color"></button>
+          <% }) %>
+        </div>
+        <input type="hidden" name="hair" id="hairInput" value="#3B2314">
+      </div>
+    </div>
+
+    <div class="fg" style="max-width:200px;margin:0 auto 32px;">
+      <label for="ageInput">Your age (optional)</label>
+      <input type="number" id="ageInput" name="age" min="10" max="110" placeholder="e.g. 21" class="form-inp">
+      <p style="font-size:12px;color:var(--text-muted);margin-top:6px;">Used only to suggest a healthy sleep range — never shown to anyone else.</p>
+    </div>
+
+    <div class="fg">
+      <label>How on top of your routines are you these days?</label>
+      <div class="experience-grid">
+        <label class="experience-card">
+          <input type="radio" name="experience_level" value="beginner">
+          <span class="experience-emoji">🌱</span>
+          <span class="experience-title">Just starting out</span>
+          <span class="experience-desc">New to tracking things — start me simple</span>
+        </label>
+        <label class="experience-card">
+          <input type="radio" name="experience_level" value="intermediate" checked>
+          <span class="experience-emoji">🌿</span>
+          <span class="experience-title">Somewhere in between</span>
+          <span class="experience-desc">I've got some habits going already</span>
+        </label>
+        <label class="experience-card">
+          <input type="radio" name="experience_level" value="experienced">
+          <span class="experience-emoji">🌳</span>
+          <span class="experience-title">Pretty on top of it</span>
+          <span class="experience-desc">Give me everything at once</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="setup-actions">
+      <a href="/setup" class="btn-back-setup">← Back</a>
+      <button type="submit" class="btn-launch"><i class="fas fa-arrow-right"></i> Continue</button>
+    </div>
+  </form>
+  <script>
+  (function() {
+    var builder = document.getElementById('avatarBuilder');
+    var maleBtn = document.getElementById('genderMaleBtn');
+    var femaleBtn = document.getElementById('genderFemaleBtn');
+    var maleAv = document.getElementById('avPreviewMale');
+    var femaleAv = document.getElementById('avPreviewFemale');
+    var genderInput = document.getElementById('genderInput');
+
+    function setGender(g) {
+      genderInput.value = g;
+      maleBtn.classList.toggle('active', g === 'male');
+      femaleBtn.classList.toggle('active', g === 'female');
+      maleAv.hidden = g !== 'male';
+      femaleAv.hidden = g !== 'female';
+    }
+    maleBtn.addEventListener('click', function() { setGender('male'); });
+    femaleBtn.addEventListener('click', function() { setGender('female'); });
+
+    function wireSwatches(containerId, inputId, cssVar) {
+      var container = document.getElementById(containerId);
+      var input = document.getElementById(inputId);
+      container.querySelectorAll('.swatch').forEach(function(sw) {
+        sw.addEventListener('click', function() {
+          container.querySelectorAll('.swatch').forEach(function(s) { s.classList.remove('active'); });
+          sw.classList.add('active');
+          var val = sw.dataset.val;
+          input.value = val;
+          builder.style.setProperty(cssVar, val);
+        });
+      });
+    }
+    wireSwatches('skinSwatches', 'skinInput', '--av-skin');
+    wireSwatches('hairSwatches', 'hairInput', '--av-hair');
+  })();
+  </script>
+
   <% } else if(step === 'modules') { %>
   <div class="role-badge-top">
     <span class="role-badge"><i class="fas fa-user"></i> <%= user.role %></span>
   </div>
   <h1 class="setup-title"><i class="fas fa-puzzle-piece"></i> Customize Your Workspace</h1>
-  <p class="setup-sub">We've recommended modules based on your role. Toggle them to fit your needs.</p>
+  <p class="setup-sub">
+    <% if(user.experience_level === 'beginner') { %>
+      We kept this short since you're just starting out — you can always turn more on later from Settings.
+    <% } else { %>
+      We've recommended modules based on your role. Toggle them to fit your needs.
+    <% } %>
+  </p>
   <p class="selected-count">Selected: <span id="selCount"><%= recommended.length %></span> modules</p>
 
   <form method="POST" action="/setup/modules" id="modForm">
@@ -85,8 +205,8 @@
       <% }) %>
     </div>
     <div class="setup-actions">
-      <a href="/setup" class="btn-back-setup">← Back</a>
-      <button type="submit" class="btn-launch"><i class="fas fa-arrow-right"></i> Continue</button>
+      <a href="/setup?step=you" class="btn-back-setup">← Back</a>
+      <button type="submit" class="btn-launch"><i class="fas fa-rocket"></i> Launch Workspace</button>
     </div>
   </form>
   <script>
@@ -98,64 +218,6 @@
         if(cb.checked) card.classList.add('on'); else card.classList.remove('on');
       });
     }
-  </script>
-
-  <% } else if(step === 'profile') { %>
-  <div class="setup-mascot">🦉</div>
-  <h1 class="setup-title">One last thing, <%= user.name.split(' ')[0] %>!</h1>
-  <p class="setup-sub">Add a profile picture so it's really you in there — totally optional, skip it if you're not feeling it right now.</p>
-
-  <div class="profile-step-card">
-    <div class="profile-step-photo">
-      <img id="setupPhotoPreview" src="<%= user.profile_picture || '' %>" alt="" style="<%= user.profile_picture ? '' : 'display:none;' %>">
-      <div id="setupPhotoPlaceholder" class="user-avatar" style="width:100%;height:100%;font-size:36px;<%= user.profile_picture ? 'display:none;' : '' %>"><%= user.name.charAt(0).toUpperCase() %></div>
-    </div>
-    <input type="file" accept="image/*" id="setupPhotoInput" style="display:none;">
-    <button type="button" class="btn secondary btn-sm" id="setupChoosePhotoBtn"><i class="fas fa-camera" aria-hidden="true"></i> Choose a photo</button>
-  </div>
-
-  <form method="POST" action="/setup/profile" id="profileForm">
-    <input type="hidden" name="photo_data" id="setupPhotoData">
-    <div class="setup-actions">
-      <button type="submit" class="btn-back-setup" id="skipProfileBtn">Skip for now</button>
-      <button type="submit" class="btn-launch"><i class="fas fa-rocket"></i> Launch Workspace</button>
-    </div>
-  </form>
-  <script>
-  (function() {
-    var chooseBtn = document.getElementById('setupChoosePhotoBtn');
-    var fileInput = document.getElementById('setupPhotoInput');
-    var dataField = document.getElementById('setupPhotoData');
-    var preview = document.getElementById('setupPhotoPreview');
-    var placeholder = document.getElementById('setupPhotoPlaceholder');
-
-    chooseBtn.addEventListener('click', function() { fileInput.click(); });
-
-    fileInput.addEventListener('change', function() {
-      var file = fileInput.files[0];
-      if (!file) return;
-      var img = new Image();
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        img.onload = function() {
-          var maxDim = 320;
-          var scale = Math.min(1, maxDim / Math.max(img.width, img.height));
-          var canvas = document.createElement('canvas');
-          canvas.width = Math.round(img.width * scale);
-          canvas.height = Math.round(img.height * scale);
-          var ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-          dataField.value = dataUrl;
-          preview.src = dataUrl;
-          preview.style.display = 'block';
-          placeholder.style.display = 'none';
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    });
-  })();
   </script>
   <% } %>
 </div>

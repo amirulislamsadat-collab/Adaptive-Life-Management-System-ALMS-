@@ -1,0 +1,23 @@
+<%
+// Locals: gender ('male'|'female'), skin (hex), hair (hex), size (px, default 40), avClass (extra CSS class, optional)
+const avGender = typeof gender !== 'undefined' && gender ? gender : 'male';
+const avSkin = typeof skin !== 'undefined' && skin ? skin : '#F0B594';
+const avHair = typeof hair !== 'undefined' && hair ? hair : '#3B2314';
+const avSize = typeof size !== 'undefined' && size ? size : 40;
+const avExtraClass = typeof avClass !== 'undefined' && avClass ? avClass : '';
+%>
+<svg class="alms-avatar <%= avExtraClass %>" width="<%= avSize %>" height="<%= avSize %>" viewBox="0 0 100 100" style="--av-skin:<%= avSkin %>;--av-hair:<%= avHair %>;" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <circle cx="50" cy="50" r="50" fill="var(--av-skin)" opacity="0.18"></circle>
+  <ellipse cx="50" cy="80" rx="30" ry="20" fill="var(--av-skin)"></ellipse>
+  <circle cx="50" cy="46" r="24" fill="var(--av-skin)"></circle>
+  <% if (avGender === 'female') { %>
+    <path d="M22 44 Q22 14 50 14 Q78 14 78 44 L78 58 Q70 46 70 34 Q60 44 50 44 Q40 44 30 34 Q30 46 22 58 Z" fill="var(--av-hair)"></path>
+    <path d="M22 44 Q18 60 26 74 Q22 60 26 46 Z" fill="var(--av-hair)"></path>
+    <path d="M78 44 Q82 60 74 74 Q78 60 74 46 Z" fill="var(--av-hair)"></path>
+  <% } else { %>
+    <path d="M24 40 Q24 16 50 16 Q76 16 76 40 Q76 30 68 26 Q60 34 50 34 Q40 34 32 26 Q24 30 24 40 Z" fill="var(--av-hair)"></path>
+  <% } %>
+  <circle cx="41" cy="48" r="2.6" fill="#2b2b2b"></circle>
+  <circle cx="59" cy="48" r="2.6" fill="#2b2b2b"></circle>
+  <path d="M42 58 Q50 64 58 58" stroke="#8a4a3a" stroke-width="2.4" fill="none" stroke-linecap="round"></path>
+</svg>

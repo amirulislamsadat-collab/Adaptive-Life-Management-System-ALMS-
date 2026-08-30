@@ -120,11 +120,15 @@ app.use(async (req, res, next) => {
       const fresh = await User.findById(req.session.user.id);
       if (fresh) {
         req.session.user.xp = fresh.xp || 0;
-        req.session.user.profile_picture = fresh.profile_picture || null;
         req.session.user.daily_water_goal_ml = fresh.daily_water_goal_ml || 2000;
         req.session.user.current_streak = fresh.current_streak || 0;
         req.session.user.longest_streak = fresh.longest_streak || 0;
         req.session.user.last_active_date = fresh.last_active_date || null;
+        req.session.user.avatar_gender = fresh.avatar_gender || 'male';
+        req.session.user.avatar_skin = fresh.avatar_skin || '#F0B594';
+        req.session.user.avatar_hair = fresh.avatar_hair || '#3B2314';
+        req.session.user.age = fresh.age || null;
+        req.session.user.experience_level = fresh.experience_level || null;
       }
       res.locals.levelInfo = Gamification.getLevelInfo(req.session.user.xp || 0);
       const lastActiveStr = req.session.user.last_active_date ? new Date(req.session.user.last_active_date).toDateString() : null;
@@ -289,6 +293,13 @@ async function initDB() {
       await db.query(`ALTER TABLE users ADD COLUMN current_streak INT DEFAULT 0`);
       await db.query(`ALTER TABLE users ADD COLUMN longest_streak INT DEFAULT 0`);
       await db.query(`ALTER TABLE users ADD COLUMN last_active_date DATE DEFAULT NULL`);
+    }
+    if (!userColNames.includes('avatar_gender')) {
+      await db.query(`ALTER TABLE users ADD COLUMN avatar_gender VARCHAR(10) DEFAULT NULL`);
+      await db.query(`ALTER TABLE users ADD COLUMN avatar_skin VARCHAR(10) DEFAULT '#F0B594'`);
+      await db.query(`ALTER TABLE users ADD COLUMN avatar_hair VARCHAR(10) DEFAULT '#3B2314'`);
+      await db.query(`ALTER TABLE users ADD COLUMN age INT DEFAULT NULL`);
+      await db.query(`ALTER TABLE users ADD COLUMN experience_level VARCHAR(20) DEFAULT NULL`);
     }
 
     // ---------- TABLE 3: modules ----------

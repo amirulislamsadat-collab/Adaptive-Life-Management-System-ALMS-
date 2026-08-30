@@ -151,6 +151,7 @@ body.sidebar-hidden .sidebar { display: none; }
   color: var(--text-dark); width: 38px; height: 38px; border-radius: var(--radius-sm);
   align-items: center; justify-content: center; cursor: pointer; font-size: 16px;
 }
+.topbar-profile-link { display: none; flex-shrink: 0; }
 
 .notif-chip {
   background: rgba(245, 158, 11, 0.1); color: #D97706;
@@ -185,6 +186,7 @@ body.sidebar-hidden .sidebar { display: none; }
   }
   .sidebar.open { transform: translateX(0); }
   .topbar-menu-btn { display: flex; }
+  .topbar-profile-link { display: block; }
 }
 
 /* --- Layouts & Containers --- */
@@ -277,12 +279,56 @@ body.sidebar-hidden .sidebar { display: none; }
 .setup-sub { text-align: center; color: var(--text-muted); font-size: 16px; margin-bottom: 48px; }
 .setup-mascot { text-align: center; font-size: 64px; margin-bottom: 8px; animation: mascot-bob 2.4s ease-in-out infinite; }
 @keyframes mascot-bob { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-8px) rotate(3deg); } }
-.profile-step-card { display: flex; flex-direction: column; align-items: center; gap: 16px; margin: 0 auto 40px; }
-.profile-step-photo {
-  width: 120px; height: 120px; border-radius: 50%; overflow: hidden; box-shadow: var(--glow-primary-strong);
-  border: 3px solid var(--card-bg);
+
+/* --- Avatar builder (setup + profile page) --- */
+.alms-avatar { border-radius: 50%; }
+.avatar-builder { max-width: 420px; margin: 0 auto 32px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.avatar-preview { border-radius: 50%; box-shadow: var(--glow-primary-strong); border: 3px solid var(--card-bg); }
+.avatar-opt-group { width: 100%; text-align: center; }
+.avatar-opt-group label { display: block; font-size: 13px; font-weight: 700; color: var(--text-dark); margin-bottom: 10px; }
+.avatar-gender-toggle { display: flex; gap: 10px; justify-content: center; }
+.avatar-gender-btn {
+  padding: 10px 18px; border-radius: 999px; border: 2px solid var(--border-color); background: var(--card-bg);
+  color: var(--text-dark); font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s ease;
 }
-.profile-step-photo img { width: 100%; height: 100%; object-fit: cover; }
+.avatar-gender-btn.active { border-color: var(--primary); background: rgba(255, 90, 95, 0.08); box-shadow: var(--glow-primary); }
+.swatch-row { display: flex; gap: 10px; justify-content: center; }
+.swatch {
+  width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border-color); cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease; padding: 0;
+}
+.swatch.active { border-color: var(--text-dark); transform: scale(1.15); box-shadow: var(--shadow-md); }
+
+.experience-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-top: 10px; margin-bottom: 32px; }
+.experience-card {
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; padding: 20px 14px;
+  border: 2px solid var(--border-color); border-radius: var(--radius-lg); cursor: pointer; background: var(--card-bg);
+  transition: all 0.15s ease;
+}
+.experience-card input { position: absolute; opacity: 0; pointer-events: none; }
+.experience-card:has(input:checked) { border-color: var(--primary); background: rgba(255, 90, 95, 0.06); box-shadow: var(--glow-primary); }
+.experience-emoji { font-size: 32px; }
+.experience-title { font-weight: 700; font-size: 14px; color: var(--text-dark); }
+.experience-desc { font-size: 12px; color: var(--text-muted); }
+
+/* --- Profile page --- */
+.profile-hero { display: flex; align-items: center; gap: 24px; margin-bottom: 24px; flex-wrap: wrap; }
+.profile-hero-avatar { border-radius: 50%; box-shadow: var(--glow-primary-strong); border: 3px solid var(--card-bg); flex-shrink: 0; }
+.profile-hero-info { flex: 1; min-width: 240px; }
+.profile-name-form { display: flex; gap: 8px; margin-bottom: 10px; max-width: 340px; }
+.profile-name-form input { flex: 1; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 18px; font-weight: 700; font-family: inherit; background: var(--card-bg); color: var(--text-dark); }
+.profile-hero-meta { display: flex; gap: 18px; flex-wrap: wrap; font-size: 13px; color: var(--text-muted); }
+.profile-hero-meta i { color: var(--primary); margin-right: 4px; }
+
+.profile-stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 40px; }
+.profile-stat-card {
+  display: flex; align-items: center; gap: 16px; background: var(--card-bg); border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg); padding: 16px 20px; box-shadow: var(--shadow-sm);
+}
+.profile-stat-icon { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+.profile-stat-icon.streak { background: rgba(249, 115, 22, 0.12); color: #f97316; }
+.profile-stat-title { font-weight: 700; font-size: 15px; color: var(--text-dark); }
+.profile-stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 .role-card { background: var(--card-bg); border: 2px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px 24px; text-align: center; cursor: pointer; transition: all 0.2s; }
 .role-card:active { border-color: var(--primary); }
 .role-card.selected { border-color: var(--primary); background: rgba(255, 90, 95, 0.05); }

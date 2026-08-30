@@ -61,6 +61,13 @@ const User = {
 
   updateWidgetLayout: async (userId, layoutJson) => {
     await db.query('UPDATE users SET widget_layout = ? WHERE id = ?', [layoutJson, userId]);
+  },
+
+  updateIdentity: async (userId, { gender, skin, hair, age, experience_level }) => {
+    await db.query(
+      'UPDATE users SET avatar_gender = ?, avatar_skin = ?, avatar_hair = ?, age = ?, experience_level = ? WHERE id = ?',
+      [gender, skin, hair, age, experience_level, userId]
+    );
   }
 };
 

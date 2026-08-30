@@ -6,9 +6,47 @@
 const Anthropic = require('@anthropic-ai/sdk');
 const AssistantMessage = require('../models/AssistantMessage');
 
-const isConfigured = !!process.env.ANTHROPIC_API_KEY;
-const client = isConfigured ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }) : null;
-const MODEL = process.env.ASSISTANT_MODEL || 'claude-sonnet-5';
+// Two supported providers, picked by whichever key is set (Groq checked
+// first since it has a genuinely free tier; Anthropic is the higher-quality
+// paid-after-trial-credit option). Both speak a "system prompt + message
+// list -> text reply" shape, so postChat below only branches once.
+const PROVIDER = process.env.GROQ_API_KEY ? 'groq' : (process.env.ANTHROPIC_API_KEY ? 'anthropic' : null);
+const isConfigured = !!PROVIDER;
+
+const anthropicClient = PROVIDER === 'anthropic' ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }) : null;
+const GROQ_MODEL = process.env.ASSISTANT_MODEL || 'llama-3.3-70b-versatile';
+const ANTHROPIC_MODEL = process.env.ASSISTANT_MODEL || 'claude-sonnet-5';
+
+async function callGroq(systemPrompt, messages) {
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: GROQ_MODEL,
+      max_tokens: 500,
+      messages: [{ role: 'system', content: systemPrompt }, ...messages]
+    })
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    throw new Error(`Groq API error ${res.status}: ${body}`);
+  }
+  const data = await res.json();
+  return (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '';
+}
+
+async function callAnthropic(systemPrompt, messages) {
+  const response = await anthropicClient.messages.create({
+    model: ANTHROPIC_MODEL,
+    max_tokens: 500,
+    system: systemPrompt,
+    messages
+  });
+  return response.content.filter(block => block.type === 'text').map(block => block.text).join('\n');
+}
 
 const MODULE_GUIDE = `
 - Tasks: create/edit/delete to-dos with priority, difficulty, and an optional due date. The "Today" dashboard's Quick-Add box also parses plain text like "submit report tomorrow high priority".
@@ -109,18 +147,12 @@ exports.postChat = async (req, res) => {
       .map(m => ({ role: m.role, content: m.content }));
     messages.push({ role: 'user', content: trimmedMessage });
 
-    const response = await client.messages.create({
-      model: MODEL,
-      max_tokens: 500,
-      system: buildSystemPrompt(req.session.user, enabledNames),
-      messages
-    });
+    const systemPrompt = buildSystemPrompt(req.session.user, enabledNames);
+    const rawReply = PROVIDER === 'groq'
+      ? await callGroq(systemPrompt, messages)
+      : await callAnthropic(systemPrompt, messages);
 
-    const reply = response.content
-      .filter(block => block.type === 'text')
-      .map(block => block.text)
-      .join('\n')
-      .trim() || "Sorry, I didn't catch that — could you rephrase?";
+    const reply = (rawReply || '').trim() || "Sorry, I didn't catch that — could you rephrase?";
 
     await AssistantMessage.create(req.session.user.id, 'user', trimmedMessage);
     await AssistantMessage.create(req.session.user.id, 'assistant', reply);

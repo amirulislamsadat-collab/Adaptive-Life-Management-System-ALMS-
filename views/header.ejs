@@ -54,6 +54,7 @@ if (savedTheme === 'dark') {
     </div>
     <nav class="nav-links" id="sidebarNav">
       <li><a href="/dashboard" class="<%= cp === '/dashboard' ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-th-large" aria-hidden="true"></i></span> Dashboard</a></li>
+      <li><a href="/profile" class="<%= cp === '/profile' ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-user" aria-hidden="true"></i></span> Profile</a></li>
       <% if(enabledSlugs.indexOf('tasks') !== -1){ %>
       <li><a href="/tasks/hub" class="<%= cp.indexOf('/tasks') === 0 ? 'active' : '' %>"><span class="nav-icon"><i class="fas fa-tasks" aria-hidden="true"></i></span> Tasks</a></li>
       <% } %>
@@ -164,14 +165,10 @@ if (savedTheme === 'dark') {
           <div class="xp-track"><div class="xp-fill" style="width:<%= levelInfo.progressPercent %>%"></div></div>
         </div>
       </a>
-      <div class="user-chip">
-        <% if(user.profile_picture){ %>
-          <img src="<%= user.profile_picture %>" class="user-avatar" alt="" />
-        <% } else { %>
-          <div class="user-avatar" aria-hidden="true"><%= user.name.charAt(0).toUpperCase() %></div>
-        <% } %>
+      <a href="/profile" class="user-chip" style="text-decoration:none;">
+        <%- include('partials/avatar', { gender: user.avatar_gender, skin: user.avatar_skin, hair: user.avatar_hair, size: 36, avClass: 'user-avatar' }) %>
         <span class="user-name"><%= user.name %></span>
-      </div>
+      </a>
       <a href="/logout" style="text-decoration:none">
         <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout</button>
       </a>
@@ -183,6 +180,9 @@ if (savedTheme === 'dark') {
       <button type="button" class="topbar-menu-btn" id="topbarMenuBtn" aria-label="Open navigation">
         <i class="fas fa-bars" aria-hidden="true"></i>
       </button>
+      <a href="/profile" class="topbar-profile-link" aria-label="Your profile">
+        <%- include('partials/avatar', { gender: user.avatar_gender, skin: user.avatar_skin, hair: user.avatar_hair, size: 32 }) %>
+      </a>
       <button type="button" class="topbar-search-btn" id="commandPaletteTrigger" title="Search (Ctrl+K)">
         <i class="fas fa-search" aria-hidden="true"></i> <span class="topbar-search-label">Search</span> <kbd>Ctrl K</kbd>
       </button>
