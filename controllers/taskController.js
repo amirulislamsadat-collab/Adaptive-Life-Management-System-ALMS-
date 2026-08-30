@@ -150,9 +150,12 @@ exports.getTaskList = async (req, res) => {
 exports.markDone = async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
   try {
+    const task = await Task.findById(req.params.id, req.session.user.id);
     await Task.markDone(req.params.id, req.session.user.id);
-    await Gamification.awardXp(req.session.user.id, 10);
-    req.session.success = 'Task marked as done! +10 XP';
+    const multiplier = Gamification.PRIORITY_MULTIPLIER[task && task.priority] || 1;
+    const xp = Math.round(10 * multiplier);
+    const result = await Gamification.awardXp(req.session.user.id, xp);
+    req.session.success = `Task marked as done! +${xp} XP` + (result.leveledUp ? ` — 🎉 Level up! You're now Level ${result.newLevel}: ${result.newTitle}` : '');
   } catch (err) { req.session.error = 'Failed to complete task.'; }
   res.redirect('/tasks/view');
 };

@@ -2,6 +2,7 @@
 // Controller: ExerciseLog — handles daily exercise tracking (Feature 20)
 // ============================================================
 const ExerciseLog = require('../models/ExerciseLog');
+const Gamification = require('../models/Gamification');
 
 exports.getExerciseLogs = async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
@@ -34,7 +35,8 @@ exports.postCreateExerciseLog = async (req, res) => {
     await ExerciseLog.create(req.session.user.id, {
       log_date, activity_type: activity_type.trim(), duration_minutes, intensity, calories_burned, notes
     });
-    req.session.success = 'Exercise logged successfully!';
+    const result = await Gamification.awardXp(req.session.user.id, 20);
+    req.session.success = 'Exercise logged successfully! +20 XP' + (result.leveledUp ? ` — 🎉 Level up! You're now Level ${result.newLevel}: ${result.newTitle}` : '');
     res.redirect('/exercise');
   } catch (err) {
     console.error('Create exercise log error:', err);

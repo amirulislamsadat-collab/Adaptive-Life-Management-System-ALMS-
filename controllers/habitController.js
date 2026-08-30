@@ -78,8 +78,17 @@ exports.checkinHabit = async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
   try {
     const nowChecked = await Habit.toggleToday(req.params.id, req.session.user.id);
-    if (nowChecked) await Gamification.awardXp(req.session.user.id, 15);
-    req.session.success = nowChecked ? "Nice work — marked done for today! +15 XP" : 'Check-in removed for today.';
+    if (nowChecked) {
+      const { current } = await Habit.getStreaks(req.params.id, req.session.user.id);
+      let xp = 15;
+      let bonusNote = '';
+      if (current === 7) { xp += 50; bonusNote = ' — 🔥 7-day streak bonus!'; }
+      else if (current === 30) { xp += 200; bonusNote = ' — 🔥 30-day streak bonus!'; }
+      const result = await Gamification.awardXp(req.session.user.id, xp);
+      req.session.success = `Nice work — marked done for today! +${xp} XP${bonusNote}` + (result.leveledUp ? ` — 🎉 Level up! You're now Level ${result.newLevel}: ${result.newTitle}` : '');
+    } else {
+      req.session.success = 'Check-in removed for today.';
+    }
   } catch (err) {
     console.error('Habit check-in error:', err);
     req.session.error = 'Failed to update check-in.';

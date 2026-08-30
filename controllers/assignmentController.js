@@ -100,8 +100,12 @@ exports.markStatus = async (req, res) => {
   const status = ['pending', 'in_progress', 'completed'].includes(req.body.status) ? req.body.status : 'completed';
   try {
     await Assignment.updateStatus(req.params.id, req.session.user.id, status);
-    if (status === 'completed') await Gamification.awardXp(req.session.user.id, 15);
-    req.session.success = status === 'completed' ? 'Assignment status updated. +15 XP' : 'Assignment status updated.';
+    if (status === 'completed') {
+      const result = await Gamification.awardXp(req.session.user.id, 15);
+      req.session.success = 'Assignment status updated. +15 XP' + (result.leveledUp ? ` — 🎉 Level up! You're now Level ${result.newLevel}: ${result.newTitle}` : '');
+    } else {
+      req.session.success = 'Assignment status updated.';
+    }
   } catch (err) {
     console.error('Assignment status error:', err);
     req.session.error = 'Failed to update assignment status.';

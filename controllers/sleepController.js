@@ -2,6 +2,7 @@
 // Controller: SleepLog — handles sleep tracking (Feature 18)
 // ============================================================
 const SleepLog = require('../models/SleepLog');
+const Gamification = require('../models/Gamification');
 
 function computeDurationMinutes(bedtime, wakeTime) {
   const [bh, bm] = bedtime.split(':').map(Number);
@@ -41,7 +42,12 @@ exports.postCreateSleepLog = async (req, res) => {
   try {
     const duration_minutes = computeDurationMinutes(bedtime, wake_time);
     await SleepLog.create(req.session.user.id, { sleep_date, bedtime, wake_time, duration_minutes, quality, notes });
-    req.session.success = 'Sleep logged successfully!';
+    let msg = 'Sleep logged successfully!';
+    if (duration_minutes >= 7 * 60 && duration_minutes <= 9 * 60) {
+      const result = await Gamification.awardXp(req.session.user.id, 15);
+      msg += ' +15 XP for a healthy 7-9h night' + (result.leveledUp ? ` — 🎉 Level up! You're now Level ${result.newLevel}: ${result.newTitle}` : '');
+    }
+    req.session.success = msg;
     res.redirect('/sleep');
   } catch (err) {
     console.error('Create sleep log error:', err);

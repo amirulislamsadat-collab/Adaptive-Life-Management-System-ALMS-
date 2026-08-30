@@ -83,8 +83,12 @@ exports.updateProgress = async (req, res) => {
     const before = await Goal.findById(req.params.id, req.session.user.id);
     const clamped = await Goal.updateProgress(req.params.id, req.session.user.id, req.body.progress_percent);
     const justCompleted = clamped >= 100 && before && before.progress_percent < 100;
-    if (justCompleted) await Gamification.awardXp(req.session.user.id, 25);
-    req.session.success = justCompleted ? 'Goal completed! +25 XP' : 'Progress updated!';
+    if (justCompleted) {
+      const result = await Gamification.awardXp(req.session.user.id, 25);
+      req.session.success = 'Goal completed! +25 XP' + (result.leveledUp ? ` — 🎉 Level up! You're now Level ${result.newLevel}: ${result.newTitle}` : '');
+    } else {
+      req.session.success = 'Progress updated!';
+    }
   } catch (err) {
     console.error('Goal progress error:', err);
     req.session.error = 'Failed to update progress.';

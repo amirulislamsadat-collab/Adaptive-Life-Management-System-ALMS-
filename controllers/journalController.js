@@ -2,6 +2,7 @@
 // Controller: JournalEntry — handles daily journal CRUD & search (Feature 31)
 // ============================================================
 const JournalEntry = require('../models/JournalEntry');
+const Gamification = require('../models/Gamification');
 
 exports.getEntries = async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
@@ -33,7 +34,13 @@ exports.postCreateEntry = async (req, res) => {
   }
   try {
     await JournalEntry.create(req.session.user.id, { entry_date, title: title.trim(), content, mood_tag });
-    req.session.success = 'Journal entry saved!';
+    let msg = 'Journal entry saved!';
+    const wordCount = (content || '').trim().split(/\s+/).filter(Boolean).length;
+    if (wordCount >= 50) {
+      const result = await Gamification.awardXp(req.session.user.id, 25);
+      msg += ' +25 XP for a reflective entry' + (result.leveledUp ? ` — 🎉 Level up! You're now Level ${result.newLevel}: ${result.newTitle}` : '');
+    }
+    req.session.success = msg;
     res.redirect('/journal');
   } catch (err) {
     console.error('Create journal entry error:', err);

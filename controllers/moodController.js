@@ -2,6 +2,7 @@
 // Controller: MoodLog — handles daily mood/emotional state tracking (Feature 21)
 // ============================================================
 const MoodLog = require('../models/MoodLog');
+const Gamification = require('../models/Gamification');
 
 exports.getMoodLogs = async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
@@ -29,7 +30,8 @@ exports.postCreateMoodLog = async (req, res) => {
   }
   try {
     await MoodLog.create(req.session.user.id, { log_date, mood, notes });
-    req.session.success = 'Mood logged successfully!';
+    const result = await Gamification.awardXp(req.session.user.id, 5);
+    req.session.success = 'Mood logged successfully! +5 XP' + (result.leveledUp ? ` — 🎉 Level up! You're now Level ${result.newLevel}: ${result.newTitle}` : '');
     res.redirect('/mood');
   } catch (err) {
     console.error('Create mood log error:', err);
