@@ -392,6 +392,11 @@ body.sidebar-hidden .sidebar { display: none; }
 .auth-foot { text-align: center; margin-top: 24px; color: var(--text-muted); font-size: 14px; }
 .auth-foot a { color: var(--primary); font-weight: 600; text-decoration: none; }
 .auth-foot a:hover { text-decoration: underline; }
+.auth-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; color: var(--text-muted); font-size: 13px; }
+.auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border-color); }
+.btn-google { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 13px; background: var(--card-bg); color: var(--text-dark); border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; text-decoration: none; transition: background 0.2s, border-color 0.2s; }
+.btn-google:hover { background: #f8fafc; border-color: #cbd5e1; }
+.btn-google i { color: #ea4335; font-size: 16px; }
 
 /* --- Generic Helpers --- */
 .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 600; margin-bottom: 20px; transition: color 0.2s; }

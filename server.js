@@ -10,6 +10,7 @@ const express = require('express');
 const session = require('express-session');
 const path    = require('path');
 const db      = require('./config/db');
+const { passport, isConfigured: googleAuthConfigured } = require('./config/passport');
 
 // --- Route Imports ---
 const authRoutes      = require('./routes/authRoutes');
@@ -56,6 +57,8 @@ app.use(session({
   saveUninitialized: false,
   cookie: { maxAge: 1000 * 60 * 60 * 24 }
 }));
+app.use(passport.initialize());
+app.locals.googleAuthConfigured = googleAuthConfigured;
 
 // --- Flash Messages Middleware ---
 app.use((req, res, next) => {
@@ -224,7 +227,8 @@ async function initDB() {
         id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         email VARCHAR(255) NOT NULL UNIQUE,
-        password VARCHAR(255) NOT NULL,
+        password VARCHAR(255) DEFAULT NULL,
+        google_id VARCHAR(255) UNIQUE DEFAULT NULL,
         role_id INT DEFAULT NULL,
         setup_completed TINYINT(1) DEFAULT 0,
         profile_picture MEDIUMTEXT,
@@ -243,6 +247,12 @@ async function initDB() {
     }
     if (!userColNames.includes('xp')) {
       await db.query(`ALTER TABLE users ADD COLUMN xp INT DEFAULT 0`);
+    }
+    if (!userColNames.includes('google_id')) {
+      await db.query(`ALTER TABLE users ADD COLUMN google_id VARCHAR(255) UNIQUE DEFAULT NULL`);
+      // Google-authenticated accounts have no local password, so the
+      // column can no longer be NOT NULL once this column exists.
+      await db.query(`ALTER TABLE users MODIFY password VARCHAR(255) DEFAULT NULL`);
     }
 
     // ---------- TABLE 3: modules ----------

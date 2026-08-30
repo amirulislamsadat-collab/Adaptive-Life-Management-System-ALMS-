@@ -14,12 +14,29 @@ const User = {
     return rows[0] || null;
   },
 
+  findByGoogleId: async (googleId) => {
+    const [rows] = await db.query('SELECT * FROM users WHERE google_id = ?', [googleId]);
+    return rows[0] || null;
+  },
+
   create: async (name, email, hashedPassword) => {
     const [result] = await db.query(
       'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
       [name, email, hashedPassword]
     );
     return result;
+  },
+
+  createGoogleUser: async (name, email, googleId, picture) => {
+    const [result] = await db.query(
+      'INSERT INTO users (name, email, google_id, profile_picture) VALUES (?, ?, ?, ?)',
+      [name, email, googleId, picture || null]
+    );
+    return result;
+  },
+
+  linkGoogleId: async (userId, googleId) => {
+    await db.query('UPDATE users SET google_id = ? WHERE id = ?', [googleId, userId]);
   },
 
   updateRole: async (userId, roleId) => {

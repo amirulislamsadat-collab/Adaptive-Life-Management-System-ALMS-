@@ -50,4 +50,22 @@ exports.postRegister = async (req, res) => {
   }
 };
 
+exports.googleCallback = async (req, res) => {
+  const user = req.user;
+  if (!user) { req.session.error = 'Google sign-in failed. Please try again.'; return res.redirect('/login'); }
+  try {
+    let roleName = 'Member';
+    if (user.role_id) {
+      const role = await Role.findById(user.role_id);
+      if (role) roleName = role.name;
+    }
+    req.session.user = { id: user.id, name: user.name, email: user.email, role: roleName, role_id: user.role_id, setup_completed: user.setup_completed };
+    res.redirect(user.setup_completed ? '/dashboard' : '/setup');
+  } catch (err) {
+    console.error('!!! GOOGLE LOGIN CRASH !!!! ->', err);
+    req.session.error = 'Google sign-in failed. Please try again.';
+    res.redirect('/login');
+  }
+};
+
 exports.logout = (req, res) => { req.session.destroy(); res.redirect('/login'); };
