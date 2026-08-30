@@ -8,10 +8,14 @@ const profileCtrl       = require('../controllers/profileController');
 router.get('/dashboard', dashCtrl.getDashboard);
 router.post('/dashboard/widgets', dashCtrl.postWidgetLayout);
 
-router.get('/setup',          setupCtrl.getSetup);
-router.post('/setup/role',    setupCtrl.postRole);
-router.post('/setup/you',     setupCtrl.postYou);
-router.post('/setup/modules', setupCtrl.postModules);
+router.get('/setup',            setupCtrl.getSetup);
+router.post('/setup/role',      setupCtrl.postRole);
+router.post('/setup/age',       setupCtrl.postAge);
+router.post('/setup/weight',    setupCtrl.postWeight);
+router.post('/setup/activity',  setupCtrl.postActivity);
+router.post('/setup/experience', setupCtrl.postExperience);
+router.post('/setup/avatar',    setupCtrl.postAvatar);
+router.post('/setup/modules',   setupCtrl.postModules);
 
 router.get('/modules/settings',              modCtrl.getSettings);
 router.post('/modules/settings/toggle/:id',  modCtrl.toggleModule);

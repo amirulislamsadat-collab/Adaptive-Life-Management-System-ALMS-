@@ -69,6 +69,32 @@ const User = {
        experience_level = ?, weight_kg = ?, activity_level = ? WHERE id = ?`,
       [gender, skin, hair, shirt, age, experience_level, weight_kg || null, activity_level, userId]
     );
+  },
+
+  // Granular one-field-at-a-time updates for the step-by-step setup wizard
+  // (each screen asks a single question and saves it immediately, so a user
+  // who bails out partway keeps whatever they already answered).
+  updateAge: async (userId, age) => {
+    await db.query('UPDATE users SET age = ? WHERE id = ?', [age, userId]);
+  },
+
+  updateWeight: async (userId, weightKg) => {
+    await db.query('UPDATE users SET weight_kg = ? WHERE id = ?', [weightKg, userId]);
+  },
+
+  updateActivityLevel: async (userId, level) => {
+    await db.query('UPDATE users SET activity_level = ? WHERE id = ?', [level, userId]);
+  },
+
+  updateExperienceLevel: async (userId, level) => {
+    await db.query('UPDATE users SET experience_level = ? WHERE id = ?', [level, userId]);
+  },
+
+  updateAvatarColors: async (userId, { gender, skin, hair, shirt }) => {
+    await db.query(
+      'UPDATE users SET avatar_gender = ?, avatar_skin = ?, avatar_hair = ?, avatar_shirt = ? WHERE id = ?',
+      [gender, skin, hair, shirt, userId]
+    );
   }
 };
 

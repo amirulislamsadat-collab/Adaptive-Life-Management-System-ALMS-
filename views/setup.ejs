@@ -1,25 +1,10 @@
 <%- include('header') %>
 <div class="setup-page">
-  <!-- Stepper -->
-  <% const stepOrder = ['role','you','modules']; const stepIdx = stepOrder.indexOf(step); %>
-  <div class="stepper">
-    <div class="step-item">
-      <div class="step-circle <%= stepIdx===0 ? 'active' : 'done' %>">
-        <%- stepIdx===0 ? '1' : '<i class="fas fa-check"></i>' %>
-      </div>
-      <span class="step-label <%= stepIdx===0 ? 'active' : 'done' %>">Role</span>
-    </div>
-    <div class="step-connector <%= stepIdx>=1 ? 'done' : '' %>"></div>
-    <div class="step-item">
-      <div class="step-circle <%= stepIdx===1 ? 'active' : (stepIdx>1 ? 'done' : 'inactive') %>">
-        <%- stepIdx>1 ? '<i class="fas fa-check"></i>' : '2' %>
-      </div>
-      <span class="step-label <%= stepIdx===1 ? 'active' : (stepIdx>1 ? 'done' : '') %>">You</span>
-    </div>
-    <div class="step-connector <%= stepIdx>=2 ? 'done' : '' %>"></div>
-    <div class="step-item">
-      <div class="step-circle <%= stepIdx===2 ? 'active' : 'inactive' %>">3</div>
-      <span class="step-label <%= stepIdx===2 ? 'active' : '' %>">Modules</span>
+  <% const stepOrder = ['role','age','weight','activity','experience','avatar','modules']; const stepIdx = stepOrder.indexOf(step); %>
+  <div class="setup-progress">
+    <div class="setup-progress-label">Step <%= stepIdx + 1 %> of <%= stepOrder.length %></div>
+    <div class="setup-progress-track">
+      <div class="setup-progress-fill" style="width: <%= Math.round(((stepIdx + 1) / stepOrder.length) * 100) %>%;"></div>
     </div>
   </div>
 
@@ -52,12 +37,132 @@
     }
   </script>
 
-  <% } else if(step === 'you') { %>
-  <div class="setup-mascot">🦉</div>
-  <h1 class="setup-title">Tell us about you, <%= user.name.split(' ')[0] %>!</h1>
-  <p class="setup-sub">Build your avatar and answer a couple quick questions. We'll use this to personalize your targets (sleep, water) and how much we throw at you at once.</p>
+  <% } else if(step === 'age') { %>
+  <div class="setup-mascot">🎂</div>
+  <h1 class="setup-title">How old are you, <%= user.name.split(' ')[0] %>?</h1>
+  <p class="setup-sub">Helps us suggest a healthy sleep range for you. Totally optional.</p>
 
-  <form method="POST" action="/setup/you" id="youForm">
+  <form method="POST" action="/setup/age">
+    <div class="slider-question">
+      <div class="slider-value"><span id="ageVal"><%= user.age || 25 %></span><small>years old</small></div>
+      <input type="range" name="age" id="ageSlider" min="13" max="90" value="<%= user.age || 25 %>" class="range-slider">
+      <div class="slider-minmax"><span>13</span><span>90</span></div>
+    </div>
+    <div class="setup-actions">
+      <a href="/setup" class="btn-back-setup">← Back</a>
+      <div class="setup-actions-right">
+        <button type="submit" name="skip" value="1" class="btn-skip-setup">Skip</button>
+        <button type="submit" class="btn-launch">Continue <i class="fas fa-arrow-right"></i></button>
+      </div>
+    </div>
+  </form>
+  <script>
+    (function() {
+      var s = document.getElementById('ageSlider'), v = document.getElementById('ageVal');
+      s.addEventListener('input', function() { v.textContent = s.value; });
+    })();
+  </script>
+
+  <% } else if(step === 'weight') { %>
+  <div class="setup-mascot">⚖️</div>
+  <h1 class="setup-title">What's your weight?</h1>
+  <p class="setup-sub">Used only to suggest a daily water goal that actually fits you. Optional, never shown to anyone else.</p>
+
+  <form method="POST" action="/setup/weight">
+    <div class="slider-question">
+      <div class="slider-value"><span id="weightVal"><%= user.weight_kg || 65 %></span><small>kg</small></div>
+      <input type="range" name="weight_kg" id="weightSlider" min="30" max="150" value="<%= user.weight_kg || 65 %>" class="range-slider">
+      <div class="slider-minmax"><span>30</span><span>150</span></div>
+    </div>
+    <div class="setup-actions">
+      <a href="/setup?step=age" class="btn-back-setup">← Back</a>
+      <div class="setup-actions-right">
+        <button type="submit" name="skip" value="1" class="btn-skip-setup">Skip</button>
+        <button type="submit" class="btn-launch">Continue <i class="fas fa-arrow-right"></i></button>
+      </div>
+    </div>
+  </form>
+  <script>
+    (function() {
+      var s = document.getElementById('weightSlider'), v = document.getElementById('weightVal');
+      s.addEventListener('input', function() { v.textContent = s.value; });
+    })();
+  </script>
+
+  <% } else if(step === 'activity') { %>
+  <h1 class="setup-title">How active are you day-to-day?</h1>
+  <p class="setup-sub">We'll use this to set a realistic weekly exercise target.</p>
+
+  <form method="POST" action="/setup/activity">
+    <div class="experience-grid">
+      <label class="experience-card">
+        <input type="radio" name="activity_level" value="sedentary">
+        <span class="experience-emoji">🪑</span>
+        <span class="experience-title">Mostly sedentary</span>
+        <span class="experience-desc">Desk job, little exercise</span>
+      </label>
+      <label class="experience-card">
+        <input type="radio" name="activity_level" value="lightly_active" checked>
+        <span class="experience-emoji">🚶</span>
+        <span class="experience-title">Lightly active</span>
+        <span class="experience-desc">Some walking or light exercise</span>
+      </label>
+      <label class="experience-card">
+        <input type="radio" name="activity_level" value="active">
+        <span class="experience-emoji">🏃</span>
+        <span class="experience-title">Active</span>
+        <span class="experience-desc">Regular exercise most weeks</span>
+      </label>
+      <label class="experience-card">
+        <input type="radio" name="activity_level" value="very_active">
+        <span class="experience-emoji">🔥</span>
+        <span class="experience-title">Very active</span>
+        <span class="experience-desc">Intense exercise most days</span>
+      </label>
+    </div>
+    <div class="setup-actions">
+      <a href="/setup?step=weight" class="btn-back-setup">← Back</a>
+      <button type="submit" class="btn-launch">Continue <i class="fas fa-arrow-right"></i></button>
+    </div>
+  </form>
+
+  <% } else if(step === 'experience') { %>
+  <h1 class="setup-title">How on top of your routines are you these days?</h1>
+  <p class="setup-sub">So we know how much to throw at you at once — same idea as picking a starting point in a language app.</p>
+
+  <form method="POST" action="/setup/experience">
+    <div class="experience-grid">
+      <label class="experience-card">
+        <input type="radio" name="experience_level" value="beginner">
+        <span class="experience-emoji">🌱</span>
+        <span class="experience-title">Just starting out</span>
+        <span class="experience-desc">New to tracking things, keep it simple</span>
+      </label>
+      <label class="experience-card">
+        <input type="radio" name="experience_level" value="intermediate" checked>
+        <span class="experience-emoji">🌿</span>
+        <span class="experience-title">Somewhere in between</span>
+        <span class="experience-desc">I've got some habits going already</span>
+      </label>
+      <label class="experience-card">
+        <input type="radio" name="experience_level" value="experienced">
+        <span class="experience-emoji">🌳</span>
+        <span class="experience-title">Pretty on top of it</span>
+        <span class="experience-desc">Give me everything at once</span>
+      </label>
+    </div>
+    <div class="setup-actions">
+      <a href="/setup?step=activity" class="btn-back-setup">← Back</a>
+      <button type="submit" class="btn-launch">Continue <i class="fas fa-arrow-right"></i></button>
+    </div>
+  </form>
+
+  <% } else if(step === 'avatar') { %>
+  <div class="setup-mascot">🦉</div>
+  <h1 class="setup-title">Now, build your avatar!</h1>
+  <p class="setup-sub">Make it yours — this is how you'll show up everywhere in ALMS.</p>
+
+  <form method="POST" action="/setup/avatar" id="avatarForm">
     <div class="avatar-builder" id="avatarBuilder" style="--av-skin:#F0B594;--av-hair:#3B2314;--av-shirt:#5B8DEF;">
       <div class="avatar-preview">
         <div id="avPreviewMale"><%- include('partials/avatar', { gender: 'male', size: 140 }) %></div>
@@ -104,54 +209,8 @@
       </div>
     </div>
 
-    <div class="form-row" style="max-width:420px;margin:0 auto 32px;">
-      <div class="fg">
-        <label for="ageInput">Your age (optional)</label>
-        <input type="number" id="ageInput" name="age" min="10" max="110" placeholder="e.g. 21" class="form-inp">
-      </div>
-      <div class="fg">
-        <label for="weightInput">Weight in kg (optional)</label>
-        <input type="number" id="weightInput" name="weight_kg" min="20" max="300" step="0.1" placeholder="e.g. 65" class="form-inp">
-      </div>
-    </div>
-    <p style="font-size:12px;color:var(--text-muted);text-align:center;margin-top:-24px;margin-bottom:32px;">We only use this to suggest a healthy sleep range and daily water goal. Never shown to anyone else.</p>
-
-    <div class="fg">
-      <label>How active are you day-to-day?</label>
-      <select name="activity_level" class="form-inp" style="max-width:320px;margin:0 auto 32px;display:block;">
-        <option value="sedentary">Mostly sedentary (desk job, little exercise)</option>
-        <option value="lightly_active" selected>Lightly active (some walking/light exercise)</option>
-        <option value="active">Active (regular exercise most weeks)</option>
-        <option value="very_active">Very active (intense exercise most days)</option>
-      </select>
-    </div>
-
-    <div class="fg">
-      <label>How on top of your routines are you these days?</label>
-      <div class="experience-grid">
-        <label class="experience-card">
-          <input type="radio" name="experience_level" value="beginner">
-          <span class="experience-emoji">🌱</span>
-          <span class="experience-title">Just starting out</span>
-          <span class="experience-desc">New to tracking things, keep it simple</span>
-        </label>
-        <label class="experience-card">
-          <input type="radio" name="experience_level" value="intermediate" checked>
-          <span class="experience-emoji">🌿</span>
-          <span class="experience-title">Somewhere in between</span>
-          <span class="experience-desc">I've got some habits going already</span>
-        </label>
-        <label class="experience-card">
-          <input type="radio" name="experience_level" value="experienced">
-          <span class="experience-emoji">🌳</span>
-          <span class="experience-title">Pretty on top of it</span>
-          <span class="experience-desc">Give me everything at once</span>
-        </label>
-      </div>
-    </div>
-
     <div class="setup-actions">
-      <a href="/setup" class="btn-back-setup">← Back</a>
+      <a href="/setup?step=experience" class="btn-back-setup">← Back</a>
       <button type="submit" class="btn-launch"><i class="fas fa-arrow-right"></i> Continue</button>
     </div>
   </form>
@@ -232,7 +291,7 @@
       <% }) %>
     </div>
     <div class="setup-actions">
-      <a href="/setup?step=you" class="btn-back-setup">← Back</a>
+      <a href="/setup?step=avatar" class="btn-back-setup">← Back</a>
       <button type="submit" class="btn-launch"><i class="fas fa-rocket"></i> Launch Workspace</button>
     </div>
   </form>

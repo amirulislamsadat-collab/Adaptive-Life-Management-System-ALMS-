@@ -511,21 +511,32 @@ body.sidebar-hidden .sidebar { display: none; }
   font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;
 }
 
-/* --- Setup Wizard: Stepper --- */
-.stepper { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 48px; }
-.step-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.step-circle {
-  width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  font-weight: 700; font-size: 15px; border: 2px solid var(--border-color); color: var(--text-muted); background: var(--card-bg);
+/* --- Setup Wizard: Progress Bar (Duolingo-style, one question per page) --- */
+.setup-progress { max-width: 420px; margin: 0 auto 40px; }
+.setup-progress-label { text-align: center; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 10px; }
+.setup-progress-track { height: 10px; border-radius: 999px; background: var(--border-color); overflow: hidden; }
+.setup-progress-fill { height: 100%; border-radius: 999px; background: var(--primary); box-shadow: var(--glow-primary); transition: width 0.35s ease; }
+
+/* --- Setup Wizard: single-question slider pages (age, weight) --- */
+.slider-question { max-width: 420px; margin: 0 auto 40px; text-align: center; }
+.slider-value { font-size: 48px; font-weight: 800; color: var(--text-dark); margin-bottom: 24px; }
+.slider-value small { font-size: 16px; font-weight: 600; color: var(--text-muted); margin-left: 6px; }
+.range-slider {
+  -webkit-appearance: none; appearance: none; width: 100%; height: 8px; border-radius: 999px;
+  background: var(--border-color); outline: none; cursor: pointer;
 }
-.step-circle.active { border-color: var(--primary); color: var(--primary); background: rgba(255, 90, 95, 0.08); }
-.step-circle.done { border-color: var(--success); color: #fff; background: var(--success); }
-.step-circle.inactive { border-color: var(--border-color); color: var(--text-muted); }
-.step-label { font-size: 13px; font-weight: 600; color: var(--text-muted); }
-.step-label.active { color: var(--primary); }
-.step-label.done { color: var(--success); }
-.step-connector { width: 60px; height: 2px; background: var(--border-color); }
-.step-connector.done { background: var(--success); }
+.range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--primary); border: 4px solid var(--card-bg); box-shadow: var(--shadow-md); cursor: pointer;
+}
+.range-slider::-moz-range-thumb {
+  width: 28px; height: 28px; border-radius: 50%; background: var(--primary);
+  border: 4px solid var(--card-bg); box-shadow: var(--shadow-md); cursor: pointer;
+}
+.slider-minmax { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-top: 8px; }
+.setup-actions-right { display: flex; gap: 16px; align-items: center; }
+.btn-skip-setup { background: none; border: none; color: var(--text-muted); font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; padding: 8px; }
+.btn-skip-setup:hover { color: var(--text-dark); }
 
 /* --- Setup Wizard: Role Selection --- */
 .role-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; margin-bottom: 40px; }

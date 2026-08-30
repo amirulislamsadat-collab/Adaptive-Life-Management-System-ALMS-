@@ -45,8 +45,12 @@ exports.postAvatar = async (req, res) => {
   const skin = req.body.skin || req.session.user.avatar_skin;
   const hair = req.body.hair || req.session.user.avatar_hair;
   const shirt = req.body.shirt || req.session.user.avatar_shirt;
-  const age = req.body.age ? parseInt(req.body.age, 10) : req.session.user.age;
-  const weight_kg = req.body.weight_kg ? parseFloat(req.body.weight_kg) : req.session.user.weight_kg;
+  // Sliders always carry *some* numeric value, unlike the old text boxes which
+  // could be left blank — so "was this field actually touched" has to travel
+  // as its own flag, or an untouched slider would silently overwrite a
+  // deliberately-unset age/weight with whatever the slider defaulted to.
+  const age = req.body.age_touched === '1' ? (parseInt(req.body.age, 10) || null) : req.session.user.age;
+  const weight_kg = req.body.weight_touched === '1' ? (parseFloat(req.body.weight_kg) || null) : req.session.user.weight_kg;
   const experience = ['beginner', 'intermediate', 'experienced'].includes(req.body.experience_level)
     ? req.body.experience_level : req.session.user.experience_level;
   const activity_level = ['sedentary', 'lightly_active', 'active', 'very_active'].includes(req.body.activity_level)

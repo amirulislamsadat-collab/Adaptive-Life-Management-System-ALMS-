@@ -96,12 +96,16 @@
 
       <div class="form-row">
         <div class="fg">
-          <label for="ageInput">Age</label>
-          <input type="number" id="ageInput" name="age" min="10" max="110" value="<%= user.age || '' %>" placeholder="e.g. 21">
+          <label for="ageInput">Age: <span id="ageVal"><%= user.age || 'Not set' %></span></label>
+          <input type="range" id="ageInput" name="age" min="13" max="90" value="<%= user.age || 25 %>" class="range-slider"
+            oninput="document.getElementById('ageVal').textContent=this.value; document.getElementById('ageTouched').value='1';">
+          <input type="hidden" name="age_touched" id="ageTouched" value="<%= user.age ? '1' : '0' %>">
         </div>
         <div class="fg">
-          <label for="weightInput">Weight (kg)</label>
-          <input type="number" id="weightInput" name="weight_kg" min="20" max="300" step="0.1" value="<%= user.weight_kg || '' %>" placeholder="e.g. 65">
+          <label for="weightInput">Weight: <span id="weightVal"><%= user.weight_kg ? user.weight_kg + ' kg' : 'Not set' %></span></label>
+          <input type="range" id="weightInput" name="weight_kg" min="30" max="150" value="<%= user.weight_kg || 65 %>" class="range-slider"
+            oninput="document.getElementById('weightVal').textContent=this.value+' kg'; document.getElementById('weightTouched').value='1';">
+          <input type="hidden" name="weight_touched" id="weightTouched" value="<%= user.weight_kg ? '1' : '0' %>">
         </div>
       </div>
 
