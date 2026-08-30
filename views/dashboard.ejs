@@ -23,6 +23,48 @@
   </div>
   <% } %>
 
+  <div class="checkin-card" id="checkinPromptCard" hidden>
+    <div class="checkin-card-icon"><i class="fas fa-clipboard-check" aria-hidden="true"></i></div>
+    <div class="checkin-card-body">
+      <div class="checkin-card-title">How's today looking?</div>
+      <div class="checkin-card-sub">A 30-second check-in: energy, water goal, and today's one focus. +15 XP.</div>
+    </div>
+    <button type="button" class="btn primary btn-sm" id="checkinStartBtn">Check In</button>
+  </div>
+
+  <div class="ios-install-modal" id="checkinModal" hidden>
+    <div class="ios-install-box install-picker-box">
+      <button type="button" class="ios-install-close" id="checkinModalClose" aria-label="Close">&times;</button>
+      <div class="ios-install-icon"><i class="fas fa-clipboard-check" aria-hidden="true"></i></div>
+      <h3>Daily Check-In</h3>
+      <form id="checkinForm">
+        <div class="fg">
+          <label>Energy today</label>
+          <div class="energy-picker">
+            <% ['😴','😕','🙂','😃','🤩'].forEach(function(emoji, i){ %>
+              <label class="energy-opt">
+                <input type="radio" name="energy_level" value="<%= i+1 %>" <%= i===2?'checked':'' %>>
+                <span><%= emoji %></span>
+              </label>
+            <% }) %>
+          </div>
+        </div>
+        <div class="fg">
+          <label>Water goal today: <span id="waterGoalValue"><%= today.waterGoal %></span> ml</label>
+          <input type="range" name="water_goal_ml" id="waterGoalSlider" min="500" max="4000" step="250" value="<%= today.waterGoal %>" style="width:100%;">
+        </div>
+        <div class="fg">
+          <label for="checkinFocus">Your one focus for today (optional)</label>
+          <input type="text" id="checkinFocus" name="focus_text" placeholder="e.g. Finish the project proposal" maxlength="255">
+        </div>
+        <% if(enabledSlugs.indexOf('health') !== -1){ %>
+          <a href="/mood/new" class="btn secondary btn-sm" style="width:100%;justify-content:center;margin-bottom:14px;"><i class="fas fa-smile" aria-hidden="true"></i> Also log today's mood</a>
+        <% } %>
+        <button type="submit" class="btn primary" style="width:100%;" id="checkinSubmitBtn">Complete Check-In</button>
+      </form>
+    </div>
+  </div>
+
   <form class="quick-add-bar" method="POST" action="/tasks/quick-add" id="quickAddForm">
     <i class="fas fa-plus quick-add-icon" aria-hidden="true"></i>
     <input type="text" name="text" placeholder='Quick-add a task — try "buy groceries tomorrow high priority"' autocomplete="off">
@@ -194,4 +236,66 @@
     </a>
   </div>
 </div>
+<script>
+(function() {
+  function localDateStr() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  var today = localDateStr();
+  var promptCard = document.getElementById('checkinPromptCard');
+  var modal = document.getElementById('checkinModal');
+  var startBtn = document.getElementById('checkinStartBtn');
+  var closeBtn = document.getElementById('checkinModalClose');
+  var form = document.getElementById('checkinForm');
+  var slider = document.getElementById('waterGoalSlider');
+  var sliderValue = document.getElementById('waterGoalValue');
+  if (!promptCard || !modal) return;
+
+  fetch('/checkin/status?date=' + today)
+    .then(function(r) { return r.json(); })
+    .then(function(data) { promptCard.hidden = !!data.completed; })
+    .catch(function() {});
+
+  slider.addEventListener('input', function() { sliderValue.textContent = slider.value; });
+  startBtn.addEventListener('click', function() { modal.hidden = false; });
+  closeBtn.addEventListener('click', function() { modal.hidden = true; });
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var submitBtn = document.getElementById('checkinSubmitBtn');
+    submitBtn.disabled = true;
+    fetch('/checkin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        checkin_date: today,
+        energy_level: form.energy_level.value,
+        water_goal_ml: slider.value,
+        focus_text: document.getElementById('checkinFocus').value
+      })
+    })
+      .then(function(r) { return r.json().then(function(data) { return { ok: r.ok, data: data }; }); })
+      .then(function(res) {
+        if (!res.ok) { showCheckinToast(res.data.error || 'Something went wrong.', true); submitBtn.disabled = false; return; }
+        modal.hidden = true;
+        promptCard.hidden = true;
+        var msg = res.data.note + ' (+' + res.data.xpAwarded + ' XP)';
+        if (res.data.leveledUp) msg += ' — 🎉 Level up! You\'re now Level ' + res.data.newLevel + ': ' + res.data.newTitle;
+        showCheckinToast(msg, false);
+        setTimeout(function() { location.reload(); }, 2200);
+      })
+      .catch(function() { showCheckinToast("Couldn't save your check-in — check your connection and try again.", true); submitBtn.disabled = false; });
+  });
+
+  function showCheckinToast(text, isError) {
+    var toast = document.createElement('div');
+    toast.className = 'flash ' + (isError ? 'flash-error' : 'flash-success');
+    toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:600;max-width:90vw;';
+    toast.innerHTML = '<i class="fas fa-' + (isError ? 'exclamation-triangle' : 'check-circle') + '" aria-hidden="true"></i> ' + text;
+    document.body.appendChild(toast);
+    setTimeout(function() { toast.remove(); }, isError ? 4000 : 2200);
+  });
+})();
+</script>
 <%- include('footer') %>

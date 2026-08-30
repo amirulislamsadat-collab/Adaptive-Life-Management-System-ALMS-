@@ -30,6 +30,7 @@ const goalRoutes      = require('./routes/goalRoutes');
 const journalRoutes   = require('./routes/journalRoutes');
 const focusRoutes     = require('./routes/focusRoutes');
 const assistantRoutes = require('./routes/assistantRoutes');
+const checkinRoutes   = require('./routes/checkinRoutes');
 const assistantCtrl   = require('./controllers/assistantController');
 
 // --- Middleware Imports ---
@@ -115,6 +116,7 @@ app.use(async (req, res, next) => {
       if (fresh) {
         req.session.user.xp = fresh.xp || 0;
         req.session.user.profile_picture = fresh.profile_picture || null;
+        req.session.user.daily_water_goal_ml = fresh.daily_water_goal_ml || 2000;
       }
       res.locals.levelInfo = Gamification.getLevelInfo(req.session.user.xp || 0);
     } catch (err) {
@@ -145,6 +147,7 @@ app.use('/', goalRoutes);
 app.use('/', journalRoutes);
 app.use('/', focusRoutes);
 app.use('/', assistantRoutes);
+app.use('/', checkinRoutes);
 
 // --- Notifications API (for client-side polling without page refresh) ---
 const Reminder = require('./models/Reminder');
@@ -257,6 +260,9 @@ async function initDB() {
       // Google-authenticated accounts have no local password, so the
       // column can no longer be NOT NULL once this column exists.
       await db.query(`ALTER TABLE users MODIFY password VARCHAR(255) DEFAULT NULL`);
+    }
+    if (!userColNames.includes('daily_water_goal_ml')) {
+      await db.query(`ALTER TABLE users ADD COLUMN daily_water_goal_ml INT DEFAULT 2000`);
     }
 
     // ---------- TABLE 3: modules ----------
@@ -728,7 +734,22 @@ async function initDB() {
       )
     `);
 
-    console.log('[DB] All 30 tables created and seeded successfully.');
+    // ---------- TABLE 31: daily_checkins (energy/water-goal/today's-focus, one per local day) ----------
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS daily_checkins (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        checkin_date DATE NOT NULL,
+        energy_level TINYINT NOT NULL,
+        water_goal_ml INT NOT NULL,
+        focus_text VARCHAR(255),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY uq_user_date (user_id, checkin_date),
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    console.log('[DB] All 31 tables created and seeded successfully.');
   } catch (err) {
     console.error('[DB] Initialization error ->', err.message);
   }

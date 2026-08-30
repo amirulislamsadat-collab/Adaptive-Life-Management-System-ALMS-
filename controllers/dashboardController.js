@@ -59,7 +59,7 @@ exports.getDashboard = async (req, res) => {
       remindersDue,
       todaysEvents,
       waterTotal,
-      waterGoal: 2000,
+      waterGoal: req.session.user.daily_water_goal_ml || 2000,
       activeFocus
     };
 

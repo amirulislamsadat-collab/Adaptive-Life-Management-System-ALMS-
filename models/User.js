@@ -53,6 +53,10 @@ const User = {
 
   updateName: async (userId, name) => {
     await db.query('UPDATE users SET name = ? WHERE id = ?', [name, userId]);
+  },
+
+  updateWaterGoal: async (userId, ml) => {
+    await db.query('UPDATE users SET daily_water_goal_ml = ? WHERE id = ?', [ml, userId]);
   }
 };
 

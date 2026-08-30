@@ -810,6 +810,27 @@ body.sidebar-hidden .sidebar { display: none; }
 .focus-banner-title { font-weight: 700; font-size: 15px; }
 .focus-banner-sub { font-size: 13px; opacity: 0.8; margin-top: 2px; }
 
+/* --- Daily Check-In --- */
+.checkin-card {
+  display: flex; align-items: center; gap: 16px; background: var(--card-bg); border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg); padding: 18px 22px; margin-bottom: 24px; box-shadow: var(--glow-primary);
+}
+.checkin-card-icon {
+  width: 44px; height: 44px; border-radius: 50%; background: rgba(255,90,95,0.1); color: var(--primary);
+  display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
+}
+.checkin-card-body { flex: 1; }
+.checkin-card-title { font-weight: 700; font-size: 15px; color: var(--text-dark); }
+.checkin-card-sub { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+.energy-picker { display: flex; gap: 8px; margin-top: 8px; }
+.energy-opt { flex: 1; }
+.energy-opt input { position: absolute; opacity: 0; }
+.energy-opt span {
+  display: flex; align-items: center; justify-content: center; font-size: 24px; padding: 10px 0;
+  border: 1px solid var(--border-color); border-radius: var(--radius-sm); cursor: pointer; transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.energy-opt input:checked + span { border-color: var(--primary); box-shadow: var(--glow-primary); }
+
 /* --- Quick-Add bar --- */
 .quick-add-bar {
   display: flex; align-items: center; gap: 12px; background: var(--card-bg); border: 1px solid var(--border-color);

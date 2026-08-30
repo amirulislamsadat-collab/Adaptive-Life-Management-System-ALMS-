@@ -4,17 +4,16 @@
 const WaterLog = require('../models/WaterLog');
 const Gamification = require('../models/Gamification');
 
-const DAILY_GOAL_ML = 2000;
-
 exports.getWaterLogs = async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
   try {
+    const goal = req.session.user.daily_water_goal_ml || 2000;
     const [logs, todayTotal] = await Promise.all([
       WaterLog.findAllByUser(req.session.user.id),
       WaterLog.getTodayTotal(req.session.user.id)
     ]);
-    const progress = Math.min(100, Math.round((todayTotal / DAILY_GOAL_ML) * 100));
-    res.render('water-list', { user: req.session.user, logs, todayTotal, goal: DAILY_GOAL_ML, progress });
+    const progress = Math.min(100, Math.round((todayTotal / goal) * 100));
+    res.render('water-list', { user: req.session.user, logs, todayTotal, goal, progress });
   } catch (err) {
     console.error('Water list error:', err);
     req.session.error = 'Failed to load water intake logs.';
