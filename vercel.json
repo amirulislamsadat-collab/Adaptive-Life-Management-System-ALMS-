@@ -9,7 +9,6 @@
     { "src": "/js/(.*)", "dest": "/public/js/$1" },
     { "src": "/icons/(.*)", "dest": "/public/icons/$1" },
     { "src": "/manifest.json", "dest": "/public/manifest.json" },
-    { "src": "/service-worker.js", "dest": "/public/service-worker.js" },
     { "src": "/offline.html", "dest": "/public/offline.html" },
     { "src": "/(.*)", "dest": "/server.js" }
   ],

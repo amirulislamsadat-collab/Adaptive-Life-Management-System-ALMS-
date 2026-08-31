@@ -54,6 +54,16 @@ app.set('views', path.join(__dirname, 'views'));
 // (submitted as a normal form field, not multipart) fits in one request.
 app.use(express.urlencoded({ extended: true, limit: '4mb' }));
 app.use(express.json({ limit: '4mb' }));
+
+// Browsers only re-check a service worker for updates roughly once every 24
+// hours unless the file itself says not to cache it — without this, a fixed
+// service-worker.js (like the caching-bug fix below) could take up to a day
+// to actually reach anyone who already has the old one installed.
+app.get('/service-worker.js', (req, res) => {
+  res.set('Cache-Control', 'no-cache');
+  res.sendFile(path.join(__dirname, 'public', 'service-worker.js'));
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // --- DB Ready Gate ---

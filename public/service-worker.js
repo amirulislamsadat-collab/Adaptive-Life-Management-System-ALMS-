@@ -4,8 +4,15 @@
 // dashboards, etc. change every request), so pages are fetched fresh from
 // the network every time — caching is limited to static assets (CSS, icons)
 // plus a single offline fallback page for when there's no connection at all.
+//
+// Static assets are network-first, not cache-first: this app changes CSS/JS
+// often, and a cache-first strategy meant anyone who'd already loaded the
+// app once would keep seeing the old stylesheet forever, no matter how many
+// times the site got redeployed, since nothing ever told the cache it was
+// stale. Network-first means every visit gets whatever's actually live when
+// online; the cache only kicks in as a fallback if the network fails.
 // ============================================================
-const CACHE_NAME = 'alms-static-v1';
+const CACHE_NAME = 'alms-static-v2';
 const STATIC_ASSETS = [
   '/css/style.css',
   '/manifest.json',
@@ -34,14 +41,16 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(req.url);
 
-  // Static assets: cache-first for speed, network as a fallback/refresh.
+  // Static assets: network-first, so a redeploy shows up on the very next
+  // load instead of being silently masked by a stale cache. The cache is
+  // only a fallback for when there's genuinely no connection.
   if (STATIC_ASSETS.some((path) => url.pathname === path)) {
     event.respondWith(
-      caches.match(req).then((cached) => cached || fetch(req).then((res) => {
+      fetch(req).then((res) => {
         const clone = res.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
         return res;
-      }))
+      }).catch(() => caches.match(req))
     );
     return;
   }
