@@ -42,6 +42,12 @@
     <form method="POST" action="/savings-goals/<%= goal.id %>/contributions/add" style="display:flex;gap:10px;align-items:flex-end;margin-bottom:24px;flex-wrap:wrap;" id="addContributionForm">
       <div class="fg" style="margin-bottom:0;flex:1;min-width:140px;">
         <label for="contribAmount">Amount</label>
+        <div class="quick-chip-row">
+          <button type="button" class="quick-chip" data-target="contribAmount" data-val="10">$10</button>
+          <button type="button" class="quick-chip" data-target="contribAmount" data-val="25">$25</button>
+          <button type="button" class="quick-chip" data-target="contribAmount" data-val="50">$50</button>
+          <button type="button" class="quick-chip" data-target="contribAmount" data-val="100">$100</button>
+        </div>
         <input id="contribAmount" type="number" name="amount" min="0.01" step="0.01" required placeholder="50.00">
       </div>
       <div class="fg" style="margin-bottom:0;flex:1;min-width:140px;">

@@ -33,40 +33,38 @@
 
         <div class="fg">
           <label>Priority</label>
-          <div class="radio-group-inline" style="display:flex;gap:15px;margin-top:10px;">
-            <label style="display:flex;align-items:center;gap:5px;font-weight:normal;color:var(--text-main);">
-              <input type="radio" name="priority" value="low" <%= currentTask && currentTask.priority === 'low' ? 'checked' : '' %>>
-              <i class="fas fa-arrow-down" style="color:#10b981;" aria-hidden="true"></i> Low
-            </label>
-            <label style="display:flex;align-items:center;gap:5px;font-weight:normal;color:var(--text-main);">
-              <input type="radio" name="priority" value="medium" <%= !currentTask || currentTask.priority === 'medium' ? 'checked' : '' %>>
-              <i class="fas fa-minus" style="color:#f59e0b;" aria-hidden="true"></i> Medium
-            </label>
-            <label style="display:flex;align-items:center;gap:5px;font-weight:normal;color:var(--text-main);">
-              <input type="radio" name="priority" value="high" <%= currentTask && currentTask.priority === 'high' ? 'checked' : '' %>>
-              <i class="fas fa-arrow-up" style="color:#ef4444;" aria-hidden="true"></i> High
-            </label>
+          <div class="pill-picker">
+            <input type="radio" id="prioLow" name="priority" value="low" <%= currentTask && currentTask.priority === 'low' ? 'checked' : '' %>>
+            <label class="pill-option" for="prioLow"><i class="fas fa-arrow-down" style="color:#10b981;" aria-hidden="true"></i> Low</label>
+            <input type="radio" id="prioMedium" name="priority" value="medium" <%= !currentTask || currentTask.priority === 'medium' ? 'checked' : '' %>>
+            <label class="pill-option" for="prioMedium"><i class="fas fa-minus" style="color:#f59e0b;" aria-hidden="true"></i> Medium</label>
+            <input type="radio" id="prioHigh" name="priority" value="high" <%= currentTask && currentTask.priority === 'high' ? 'checked' : '' %>>
+            <label class="pill-option" for="prioHigh"><i class="fas fa-arrow-up" style="color:#ef4444;" aria-hidden="true"></i> High</label>
           </div>
         </div>
       </div>
       
-      <div class="form-row">
-        <div class="fg">
-          <label for="taskDifficulty">Difficulty Level</label>
-          <select id="taskDifficulty" name="difficulty">
-          <option value="easy" <%= currentTask && currentTask.difficulty === 'easy' ? 'selected' : '' %>>Easy</option>
-          <option value="normal" <%= !currentTask || currentTask.difficulty === 'normal' ? 'selected' : '' %>>Normal</option>
-          <option value="hard" <%= currentTask && currentTask.difficulty === 'hard' ? 'selected' : '' %>>Hard</option>
-          </select>
+      <div class="fg">
+        <label>Difficulty Level</label>
+        <div class="pill-picker">
+          <input type="radio" id="diffEasy" name="difficulty" value="easy" <%= currentTask && currentTask.difficulty === 'easy' ? 'checked' : '' %>>
+          <label class="pill-option" for="diffEasy"><span class="pill-emoji">🟢</span> Easy</label>
+          <input type="radio" id="diffNormal" name="difficulty" value="normal" <%= !currentTask || currentTask.difficulty === 'normal' ? 'checked' : '' %>>
+          <label class="pill-option" for="diffNormal"><span class="pill-emoji">🟡</span> Normal</label>
+          <input type="radio" id="diffHard" name="difficulty" value="hard" <%= currentTask && currentTask.difficulty === 'hard' ? 'checked' : '' %>>
+          <label class="pill-option" for="diffHard"><span class="pill-emoji">🔴</span> Hard</label>
         </div>
+      </div>
 
-        <div class="fg">
-          <label for="taskAvail">Time Availability</label>
-          <select id="taskAvail" name="availability">
-          <option value="flexible" <%= !currentTask || currentTask.availability === 'flexible' ? 'selected' : '' %>>Flexible</option>
-          <option value="urgent" <%= currentTask && currentTask.availability === 'urgent' ? 'selected' : '' %>>Urgent</option>
-          <option value="weekend" <%= currentTask && currentTask.availability === 'weekend' ? 'selected' : '' %>>Weekend</option>
-          </select>
+      <div class="fg">
+        <label>Time Availability</label>
+        <div class="pill-picker">
+          <input type="radio" id="availFlexible" name="availability" value="flexible" <%= !currentTask || currentTask.availability === 'flexible' ? 'checked' : '' %>>
+          <label class="pill-option" for="availFlexible"><span class="pill-emoji">🌤️</span> Flexible</label>
+          <input type="radio" id="availUrgent" name="availability" value="urgent" <%= currentTask && currentTask.availability === 'urgent' ? 'checked' : '' %>>
+          <label class="pill-option" for="availUrgent"><span class="pill-emoji">⚡</span> Urgent</label>
+          <input type="radio" id="availWeekend" name="availability" value="weekend" <%= currentTask && currentTask.availability === 'weekend' ? 'checked' : '' %>>
+          <label class="pill-option" for="availWeekend"><span class="pill-emoji">🌅</span> Weekend</label>
         </div>
       </div>
 

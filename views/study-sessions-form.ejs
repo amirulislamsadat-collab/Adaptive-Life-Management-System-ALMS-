@@ -26,22 +26,30 @@
           <input id="sDate" type="datetime-local" name="session_date" required value="<%= session ? new Date(session.session_date).toISOString().slice(0,16) : '' %>">
         </div>
       </div>
-      <div class="form-row">
-        <div class="fg">
-          <label for="sDuration">Planned Duration (minutes)</label>
-          <input id="sDuration" type="number" name="duration_minutes" min="5" step="5" value="<%= session ? session.duration_minutes : 60 %>">
+      <div class="fg">
+        <label for="sDuration">Planned Duration: <span class="live-val" id="sDurationVal"><%= session ? session.duration_minutes : 60 %></span> min</label>
+        <div class="quick-chip-row">
+          <button type="button" class="quick-chip" data-target="sDuration" data-val="15">15 min</button>
+          <button type="button" class="quick-chip" data-target="sDuration" data-val="30">30 min</button>
+          <button type="button" class="quick-chip" data-target="sDuration" data-val="60">1 hr</button>
+          <button type="button" class="quick-chip" data-target="sDuration" data-val="90">90 min</button>
         </div>
-        <% if(session){ %>
-        <div class="fg">
-          <label for="sStatus">Status</label>
-          <select id="sStatus" name="status">
-            <option value="planned" <%= session.status==='planned' ? 'selected' : '' %>>Planned</option>
-            <option value="completed" <%= session.status==='completed' ? 'selected' : '' %>>Completed</option>
-            <option value="missed" <%= session.status==='missed' ? 'selected' : '' %>>Missed</option>
-          </select>
-        </div>
-        <% } %>
+        <input id="sDuration" type="range" name="duration_minutes" min="5" max="240" step="5" value="<%= session ? session.duration_minutes : 60 %>" class="range-slider" data-live-label="sDurationVal">
+        <div class="slider-minmax"><span>5 min</span><span>4 hrs</span></div>
       </div>
+      <% if(session){ %>
+      <div class="fg">
+        <label>Status</label>
+        <div class="pill-picker">
+          <input type="radio" id="statPlanned" name="status" value="planned" <%= session.status==='planned' ? 'checked' : '' %>>
+          <label class="pill-option" for="statPlanned"><span class="pill-emoji">🗓️</span> Planned</label>
+          <input type="radio" id="statCompleted" name="status" value="completed" <%= session.status==='completed' ? 'checked' : '' %>>
+          <label class="pill-option" for="statCompleted"><span class="pill-emoji">✅</span> Completed</label>
+          <input type="radio" id="statMissed" name="status" value="missed" <%= session.status==='missed' ? 'checked' : '' %>>
+          <label class="pill-option" for="statMissed"><span class="pill-emoji">😅</span> Missed</label>
+        </div>
+      </div>
+      <% } %>
       <div class="fg">
         <label for="sNotes">Notes</label>
         <textarea id="sNotes" name="notes" placeholder="Topics to cover, goals for this session..." rows="4"><%= session ? session.notes || '' : '' %></textarea>

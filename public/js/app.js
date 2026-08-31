@@ -56,6 +56,40 @@ window.almsCelebrate = function () {
     history.replaceState({}, '', url);
   }
 
+  // --- Fun sliders: any range input marked data-live-label gets its value
+  // mirrored into the labeled element live as it's dragged, and any
+  // .quick-chip button wired to data-target sets that slider directly (tap
+  // "500ml" instead of dragging to exactly the right spot). Used across the
+  // module log forms (water, exercise, screen time, study sessions, etc.)
+  // instead of plain number boxes. ---
+  document.querySelectorAll('input[type="range"][data-live-label]').forEach(function (slider) {
+    var label = document.getElementById(slider.dataset.liveLabel);
+    if (!label) return;
+    var suffix = slider.dataset.liveSuffix || '';
+    var update = function () { label.textContent = slider.value + suffix; };
+    slider.addEventListener('input', update);
+  });
+
+  // --- Any [data-toggle-target] button shows/hides the element it names
+  // (e.g. "Or log a custom amount" revealing a hidden slider form). ---
+  document.querySelectorAll('[data-toggle-target]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var target = document.getElementById(btn.dataset.toggleTarget);
+      if (target) target.hidden = !target.hidden;
+    });
+  });
+
+  document.querySelectorAll('.quick-chip[data-target]').forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      var target = document.getElementById(chip.dataset.target);
+      if (!target) return;
+      target.value = chip.dataset.val;
+      target.dispatchEvent(new Event('input'));
+      document.querySelectorAll('.quick-chip[data-target="' + chip.dataset.target + '"]').forEach(function (c) { c.classList.remove('active'); });
+      chip.classList.add('active');
+    });
+  });
+
   // --- Service worker (installability + offline fallback) ---
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {

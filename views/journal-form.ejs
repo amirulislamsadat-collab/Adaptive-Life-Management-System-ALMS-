@@ -13,15 +13,21 @@
           <input id="jDate" type="date" name="entry_date" required value="<%= entry ? new Date(entry.entry_date).toISOString().slice(0,10) : new Date().toISOString().slice(0,10) %>">
         </div>
         <div class="fg">
-          <label for="jMood">Mood (optional)</label>
-          <select id="jMood" name="mood_tag">
-            <option value="">Skip this</option>
-            <option value="great" <%= entry && entry.mood_tag==='great' ? 'selected' : '' %>>😄 Great</option>
-            <option value="good" <%= entry && entry.mood_tag==='good' ? 'selected' : '' %>>🙂 Good</option>
-            <option value="okay" <%= entry && entry.mood_tag==='okay' ? 'selected' : '' %>>😐 Okay</option>
-            <option value="low" <%= entry && entry.mood_tag==='low' ? 'selected' : '' %>>😕 Low</option>
-            <option value="bad" <%= entry && entry.mood_tag==='bad' ? 'selected' : '' %>>😞 Bad</option>
-          </select>
+          <label>Mood (optional)</label>
+          <div class="pill-picker">
+            <input type="radio" id="jmSkip" name="mood_tag" value="" <%= !entry || !entry.mood_tag ? 'checked' : '' %>>
+            <label class="pill-option" for="jmSkip">Skip</label>
+            <input type="radio" id="jmGreat" name="mood_tag" value="great" <%= entry && entry.mood_tag==='great' ? 'checked' : '' %>>
+            <label class="pill-option" for="jmGreat"><span class="pill-emoji">😄</span> Great</label>
+            <input type="radio" id="jmGood" name="mood_tag" value="good" <%= entry && entry.mood_tag==='good' ? 'checked' : '' %>>
+            <label class="pill-option" for="jmGood"><span class="pill-emoji">🙂</span> Good</label>
+            <input type="radio" id="jmOkay" name="mood_tag" value="okay" <%= entry && entry.mood_tag==='okay' ? 'checked' : '' %>>
+            <label class="pill-option" for="jmOkay"><span class="pill-emoji">😐</span> Okay</label>
+            <input type="radio" id="jmLow" name="mood_tag" value="low" <%= entry && entry.mood_tag==='low' ? 'checked' : '' %>>
+            <label class="pill-option" for="jmLow"><span class="pill-emoji">😕</span> Low</label>
+            <input type="radio" id="jmBad" name="mood_tag" value="bad" <%= entry && entry.mood_tag==='bad' ? 'checked' : '' %>>
+            <label class="pill-option" for="jmBad"><span class="pill-emoji">😞</span> Bad</label>
+          </div>
         </div>
       </div>
       <div class="fg">

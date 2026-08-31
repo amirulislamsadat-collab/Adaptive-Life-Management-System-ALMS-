@@ -25,12 +25,15 @@
         </div>
       </div>
       <div class="fg">
-        <label for="medFreq">Frequency <span class="required">*</span></label>
-        <select id="medFreq" name="frequency">
-          <option value="daily" <%= !medication || medication.frequency==='daily' ? 'selected' : '' %>>Daily</option>
-          <option value="weekdays" <%= medication && medication.frequency==='weekdays' ? 'selected' : '' %>>Weekdays (Mon-Fri)</option>
-          <option value="custom" <%= medication && medication.frequency==='custom' ? 'selected' : '' %>>Custom weekdays</option>
-        </select>
+        <label>Frequency <span class="required">*</span></label>
+        <div class="pill-picker">
+          <input type="radio" id="medFreqDaily" name="frequency" value="daily" <%= !medication || medication.frequency==='daily' ? 'checked' : '' %>>
+          <label class="pill-option" for="medFreqDaily"><span class="pill-emoji">📅</span> Daily</label>
+          <input type="radio" id="medFreqWeekdays" name="frequency" value="weekdays" <%= medication && medication.frequency==='weekdays' ? 'checked' : '' %>>
+          <label class="pill-option" for="medFreqWeekdays"><span class="pill-emoji">💼</span> Weekdays</label>
+          <input type="radio" id="medFreqCustom" name="frequency" value="custom" <%= medication && medication.frequency==='custom' ? 'checked' : '' %>>
+          <label class="pill-option" for="medFreqCustom"><span class="pill-emoji">🎛️</span> Custom</label>
+        </div>
       </div>
       <div class="fg" id="daysWrap" style="display:none;">
         <label>Custom Weekdays</label>
@@ -56,10 +59,13 @@
 </div>
 <script>
 (function(){
-  const freq = document.getElementById('medFreq');
+  const freqInputs = document.querySelectorAll('input[name="frequency"]');
   const wrap = document.getElementById('daysWrap');
-  function toggleDays(){ wrap.style.display = freq.value === 'custom' ? 'block' : 'none'; }
-  freq.addEventListener('change', toggleDays);
+  function toggleDays(){
+    const checked = document.querySelector('input[name="frequency"]:checked');
+    wrap.style.display = checked && checked.value === 'custom' ? 'block' : 'none';
+  }
+  freqInputs.forEach(function(el){ el.addEventListener('change', toggleDays); });
   toggleDays();
 })();
 </script>

@@ -21,8 +21,15 @@
         </div>
       </div>
       <div class="fg">
-        <label for="stMinutes">Duration (minutes) <span class="required">*</span></label>
-        <input id="stMinutes" type="number" name="minutes" min="1" required value="<%= log ? log.minutes : '' %>">
+        <label for="stMinutes">Duration: <span class="live-val" id="stMinutesVal"><%= log ? log.minutes : 30 %></span> min <span class="required">*</span></label>
+        <div class="quick-chip-row">
+          <button type="button" class="quick-chip" data-target="stMinutes" data-val="15">15 min</button>
+          <button type="button" class="quick-chip" data-target="stMinutes" data-val="30">30 min</button>
+          <button type="button" class="quick-chip" data-target="stMinutes" data-val="60">1 hr</button>
+          <button type="button" class="quick-chip" data-target="stMinutes" data-val="120">2 hrs</button>
+        </div>
+        <input id="stMinutes" type="range" name="minutes" min="5" max="480" step="5" required value="<%= log ? log.minutes : 30 %>" class="range-slider" data-live-label="stMinutesVal">
+        <div class="slider-minmax"><span>5 min</span><span>8 hrs</span></div>
       </div>
       <div class="fg">
         <label>Category</label>

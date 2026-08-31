@@ -12,12 +12,15 @@
         <input id="hName" type="text" name="name" required placeholder="e.g. Read 20 minutes, No phone after 10pm" value="<%= habit ? habit.name : '' %>">
       </div>
       <div class="fg">
-        <label for="hFreq">Frequency</label>
-        <select id="hFreq" name="frequency">
-          <option value="daily" <%= !habit || habit.frequency==='daily' ? 'selected' : '' %>>Daily</option>
-          <option value="weekdays" <%= habit && habit.frequency==='weekdays' ? 'selected' : '' %>>Weekdays (Mon-Fri)</option>
-          <option value="weekly" <%= habit && habit.frequency==='weekly' ? 'selected' : '' %>>Weekly</option>
-        </select>
+        <label>Frequency</label>
+        <div class="pill-picker">
+          <input type="radio" id="freqDaily" name="frequency" value="daily" <%= !habit || habit.frequency==='daily' ? 'checked' : '' %>>
+          <label class="pill-option" for="freqDaily"><span class="pill-emoji">📅</span> Daily</label>
+          <input type="radio" id="freqWeekdays" name="frequency" value="weekdays" <%= habit && habit.frequency==='weekdays' ? 'checked' : '' %>>
+          <label class="pill-option" for="freqWeekdays"><span class="pill-emoji">💼</span> Weekdays</label>
+          <input type="radio" id="freqWeekly" name="frequency" value="weekly" <%= habit && habit.frequency==='weekly' ? 'checked' : '' %>>
+          <label class="pill-option" for="freqWeekly"><span class="pill-emoji">🗓️</span> Weekly</label>
+        </div>
       </div>
       <div class="fg">
         <label for="hDesc">Description</label>

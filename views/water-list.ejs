@@ -18,15 +18,32 @@
         <div class="progress-fill" style="width:<%= progress %>%"></div>
       </div>
     </div>
-    <form method="POST" action="/water/create" class="water-quick-form" id="quickWaterForm">
+    <div class="water-tap-row">
+      <% [
+        { ml: 150, emoji: '🥃', label: 'Glass' },
+        { ml: 250, emoji: '🥤', label: 'Cup' },
+        { ml: 500, emoji: '🍶', label: 'Bottle' },
+        { ml: 1000, emoji: '💧', label: 'Big Bottle' }
+      ].forEach(function(opt){ %>
+      <form method="POST" action="/water/create" style="display:contents;">
+        <input type="hidden" name="log_date" value="<%= new Date().toISOString().slice(0,10) %>">
+        <input type="hidden" name="amount_ml" value="<%= opt.ml %>">
+        <button type="submit" class="water-tap-btn" id="waterTap<%= opt.ml %>">
+          <span class="water-tap-emoji"><%= opt.emoji %></span>
+          <span class="water-tap-label"><%= opt.label %></span>
+          <span class="water-tap-amt"><%= opt.ml %>ml</span>
+        </button>
+      </form>
+      <% }) %>
+    </div>
+    <button type="button" class="water-custom-toggle" data-toggle-target="waterCustomForm">Or log a custom amount <i class="fas fa-chevron-down" aria-hidden="true"></i></button>
+    <form method="POST" action="/water/create" class="water-quick-form" id="waterCustomForm" hidden>
       <input type="hidden" name="log_date" value="<%= new Date().toISOString().slice(0,10) %>">
-      <select name="amount_ml" id="waterAmount">
-        <option value="150">150 ml (Glass)</option>
-        <option value="250" selected>250 ml (Cup)</option>
-        <option value="500">500 ml (Bottle)</option>
-        <option value="1000">1000 ml (Large Bottle)</option>
-      </select>
-      <button type="submit" class="btn primary" id="addWaterBtn"><i class="fas fa-plus" aria-hidden="true"></i> Add Water</button>
+      <div class="fg" style="flex:1;min-width:200px;margin-bottom:0;">
+        <label for="waterCustomAmt">Amount: <span class="live-val" id="waterCustomVal">300</span> ml</label>
+        <input id="waterCustomAmt" type="range" name="amount_ml" min="50" max="2000" step="50" value="300" class="range-slider" data-live-label="waterCustomVal">
+      </div>
+      <button type="submit" class="btn primary" id="addWaterBtn"><i class="fas fa-plus" aria-hidden="true"></i> Add</button>
     </form>
   </div>
 

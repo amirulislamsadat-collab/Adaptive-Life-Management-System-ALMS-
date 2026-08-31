@@ -12,8 +12,15 @@
         <input id="wDate" type="date" name="log_date" required value="<%= new Date(log.log_date).toISOString().slice(0,10) %>">
       </div>
       <div class="fg">
-        <label for="wAmount">Amount (ml) <span class="required">*</span></label>
-        <input id="wAmount" type="number" name="amount_ml" min="1" required value="<%= log.amount_ml %>">
+        <label for="wAmount">Amount: <span class="live-val" id="wAmountVal"><%= log.amount_ml %></span> ml <span class="required">*</span></label>
+        <div class="quick-chip-row">
+          <button type="button" class="quick-chip" data-target="wAmount" data-val="250">🥤 250ml</button>
+          <button type="button" class="quick-chip" data-target="wAmount" data-val="500">🥛 500ml</button>
+          <button type="button" class="quick-chip" data-target="wAmount" data-val="750">🍶 750ml</button>
+          <button type="button" class="quick-chip" data-target="wAmount" data-val="1000">💧 1 Liter</button>
+        </div>
+        <input id="wAmount" type="range" name="amount_ml" min="50" max="2000" step="50" required value="<%= log.amount_ml %>" class="range-slider" data-live-label="wAmountVal">
+        <div class="slider-minmax"><span>50ml</span><span>2000ml</span></div>
       </div>
       <div class="form-actions">
         <a class="btn secondary" href="/water" id="cancelWaterBtn"><i class="fas fa-times" aria-hidden="true"></i> Cancel</a>

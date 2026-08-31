@@ -17,23 +17,32 @@
           <input id="exActivity" type="text" name="activity_type" required placeholder="e.g. Running, Cycling, Gym" value="<%= log ? log.activity_type : '' %>">
         </div>
       </div>
-      <div class="form-row">
-        <div class="fg">
-          <label for="exDuration">Duration (minutes) <span class="required">*</span></label>
-          <input id="exDuration" type="number" name="duration_minutes" min="1" required value="<%= log ? log.duration_minutes : '' %>">
+      <div class="fg">
+        <label for="exDuration">Duration: <span class="live-val" id="exDurationVal"><%= log ? log.duration_minutes : 30 %></span> min <span class="required">*</span></label>
+        <div class="quick-chip-row">
+          <button type="button" class="quick-chip" data-target="exDuration" data-val="15">15 min</button>
+          <button type="button" class="quick-chip" data-target="exDuration" data-val="30">30 min</button>
+          <button type="button" class="quick-chip" data-target="exDuration" data-val="45">45 min</button>
+          <button type="button" class="quick-chip" data-target="exDuration" data-val="60">60 min</button>
         </div>
-        <div class="fg">
-          <label for="exIntensity">Intensity</label>
-          <select id="exIntensity" name="intensity">
-            <option value="light" <%= log && log.intensity==='light' ? 'selected' : '' %>>Light</option>
-            <option value="moderate" <%= !log || log.intensity==='moderate' ? 'selected' : '' %>>Moderate</option>
-            <option value="intense" <%= log && log.intensity==='intense' ? 'selected' : '' %>>Intense</option>
-          </select>
+        <input id="exDuration" type="range" name="duration_minutes" min="5" max="180" step="5" required value="<%= log ? log.duration_minutes : 30 %>" class="range-slider" data-live-label="exDurationVal">
+        <div class="slider-minmax"><span>5 min</span><span>3 hrs</span></div>
+      </div>
+      <div class="fg">
+        <label>Intensity</label>
+        <div class="pill-picker">
+          <input type="radio" id="intLight" name="intensity" value="light" <%= log && log.intensity==='light' ? 'checked' : '' %>>
+          <label class="pill-option" for="intLight"><span class="pill-emoji">🚶</span> Light</label>
+          <input type="radio" id="intModerate" name="intensity" value="moderate" <%= !log || log.intensity==='moderate' ? 'checked' : '' %>>
+          <label class="pill-option" for="intModerate"><span class="pill-emoji">🏃</span> Moderate</label>
+          <input type="radio" id="intIntense" name="intensity" value="intense" <%= log && log.intensity==='intense' ? 'checked' : '' %>>
+          <label class="pill-option" for="intIntense"><span class="pill-emoji">🔥</span> Intense</label>
         </div>
       </div>
       <div class="fg">
-        <label for="exCalories">Calories Burned (optional)</label>
-        <input id="exCalories" type="number" name="calories_burned" min="0" value="<%= log && log.calories_burned ? log.calories_burned : '' %>">
+        <label for="exCalories">Calories Burned (optional): <span class="live-val" id="exCaloriesVal"><%= log && log.calories_burned ? log.calories_burned : 0 %></span></label>
+        <input id="exCalories" type="range" name="calories_burned" min="0" max="1000" step="10" value="<%= log && log.calories_burned ? log.calories_burned : 0 %>" class="range-slider" data-live-label="exCaloriesVal">
+        <div class="slider-minmax"><span>0</span><span>1000</span></div>
       </div>
       <div class="fg">
         <label for="exNotes">Notes</label>

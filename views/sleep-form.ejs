@@ -22,14 +22,19 @@
         </div>
       </div>
       <div class="fg">
-        <label for="slQuality">Sleep Quality</label>
-        <select id="slQuality" name="quality">
-          <option value="great" <%= log && log.quality==='great' ? 'selected' : '' %>>Great</option>
-          <option value="good" <%= log && log.quality==='good' ? 'selected' : '' %>>Good</option>
-          <option value="okay" <%= !log || log.quality==='okay' ? 'selected' : '' %>>Okay</option>
-          <option value="poor" <%= log && log.quality==='poor' ? 'selected' : '' %>>Poor</option>
-          <option value="bad" <%= log && log.quality==='bad' ? 'selected' : '' %>>Bad</option>
-        </select>
+        <label>Sleep Quality</label>
+        <div class="pill-picker">
+          <input type="radio" id="qGreat" name="quality" value="great" <%= log && log.quality==='great' ? 'checked' : '' %>>
+          <label class="pill-option" for="qGreat"><span class="pill-emoji">😄</span> Great</label>
+          <input type="radio" id="qGood" name="quality" value="good" <%= log && log.quality==='good' ? 'checked' : '' %>>
+          <label class="pill-option" for="qGood"><span class="pill-emoji">🙂</span> Good</label>
+          <input type="radio" id="qOkay" name="quality" value="okay" <%= !log || log.quality==='okay' ? 'checked' : '' %>>
+          <label class="pill-option" for="qOkay"><span class="pill-emoji">😐</span> Okay</label>
+          <input type="radio" id="qPoor" name="quality" value="poor" <%= log && log.quality==='poor' ? 'checked' : '' %>>
+          <label class="pill-option" for="qPoor"><span class="pill-emoji">😕</span> Poor</label>
+          <input type="radio" id="qBad" name="quality" value="bad" <%= log && log.quality==='bad' ? 'checked' : '' %>>
+          <label class="pill-option" for="qBad"><span class="pill-emoji">😞</span> Bad</label>
+        </div>
       </div>
       <div class="fg">
         <label for="slNotes">Notes</label>
