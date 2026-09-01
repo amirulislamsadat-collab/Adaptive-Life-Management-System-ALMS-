@@ -28,6 +28,12 @@ var savedTheme = localStorage.getItem('alms_theme');
 if (savedTheme === 'dark') {
   document.documentElement.setAttribute('data-theme', 'dark');
 }
+<% if (typeof user !== 'undefined' && user) { %>
+// Being here at all means this browser has signed in at least once, so the
+// login page can greet it as "Welcome Back" instead of a first-timer's
+// plain "Welcome!" from now on.
+try { localStorage.setItem('alms_returning_user', '1'); } catch (e) {}
+<% } %>
 </script>
 <% var setupDone = user && user.setup_completed == 1; %>
 <% if(setupDone){ %>

@@ -3,9 +3,19 @@
   <div class="auth-card">
     <div class="auth-icon-wrap">
       <div class="auth-icon"><i class="fas fa-infinity"></i></div>
-      <div class="auth-title">Welcome Back</div>
-      <div class="auth-sub">Sign in to your ALMS workspace</div>
+      <div class="auth-title" id="loginTitle">Welcome!</div>
+      <div class="auth-sub" id="loginSub">New here? Sign in below or create an account to get started.</div>
     </div>
+    <script>
+      (function() {
+        try {
+          if (localStorage.getItem('alms_returning_user') === '1') {
+            document.getElementById('loginTitle').textContent = 'Welcome Back';
+            document.getElementById('loginSub').textContent = 'Sign in to your ALMS workspace';
+          }
+        } catch (e) {}
+      })();
+    </script>
     <form method="POST" action="/login">
       <div class="form-grp">
         <label class="form-lbl">Email Address</label>
