@@ -17,4 +17,28 @@ const pool = mysql.createPool({
   connectionLimit: 10
 });
 
+// Cloud MySQL providers with a free/idle tier (Aiven included) can power
+// themselves off after a stretch of inactivity, so a query can start failing
+// at any point during the app's lifetime, not just at startup. Rather than
+// letting that show up as a different raw error on every single page, the
+// server checks this before routing each request and shows one friendly
+// "the database is asleep" page instead. Cached briefly so healthy traffic
+// doesn't pay for an extra round trip on every request, and re-checked often
+// enough that recovery (someone powers the database back on) is picked up
+// within moments, no redeploy needed.
+let lastHealthCheck = { ok: true, checkedAt: 0 };
+const HEALTH_CHECK_TTL_MS = 15000;
+
+pool.isHealthy = async () => {
+  const now = Date.now();
+  if (now - lastHealthCheck.checkedAt < HEALTH_CHECK_TTL_MS) return lastHealthCheck.ok;
+  try {
+    await pool.query('SELECT 1');
+    lastHealthCheck = { ok: true, checkedAt: now };
+  } catch (e) {
+    lastHealthCheck = { ok: false, checkedAt: now };
+  }
+  return lastHealthCheck.ok;
+};
+
 module.exports = pool;

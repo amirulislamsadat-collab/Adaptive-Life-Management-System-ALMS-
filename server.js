@@ -79,6 +79,20 @@ app.use((req, res, next) => {
   dbReady.then(() => next()).catch(next);
 });
 
+// --- DB Health Gate ---
+// Free/idle-tier cloud databases (Aiven included) can power themselves off
+// after a stretch of inactivity, which can happen well after startup, not
+// just at a cold start. Rather than every controller's own try/catch
+// surfacing a different raw error, this checks (cheaply, cached briefly —
+// see pool.isHealthy in config/db.js) before routing each request and shows
+// one friendly page instead. It clears itself automatically once the
+// database is reachable again, no redeploy needed.
+app.use(async (req, res, next) => {
+  const healthy = await db.isHealthy().catch(() => false);
+  if (!healthy) return res.status(503).render('db-sleeping');
+  next();
+});
+
 // --- Session ---
 app.use(session({
   secret: process.env.SESSION_SECRET || 'alms-secret-key-470',
